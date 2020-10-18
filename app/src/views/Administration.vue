@@ -92,15 +92,16 @@
                                     <v-list style="background: transparent">
                                         <v-list-item v-for="(url, index) in urls" :key="index">
                                             <v-list-item-icon>
-                                                <v-icon>attach_file</v-icon>
+                                                <v-btn icon @click.stop="window.open(url.link)">
+                                                    <v-icon color="white">attach_file</v-icon>
+                                                </v-btn>
                                             </v-list-item-icon>
                                             <v-list-item-title class="d-flex" style="width: 100px">
                                                 <span class="text-ellipsis" style="width: 50%">{{ url.name }}</span>
-                                                <a class="text-ellipsis ml-2" style="width: 50%" :href="url.link" target="_blank">{{ url.link }}</a>
                                             </v-list-item-title>
                                             <v-list-item-action>
                                                 <v-btn icon @click.stop="urls.splice(urls.indexOf(url), 1)">
-                                                    <v-icon color="error">delete</v-icon>
+                                                    <v-icon color="error" class="material-icons-outlined">delete</v-icon>
                                                 </v-btn>
                                             </v-list-item-action>
                                             <v-progress-linear v-if="progress[url.link]" style="position: absolute; top: 0; left: 0;"
@@ -206,8 +207,14 @@
         mounted() {
             this.buildTree();
 
-            this.$socket.on('progress', ({progress, link}) => {
+            this.$socket.on('progress', ({progress, link, name}) => {
                 this.progress[link] = progress;
+                if (!this.urls.find(u => u.link === link)) {
+                    this.urls.push({
+                        link: link,
+                        name: name
+                    });
+                }
                 this.$forceUpdate();
             });
 
@@ -217,7 +224,8 @@
                 this.buildTree();
             });
 
-            this.$socket.on('error', err => {
+            this.$socket.on('error', ({err, link}) => {
+                this.progress[link] = null;
                 console.error(err);
             });
         },
