@@ -1,0 +1,7 @@
+:not(.v-dialog) > .v-card {
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 50px !important;
+  padding: 1em;
+  background: #2d325a !important;
+}

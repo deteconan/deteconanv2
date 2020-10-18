@@ -1,0 +1,28 @@
+{
+  "name": "deteconan",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-modules --experimental-json-modules test.js",
+    "start-dev": "nodemon --experimental-modules --experimental-json-modules app.js",
+    "start": "node app.js",
+    "build": "cd app && npm cache -f clean && npm i chalk && npm i --only=dev && npm run build"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-async-errors": "^3.1.1",
+    "googleapis": "^61.0.0",
+    "http-errors": "~1.6.3",
+    "knex": "^0.21.6",
+    "mongoose": "^5.10.9",
+    "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
+    "pug": "2.0.0-beta11",
+    "socket.io": "^2.3.0",
+    "uuid": "^8.3.1"
+  }
+}
