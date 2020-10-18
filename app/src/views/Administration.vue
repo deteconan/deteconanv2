@@ -1,6 +1,6 @@
 <template>
     <main-page class="administration">
-        <div style="height: 8%">
+        <div style="height: 10%">
             <v-card elevation="0">
                 <h2 class="pl-2">Gestion des fichiers</h2>
             </v-card>
