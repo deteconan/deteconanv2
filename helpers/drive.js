@@ -44,9 +44,7 @@ export default class DriveHelper {
     }
 
     static async uploadFromTorrent(outputName, url, parentId, onProgress) {
-        let response = torrentStream(url, {
-            connections: 1000000
-        });
+        let response = torrentStream(url);
         let fileSize = 0, filename = '';
         await new Promise(resolve => {
             response.on('ready', function() {
