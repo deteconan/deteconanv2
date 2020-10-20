@@ -4,7 +4,7 @@ import axios from 'axios';
 import credentials from '../credentials/admin.json';
 import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
-import torrentStream from 'torrent-stream';
+import WebTorrent from 'webtorrent';
 import mime from 'mime';
 
 const jwToken = new google.auth.JWT(
@@ -44,17 +44,21 @@ export default class DriveHelper {
     }
 
     static async uploadFromTorrent(outputName, url, parentId, onProgress) {
-        let response = torrentStream(url);
+        let response = null;
+        let client = new WebTorrent();
         let fileSize = 0, filename = '';
+
         await new Promise(resolve => {
-            response.on('ready', function() {
-                let selected = response.files[0];
-                response.files.forEach(file => {
+            client.add(url, torrent => {
+                let selected = torrent.files[0];
+                torrent.files.forEach(file => {
                     if (file.length > selected.length)
                         selected = file;
                 });
+
                 fileSize = selected.length;
                 filename = selected.name;
+
                 response = selected.createReadStream();
                 resolve();
             });
@@ -210,11 +214,11 @@ export default class DriveHelper {
     }
 
     static async deleteFile(fileId) {
-        const res = await drive.files.delete({
+        await drive.files.delete({
             fileId: fileId
+        }).catch(err => {
+            console.log(err);
         });
-
-        return res.data;
     }
 
     static async createFolder(name, parentId) {
