@@ -1,7 +1,6 @@
 import express from 'express';
 import DriveHelper from "../helpers/drive.js";
 import {checkRequiredPOST} from "../helpers/middlewares.js";
-import Folders from '../models/folders.js';
 
 const router = express.Router();
 
@@ -10,24 +9,9 @@ router.get('/files/tree', async (req, res) => {
   res.json(tree);
 });
 
-router.post('/files/upload/urls', checkRequiredPOST('urls'), async (req, res) => {
-  const urls = req.body.urls;
-  const parentId = req.body.parent_id;
-
-  if (!Array.isArray(urls))
-    return res.status(HTTP_BAD_REQUEST).send('urls must be an array');
-
-  const parent = await Folders.find({ _id: parentId });
-  if (!parent)
-    return res.status(HTTP_BAD_REQUEST).send('parent does not exist');
-
-  for (let url of urls) {
-    await DriveHelper.uploadFromUrl(url.name, url.link, parentId, progress => {
-
-    });
-  }
-
-  res.sendStatus(HTTP_OK);
+router.post('/files/delete', checkRequiredPOST('file_id'), async (req, res) => {
+  await DriveHelper.deleteFile(req.body.file_id);
+  res.json(HTTP_OK);
 });
 
 export default router;

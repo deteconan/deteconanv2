@@ -24,14 +24,14 @@
                             </div>
                         </div>
                         <template v-else-if="items.length > 0">
-                            <v-treeview v-model="tree" :open.sync="open" :items="items" activatable item-key="id" return-object open-all @update:active="selectFile">
+                            <v-treeview v-model="tree" :open.sync="open" :items.sync="items" activatable item-key="id" return-object open-all @update:active="selectFile">
                                 <template #label="{ item, open }">
                                     <div @contextmenu="onRightClick($event, item)" @click="selectFile(item)" style="cursor: pointer">
                                         <v-icon v-if="item.mimeType === 'folder'">
                                             {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                                         </v-icon>
                                         <v-icon class="material-icons-outlined" v-else>
-                                            {{ icons[item.mimeType] }}
+                                            {{ item | icon }}
                                         </v-icon>
                                         <span class="pl-2">{{ item.name }}</span>
                                     </div>
@@ -101,7 +101,7 @@
                                             </v-list-item-title>
                                             <v-list-item-action>
                                                 <v-btn icon @click.stop="urls.splice(urls.indexOf(url), 1)">
-                                                    <v-icon color="error" class="material-icons-outlined">delete</v-icon>
+                                                    <v-icon color="error" class="material-icons-outlined" title="Annuler">close</v-icon>
                                                 </v-btn>
                                             </v-list-item-action>
                                             <v-progress-linear v-if="progress[url.link]" style="position: absolute; top: 0; left: 0;"
@@ -180,8 +180,8 @@
         data() {
             return {
                 foldersMenuOptions: [
-                    { title: 'Renommer', action: folder => console.log(folder.id), color: 'dark', icon: 'edit' },
-                    { title: 'Supprimer', action: folder => console.log(folder.name), color: 'error', icon: 'delete' }
+                    { title: 'Renommer', action: file => console.log(file.id), color: 'dark', icon: 'edit' },
+                    { title: 'Supprimer', action: file => this.deleteFile(file), color: 'error', icon: 'delete' }
                 ],
                 fileSelected: null,
                 loadingFolders: false,
@@ -191,10 +191,6 @@
                 tree: [],
                 items: [],
                 open: [],
-                icons: {
-                    'video/mp4': 'movie',
-                    'image/jpeg': 'image'
-                },
                 uploadMode: 'url',
                 url: {
                     name: null,
@@ -317,9 +313,9 @@
                 this.loadingFolders = true;
                 Network.get('/files/tree').then(res => {
                     this.items = res.data;
+                    this.$forceUpdate();
                 }).finally(() => {
                     this.loadingFolders = false;
-                    this.$forceUpdate();
                 });
             },
             uploadFromUrl() {
@@ -337,14 +333,15 @@
                 });
                 this.url.name = null;
                 this.url.link = null;
-
-                /* Network.post('/files/upload/urls', {
-                    urls: this.urls,
-                    parent_id: this.fileSelected.id
-                }).then(() => {
-                    this.urls = [];
-                    this.buildTree();
-                }); */
+            },
+            deleteFile(file) {
+                if (file.mimeType !== 'folder') {
+                    Network.post('/files/delete', {
+                        file_id: file.id
+                    }).then(() => {
+                        this.buildTree();
+                    });
+                }
             }
         }
     }

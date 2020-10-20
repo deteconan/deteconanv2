@@ -1,5 +1,4 @@
 import express from 'express';
-import 'express-async-errors';
 import path from 'path';
 import { sendError } from './helpers/utils.js';
 import DB from './helpers/DB.js';

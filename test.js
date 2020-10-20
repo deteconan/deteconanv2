@@ -14,9 +14,9 @@ async function test() {
     // const res = await IamHelper.createServiceAccount(config.projectId);
 
     DB.init();
-    await DriveHelper.uploadFromUrl('james', 'https://www.w3schools.com/html/mov_bbb.mp4', config.fileId, '5f8a7de9984b01115007d89e');
-    // const files = await DriveHelper.listFiles(config.fileId);
-    // console.log(files);
+    // await DriveHelper.uploadFromUrl('james', 'https://www.w3schools.com/html/mov_bbb.mp4', config.fileId, '5f8a7de9984b01115007d89e');
+    const files = await DriveHelper.listFiles(config.fileId);
+    console.log(files);
     // await DriveHelper.createFolder('Navets', '5f8a78a89a206e33c0450a58');
 
     DB.close();

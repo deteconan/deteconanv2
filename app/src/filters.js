@@ -24,3 +24,12 @@ Vue.filter('mimeType', value => {
 
     return value.mimeType;
 });
+
+Vue.filter('icon', value => {
+    if (value.mimeType.includes('video'))
+        return 'movie';
+    else if (value.mimeType.includes('image'))
+        return 'image';
+    else
+        return null;
+});

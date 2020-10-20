@@ -4,6 +4,8 @@ import axios from 'axios';
 import credentials from '../credentials/admin.json';
 import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
+import torrentStream from 'torrent-stream';
+import mime from 'mime';
 
 const jwToken = new google.auth.JWT(
     credentials.client_email,
@@ -39,6 +41,67 @@ export default class DriveHelper {
         });
 
         return res.data.storageQuota;
+    }
+
+    static async uploadFromTorrent(outputName, url, parentId, onProgress) {
+        let response = torrentStream(url, {
+            connections: 1000000
+        });
+        let fileSize = 0, filename = '';
+        await new Promise(resolve => {
+            response.on('ready', function() {
+                let selected = response.files[0];
+                response.files.forEach(file => {
+                    if (file.length > selected.length)
+                        selected = file;
+                });
+                fileSize = selected.length;
+                filename = selected.name;
+                response = selected.createReadStream();
+                resolve();
+            });
+        });
+
+        let metadata = {
+            name: outputName,
+            parents: [config.fileId],
+            appProperties: {
+                parentId
+            }
+        };
+
+        let media = {
+            mimeType: mime.getType(filename),
+            body: response
+        };
+
+        let time = new Date().getTime();
+        const res = await drive.files.create({
+            auth: jwToken,
+            resource: metadata,
+            media: media,
+            fields: 'id'
+        }, {
+            onUploadProgress: e => {
+                // process.stdout.clearLine();
+                // process.stdout.cursorTo(0);
+                let progress = Math.round(Number(e.bytesRead.toString()) * 10000 / Number(fileSize)) / 100;
+                // process.stdout.write(JSON.stringify(progress) + '%');
+
+                if (onProgress) {
+                    let now = new Date().getTime();
+
+                    if (now - time >= 2000) {
+                        onProgress(progress);
+                        time = now;
+                    }
+                }
+            }
+        }).catch(err => {
+            console.error(err);
+        });
+
+        return res.data;
     }
 
     static async uploadFromUrl(outputName, url, parentId, onProgress) {
@@ -87,6 +150,8 @@ export default class DriveHelper {
                     }
                 }
             }
+        }).catch(err => {
+            console.error(err);
         });
 
         // process.stdout.clearLine();
