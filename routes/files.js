@@ -8,10 +8,10 @@ import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
 
 TorrentSearchApi.enableProvider('Torrent9');
-TorrentSearchApi.enableProvider('Torrentz2');
+// TorrentSearchApi.enableProvider('Torrentz2');
 TorrentSearchApi.enableProvider('Limetorrents');
 TorrentSearchApi.enableProvider('ThePirateBay');
-TorrentSearchApi.enableProvider('KickassTorrents');
+// TorrentSearchApi.enableProvider('KickassTorrents');
 TorrentSearchApi.enableProvider('Rarbg');
 
 const router = express.Router();
