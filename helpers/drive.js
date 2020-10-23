@@ -281,6 +281,8 @@ export default class DriveHelper {
         }).catch(err => {
             console.log(err);
         });
+
+        await this.updateQuota(credentials.client_email);
     }
 
     static async createFolder(name, parentId) {

@@ -15,8 +15,10 @@ export function uploadImage(url) {
         imgur.upload(url, (err, res) => {
             if (err)
                 reject(err);
-            else
+            else if (res.data)
                 resolve(res.data.link);
+            else
+                resolve('none');
         });
     });
 }

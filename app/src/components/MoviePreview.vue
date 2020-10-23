@@ -8,6 +8,9 @@
             <v-btn @click.stop="deleteMovie" class="delete-btn" icon>
                 <v-icon color="error" class="material-icons-outlined">delete</v-icon>
             </v-btn>
+            <div v-if="processing" class="processing">
+                <v-icon>hourglass_top</v-icon>
+            </div>
         </div>
         <div :title="movie.name" class="movie-title">{{ movie.name }}</div>
     </div>
@@ -29,6 +32,11 @@
                 imageLoaded: false
             }
         },
+        computed: {
+            processing() {
+                return !this.movie.thumbnailLink;
+            }
+        },
         methods: {
             deleteMovie() {
                 if (!this.movie.id)
@@ -48,6 +56,7 @@
 
 <style lang="scss" scoped>
     .movie-preview {
+        position: relative;
         width: 150px;
 
         .img-container {
@@ -129,6 +138,23 @@
 
             &:hover {
                 text-decoration: underline;
+            }
+        }
+
+        .processing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--v-secondary-base);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+
+            i {
+                font-size: 10pt;
             }
         }
     }
