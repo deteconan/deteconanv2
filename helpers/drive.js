@@ -10,6 +10,7 @@ import mime from 'mime';
 import Credentials from "../models/credentials.js";
 import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
+import moment from 'moment';
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
@@ -119,7 +120,8 @@ export default class DriveHelper {
             appProperties: {
                 parentId,
                 image,
-                year
+                year,
+                upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
 
@@ -195,7 +197,8 @@ export default class DriveHelper {
             name: outputName,
             parents: [config.fileId],
             appProperties: {
-                parentId
+                parentId,
+                upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
 
