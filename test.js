@@ -7,6 +7,7 @@ import config from './credentials/config.json';
 import './helpers/mongodb.js';
 import Credentials from './models/credentials.js';
 import TorrentSearchApi from 'torrent-search-api';
+import imgur from 'imgur-node-api';
 
 import googleapis from 'googleapis';
 const { google } = googleapis;
@@ -22,8 +23,8 @@ async function test() {
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);
     });*/
-    const files = await DriveHelper.listFiles(config.fileId);
-    console.log(files);
+    // const files = await DriveHelper.listFiles(config.fileId);
+    // console.log(files);
     // await DriveHelper.createFolder('Navets', '5f8a78a89a206e33c0450a58');
     // await DriveHelper.uploadFromUrl('test', 'https://img.theculturetrip.com/768x432/wp-content/uploads/2015/12/56-3639490-1428514993312c2c5529f443b6b5fe7ffe0b4e4973.jpg', config.fileId);
     TorrentSearchApi.enableProvider('Torrent9');
@@ -33,6 +34,11 @@ async function test() {
     TorrentSearchApi.enableProvider('ThePirateBay');
     TorrentSearchApi.enableProvider('KickassTorrents');
     TorrentSearchApi.enableProvider('Rarbg');
+    await imgur.setClientID('964df2aa43d23c0');
+    await imgur.upload('https://m.media-amazon.com/images/M/MV5BMGZlNTY1ZWUtYTMzNC00ZjUyLWE0MjQtMTMxN2E3ODYxMWVmXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_.jpg', (err, res) => {
+        console.log(res.data.link);
+        console.log(err);
+    });
     // TorrentSearchApi.enableProvider('TorrentProject');
     // TorrentSearchApi.enableProvider('Yts');
 

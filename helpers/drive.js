@@ -8,6 +8,7 @@ import config from '../credentials/config.json';
 import WebTorrent from 'webtorrent';
 import mime from 'mime';
 import Credentials from "../models/credentials.js";
+import {uploadImage} from "./utils.js";
 
 const jwToken = new google.auth.JWT(
     credentials.client_email,
@@ -95,6 +96,12 @@ export default class DriveHelper {
             });
         });
 
+        if (image) {
+            console.log('Uploading image');
+            image = await uploadImage(image);
+            console.log('Image uploaded: ' + image);
+        }
+
         let metadata = {
             name: outputName,
             parents: [config.fileId],
@@ -157,6 +164,12 @@ export default class DriveHelper {
         const quota = await this.getQuota();
         console.log('file size: ' + response.data.headers['content-length']);
         console.log('quota remaining: ' + ( Number(quota.limit) - (Number(quota.usage) + Number(response.data.headers['content-length'])) ));
+
+        if (image) {
+            console.log('Uploading image');
+            image = await uploadImage(image);
+            console.log('Image uploaded: ' + image);
+        }
 
         let metadata = {
             name: outputName,
