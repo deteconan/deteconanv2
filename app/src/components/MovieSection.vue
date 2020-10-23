@@ -1,7 +1,7 @@
 <template>
     <div class="movie-section" ref="movies">
         <div class="mb-3 d-flex align-center">
-            <h3 v-if="title">{{ title }}</h3>
+            <h3 class="text-spaced" v-if="title">{{ title }}</h3>
 
             <v-btn @click="prev" rounded icon class="ml-auto" :disabled="!canPrev">
                 <v-icon>chevron_left</v-icon>

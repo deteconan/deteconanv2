@@ -23,21 +23,18 @@ async function test() {
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);
     });*/
-    const quota = await DriveHelper.getQuota();
-    console.log(parseInt(quota.limit) - parseInt(quota.usage));
-    // const files = await DriveHelper.listFiles(config.fileId);
-    // console.log(files);
+    // const quota = await DriveHelper.getQuota();
+    // console.log(parseInt(quota.limit) - parseInt(quota.usage));
+    const files = await DriveHelper.listFiles(config.fileId);
+    console.log(files);
     // await DriveHelper.createFolder('Navets', '5f8a78a89a206e33c0450a58');
     // await DriveHelper.uploadFromUrl('test', 'https://img.theculturetrip.com/768x432/wp-content/uploads/2015/12/56-3639490-1428514993312c2c5529f443b6b5fe7ffe0b4e4973.jpg', config.fileId);
     TorrentSearchApi.enableProvider('Torrent9');
     TorrentSearchApi.enableProvider('Torrentz2');
     TorrentSearchApi.enableProvider('Limetorrents');
-    // TorrentSearchApi.enableProvider('1337x');
     TorrentSearchApi.enableProvider('ThePirateBay');
     TorrentSearchApi.enableProvider('KickassTorrents');
     TorrentSearchApi.enableProvider('Rarbg');
-    // TorrentSearchApi.enableProvider('TorrentProject');
-    // TorrentSearchApi.enableProvider('Yts');
 
     // let res = await TorrentSearchApi.search(`Nicky Larson Private Eyes`, null, 3);
     // res = res.filter(r => r.title !== 'No results returned'); // The Pirate Bay returns an error object so need to remove it
