@@ -26,26 +26,32 @@ router.get('/files/tree', async (req, res) => {
 });
 
 router.get('/folders', async (req, res) => {
-  try {
-    let folders = await Folder.find();
-    folders = folders.map(f => {
-      return {
-        id: f._id,
-        name: f.name
-      }
-    });
-    res.json(folders);
-  } catch (err) {
-    sendError(err, req, res);
-  }
+    try {
+        let folders = await Folder.find();
+        folders = folders.map(f => {
+            return {
+                id: f._id,
+                name: f.name
+            }
+        });
+        res.json(folders);
+    } catch (err) {
+        sendError(err, req, res);
+    }
 });
 
 router.get('/movies', async (req, res) => {
   try {
-    const movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
-    res.json(movies);
+      let movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
+      movies.forEach(m => {
+          m.image = m.appProperties.image;
+          m.year = m.appProperties.year;
+          m.parentId = m.appProperties.parentId;
+          delete m.appProperties;
+      });
+      res.json(movies);
   } catch (err) {
-    sendError(err, req, res);
+      sendError(err, req, res);
   }
 });
 

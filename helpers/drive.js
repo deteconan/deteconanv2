@@ -99,7 +99,9 @@ export default class DriveHelper {
             name: outputName,
             parents: [config.fileId],
             appProperties: {
-                parentId
+                parentId,
+                image,
+                year
             }
         };
 
