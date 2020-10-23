@@ -1,7 +1,7 @@
 import googleapis from 'googleapis';
 const { google } = googleapis;
 import axios from 'axios';
-import credentials from '../credentials/admin.json';
+import admin from '../credentials/admin.json';
 import Folder from '../models/folders.js';
 import FileAccount from '../models/files_accounts.js';
 import config from '../credentials/config.json';
@@ -9,11 +9,12 @@ import WebTorrent from 'webtorrent';
 import mime from 'mime';
 import Credentials from "../models/credentials.js";
 import {uploadImage} from "./utils.js";
+import IamHelper from "./iam.js";
 
 const jwToken = new google.auth.JWT(
-    credentials.client_email,
+    admin.client_email,
     null,
-    credentials.private_key,
+    admin.private_key,
     ['https://www.googleapis.com/auth/drive'],
     null
 );
@@ -38,9 +39,20 @@ export default class DriveHelper {
         return res.data;
     }
 
-    static async getQuota() {
+    static async getQuota(accountEmail = admin.client_email) {
+        const cred = await Credentials.findOne({ client_email: accountEmail });
+
+        const token = new google.auth.JWT(
+            cred.client_email,
+            null,
+            cred.private_key,
+            ['https://www.googleapis.com/auth/drive'],
+            null
+        );
+
         const res = await drive.about.get({
-            fields: 'storageQuota'
+            fields: 'storageQuota',
+            auth: token
         });
 
         return res.data.storageQuota;
@@ -49,11 +61,10 @@ export default class DriveHelper {
     static async updateQuota(accountEmail = null) {
         let accounts = [];
 
-        if (accountEmail) {
+        if (accountEmail)
             accounts = await Credentials.find({ client_email: accountEmail });
-        } else {
+        else
             accounts = await Credentials.find();
-        }
 
         for (let account of accounts) {
             const jwToken = new google.auth.JWT(
@@ -117,9 +128,18 @@ export default class DriveHelper {
             body: response
         };
 
+        const cred = await IamHelper.getAccountWithEnoughQuota(fileSize);
+        const token = new google.auth.JWT(
+            cred.client_email,
+            null,
+            cred.private_key,
+            ['https://www.googleapis.com/auth/drive'],
+            null
+        );
+
         let time = new Date().getTime();
         const res = await drive.files.create({
-            auth: jwToken,
+            auth: token,
             resource: metadata,
             media: media,
             fields: 'id'
@@ -145,11 +165,11 @@ export default class DriveHelper {
 
         const fileAccount = new FileAccount({
             file_id: res.data.id,
-            account_email: credentials.client_email
+            account_email: cred.client_email
         });
 
         await fileAccount.save();
-        await this.updateQuota(credentials.client_email);
+        await this.updateQuota(cred.client_email);
 
         return res.data;
     }
@@ -184,9 +204,18 @@ export default class DriveHelper {
             body: response.data
         };
 
+        const cred = await IamHelper.getAccountWithEnoughQuota(fileSize);
+        const token = new google.auth.JWT(
+            cred.client_email,
+            null,
+            cred.private_key,
+            ['https://www.googleapis.com/auth/drive'],
+            null
+        );
+
         let time = new Date().getTime();
         const res = await drive.files.create({
-            auth: jwToken,
+            auth: token,
             resource: metadata,
             media: media,
             fields: 'id'
@@ -214,11 +243,11 @@ export default class DriveHelper {
 
         const fileAccount = new FileAccount({
             file_id: res.data.id,
-            account_email: credentials.client_email
+            account_email: cred.client_email
         });
 
         await fileAccount.save();
-        await this.updateQuota(credentials.client_email);
+        await this.updateQuota(cred.client_email);
 
         return res.data;
     }
@@ -276,13 +305,26 @@ export default class DriveHelper {
     }
 
     static async deleteFile(fileId) {
+        const fileAccount = await FileAccount.findOne({ file_id: fileId });
+        const cred = await Credentials.findOne({ client_email: fileAccount.account_email });
+
+        const token = new google.auth.JWT(
+            cred.client_email,
+            null,
+            cred.private_key,
+            ['https://www.googleapis.com/auth/drive'],
+            null
+        );
+
         await drive.files.delete({
-            fileId: fileId
+            fileId: fileId,
+            auth: token
         }).catch(err => {
             console.log(err);
         });
 
-        await this.updateQuota(credentials.client_email);
+        await this.updateQuota(admin.client_email);
+        await FileAccount.deleteOne({ file_id: file.file_id });
     }
 
     static async createFolder(name, parentId) {

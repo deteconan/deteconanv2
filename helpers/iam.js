@@ -4,6 +4,8 @@ const iam = google.iam('v1');
 import credentials from '../credentials/admin.json';
 import { v4 as uuid } from 'uuid';
 import Credentials from '../models/credentials.js';
+import config from '../credentials/config.json';
+import DriveHelper from "./drive.js";
 
 const jwToken = new google.auth.JWT(
     credentials.client_email,
@@ -90,6 +92,17 @@ export default class IamHelper {
         });
 
         return JSON.parse(Buffer.from(res.data.privateKeyData, 'base64').toString()); // Decode Base64
+    }
+
+    static async getAccountWithEnoughQuota(sizeInBytes) {
+        let cred = await Credentials.findOne({ remaining_quota: { $gte: sizeInBytes } });
+
+        if (!cred) { // If there is no account with enough quota
+            // Create a new one
+            cred = await this.createServiceAccount(config.projectId);
+            await DriveHelper.grantUserPermission(config.fileId, cred.client_email);
+        }
+        return cred;
     }
 
 }
