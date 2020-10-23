@@ -221,6 +221,7 @@
                 this.uploadType = null;
                 this.movieDetails = null;
                 this.movieTorrent = null;
+                this.folderSelected = null;
             },
             upload() {
                 if (!this.canUpload)
