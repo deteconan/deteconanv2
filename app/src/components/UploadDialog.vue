@@ -45,12 +45,12 @@
                         </v-select>
 
                         <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents"
-                               class="d-block mx-auto" v-if="autocomplete.length === 0 || torrents.length === 0">
+                               class="d-block mx-auto" v-if="autocomplete.length === 0 && torrents.length === 0">
                             <v-icon>search</v-icon>
                             <span class="ml-1">Rechercher</span>
                         </v-btn>
 
-                        <template v-if="autocomplete.length > 0 && torrents.length > 0">
+                        <template v-if="autocomplete.length > 0 || torrents.length > 0">
                             <v-tabs v-model="moviesTab" grow>
                                 <v-tab href="#info">Informations</v-tab>
                                 <v-tab href="#torrents">Torrents</v-tab>

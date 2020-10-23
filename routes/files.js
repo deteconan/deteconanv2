@@ -89,6 +89,10 @@ router.post('/movies/autocomplete', checkRequiredPOST('name'), async (req, res) 
 router.post('/movies/torrents', checkRequiredPOST('name'), async (req, res) => {
   try {
     let torrents = await TorrentSearchApi.search(req.body.name, null, 10);
+    for (let torrent of torrents) {
+      if (!torrent.magnet)
+          torrent.magnet = await TorrentSearchApi.getMagnet(torrent);
+    }
     torrents = torrents.filter(t => t.title !== 'No results returned' && t.magnet); // The Pirate Bay returns an error object so need to remove it
     torrents = torrents.map(t => {
       return {

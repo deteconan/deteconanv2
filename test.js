@@ -7,7 +7,6 @@ import config from './credentials/config.json';
 import './helpers/mongodb.js';
 import Credentials from './models/credentials.js';
 import TorrentSearchApi from 'torrent-search-api';
-import imgur from 'imgur-node-api';
 
 import googleapis from 'googleapis';
 const { google } = googleapis;
@@ -34,17 +33,16 @@ async function test() {
     TorrentSearchApi.enableProvider('ThePirateBay');
     TorrentSearchApi.enableProvider('KickassTorrents');
     TorrentSearchApi.enableProvider('Rarbg');
-    await imgur.setClientID('964df2aa43d23c0');
-    await imgur.upload('https://m.media-amazon.com/images/M/MV5BMGZlNTY1ZWUtYTMzNC00ZjUyLWE0MjQtMTMxN2E3ODYxMWVmXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_.jpg', (err, res) => {
-        console.log(res.data.link);
-        console.log(err);
-    });
     // TorrentSearchApi.enableProvider('TorrentProject');
     // TorrentSearchApi.enableProvider('Yts');
 
-    // let res = await TorrentSearchApi.search(`Qu'est-ce qu'on a fait au bon dieu`, null, 3);
+    let res = await TorrentSearchApi.search(`Nicky Larson Private Eyes`, null, 3);
     // res = res.filter(r => r.title !== 'No results returned'); // The Pirate Bay returns an error object so need to remove it
-    // console.log(res);
+    for (let torrent of res) {
+        if (!torrent.magnet)
+            torrent.magnet = await TorrentSearchApi.getMagnet(torrent);
+    }
+    console.log(res);
 
     DB.close();
 }
