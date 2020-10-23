@@ -42,7 +42,7 @@ router.get('/folders', async (req, res) => {
 
 router.get('/movies', async (req, res) => {
   try {
-    const movies = await DriveHelper.listFiles(config.fileId, '5f8a7de9984b01115007d89e'); // Movies folder
+    const movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
     res.json(movies);
   } catch (err) {
     sendError(err, req, res);
