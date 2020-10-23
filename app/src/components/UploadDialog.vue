@@ -191,27 +191,29 @@
                 if (!this.file.name)
                     return;
 
-                this.loadingMoviesInfo = true;
-                Network.post('/movies/autocomplete', {
-                    name: this.file.name
-                }).then(res => {
-                    this.movieDetails = null;
-                    this.autocomplete = res.data;
-                }).catch(err => {
-                    this.autocomplete = [];
-                    console.error(err.response.data);
-                }).finally(() => this.loadingMoviesInfo = false);
+                if (!this.movieDetails) {
+                    this.loadingMoviesInfo = true;
+                    Network.post('/movies/autocomplete', {
+                        name: this.file.name
+                    }).then(res => {
+                        this.autocomplete = res.data;
+                    }).catch(err => {
+                        this.autocomplete = [];
+                        console.error(err.response.data);
+                    }).finally(() => this.loadingMoviesInfo = false);
+                }
 
-                this.loadingMoviesTorrents = true;
-                Network.post('/movies/torrents', {
-                    name: this.file.name
-                }).then(res => {
-                    this.movieTorrent = null;
-                    this.torrents = res.data;
-                }).catch(err => {
-                    this.torrents = [];
-                    console.error(err);
-                }).finally(() => this.loadingMoviesTorrents = false);
+                if (!this.movieTorrent) {
+                    this.loadingMoviesTorrents = true;
+                    Network.post('/movies/torrents', {
+                        name: this.file.name
+                    }).then(res => {
+                        this.torrents = res.data;
+                    }).catch(err => {
+                        this.torrents = [];
+                        console.error(err);
+                    }).finally(() => this.loadingMoviesTorrents = false);
+                }
             },
             reset() {
                 this.file.name = null;
