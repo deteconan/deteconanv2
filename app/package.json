@@ -1,25 +1,23 @@
 {
-  "name": "deteconan",
+  "name": "deteconanv2",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "./node_modules/.bin/vue-cli-service serve --port 8080",
     "build-dev": "./node_modules/.bin/vue-cli-service build --mode local",
     "build": "./node_modules/.bin/vue-cli-service build --mode live",
-    "lint": "./node_modules/.bin/vue-cli-service lint",
-    "android": "npm run build && npx cap sync android && npx cap copy android && npx cap open android"
+    "lint": "./node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
-    "deepmerge": "^4.2.2",
-    "fibers": "^5.0.0",
-    "sass": "^1.26.10",
-    "sass-loader": "^10.0.1",
+    "sass": "^1.27.0",
+    "sass-loader": "^10.0.3",
     "socket.io-client": "^2.3.1",
     "vue": "^2.6.11",
-    "vue-router": "^3.4.3",
-    "vuetify": "^2.3.10"
+    "vue-router": "^3.4.7",
+    "vuetify": "^2.3.14",
+    "vuex": "^3.5.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

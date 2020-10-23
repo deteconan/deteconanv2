@@ -6,11 +6,18 @@ import './helpers/mongodb.js';
 import http from 'http';
 import SocketIO from 'socket.io';
 import Sockets from './helpers/sockets.js';
+import schedule from 'node-schedule';
+import filesRoutes from './routes/files.js';
+import DriveHelper from "./helpers/drive.js";
 
 const app = express();
 DB.init();
 
-import filesRoutes from './routes/files.js';
+if (process.env.NODE_ENV) { // Not in local
+  schedule.scheduleJob({hour: 23, minute: 0}, async () => { // Every days at 11pm
+    await DriveHelper.updateQuota();
+  });
+}
 
 // HTTP codes
 global.HTTP_OK = 200;

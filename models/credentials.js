@@ -10,7 +10,8 @@ const credentials = new mongoose.Schema({
     auth_uri: String,
     token_uri: String,
     auth_provider_x509_cert_url: String,
-    client_x509_cert_url: String
+    client_x509_cert_url: String,
+    remaining_quota: Number
 });
 
 export default mongoose.model('Credentials', credentials);

@@ -34,8 +34,6 @@ export default class IamHelper {
     }
 
     static async createServiceAccount(projectId) {
-        const size = (await this.getServiceAccounts(projectId)).length;
-
         const letter = String.fromCharCode(97+Math.floor(Math.random() * 26));
         let name = uuid().split('-').join('');
         name = letter + name.slice(0, 9);
@@ -73,7 +71,7 @@ export default class IamHelper {
         const credDB = new Credentials(cred);
         await credDB.save();
 
-        return res.data;
+        return cred;
     }
 
     static async getServiceAccountKeys(projectId, accountId) {

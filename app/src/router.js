@@ -1,23 +1,22 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from 'vue'
+import Router from 'vue-router'
+import Movies from "@/views/Movies.vue"
+import Upload from "@/views/Upload.vue"
 
-import Home from "@/views/Home.vue";
-import Administration from "@/views/Administration.vue";
-
-Vue.use(Router);
+Vue.use(Router)
 
 export default new Router({
     mode: `history`,
     routes: [
         {
-            path: `/`,
-            name: `home`,
-            component: Home
+            path: `/movies`,
+            name: `movies`,
+            component: Movies
         },
         {
-            path: '/dashboard',
-            name: 'dashboard',
-            component: Administration
+            path: `/upload`,
+            name: `upload`,
+            component: Upload
         }
     ]
-});
+})

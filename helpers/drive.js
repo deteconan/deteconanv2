@@ -3,9 +3,11 @@ const { google } = googleapis;
 import axios from 'axios';
 import credentials from '../credentials/admin.json';
 import Folder from '../models/folders.js';
+import FileAccount from '../models/files_accounts.js';
 import config from '../credentials/config.json';
 import WebTorrent from 'webtorrent';
 import mime from 'mime';
+import Credentials from "../models/credentials.js";
 
 const jwToken = new google.auth.JWT(
     credentials.client_email,
@@ -43,7 +45,36 @@ export default class DriveHelper {
         return res.data.storageQuota;
     }
 
-    static async uploadFromTorrent(outputName, url, parentId, onProgress) {
+    static async updateQuota(accountEmail = null) {
+        let accounts = [];
+
+        if (accountEmail) {
+            accounts = await Credentials.find({ client_email: accountEmail });
+        } else {
+            accounts = await Credentials.find();
+        }
+
+        for (let account of accounts) {
+            const jwToken = new google.auth.JWT(
+                account.client_email,
+                null,
+                account.private_key,
+                ['https://www.googleapis.com/auth/drive'],
+                null
+            );
+
+            const res = await drive.about.get({
+                fields: 'storageQuota',
+                auth: jwToken
+            });
+
+            const remaining = parseInt(res.data.storageQuota.limit) - parseInt(res.data.storageQuota.usage);
+            await Credentials.updateOne({ client_email: account.client_email }, { $set: { remaining_quota: remaining } });
+            console.log(account.client_email, '-> quota updated');
+        }
+    }
+
+    static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, onProgress) {
         let response = null;
         let client = new WebTorrent();
         let fileSize = 0, filename = '';
@@ -103,10 +134,18 @@ export default class DriveHelper {
             console.error(err);
         });
 
+        const fileAccount = new FileAccount({
+            file_id: res.data.id,
+            account_email: credentials.client_email
+        });
+
+        await fileAccount.save();
+        await this.updateQuota(credentials.client_email);
+
         return res.data;
     }
 
-    static async uploadFromUrl(outputName, url, parentId, onProgress) {
+    static async uploadFromUrl(outputName, url, parentId, image = null, year = null, onProgress) {
         const response = await axios({
             url,
             method: 'GET',
@@ -157,6 +196,14 @@ export default class DriveHelper {
         });
 
         // process.stdout.clearLine();
+
+        const fileAccount = new FileAccount({
+            file_id: res.data.id,
+            account_email: credentials.client_email
+        });
+
+        await fileAccount.save();
+        await this.updateQuota(credentials.client_email);
 
         return res.data;
     }

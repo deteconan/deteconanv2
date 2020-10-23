@@ -6,26 +6,26 @@ export default {
         let sockets = io.of('/upload');
         sockets.on('connection', (socket) => {
 
-            socket.on('upload_url', async ({ url, parent_id }) => {
-                const parent = await Folders.find({ _id: parent_id });
+            socket.on('upload_url', async (media) => {
+                const parent = await Folders.find({ _id: media.parent_id });
                 if (!parent)
                     sockets.emit('error', 'parent does not exist');
 
-                if (url.link.startsWith('magnet')) {
-                    DriveHelper.uploadFromTorrent(url.name, url.link, parent_id, progress => {
-                        sockets.emit('progress', {progress, link: url.link, name: url.name});
+                if (media.link.startsWith('magnet')) {
+                    DriveHelper.uploadFromTorrent(media.name, media.link, media.parent_id, media.image, media.year, progress => {
+                        sockets.emit('progress', {progress, link: media.link, name: media.name});
                     }).then(() => {
-                        sockets.emit('finish', url.link);
+                        sockets.emit('finish', media.link);
                     }).catch(err => {
-                        sockets.emit('error', {err, link: url.link, name: url.name});
+                        sockets.emit('error', {err, link: media.link, name: media.name});
                     });
                 } else {
-                    DriveHelper.uploadFromUrl(url.name, url.link, parent_id, progress => {
-                        sockets.emit('progress', {progress, link: url.link, name: url.name});
+                    DriveHelper.uploadFromUrl(media.name, media.link, media.parent_id, media.image, media.year, progress => {
+                        sockets.emit('progress', {progress, link: media.link, name: media.name});
                     }).then(() => {
-                        sockets.emit('finish', url.link);
+                        sockets.emit('finish', media.link);
                     }).catch(err => {
-                        sockets.emit('error', {err, link: url.link, name: url.name});
+                        sockets.emit('error', {err, link: media.link, name: media.name});
                     });
                 }
             });

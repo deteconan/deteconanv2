@@ -2,9 +2,8 @@
   <div id="app">
     <v-app>
       <toolbar></toolbar>
-
-      <div class="d-flex h-100">
-        <Menu class="main-menu"></Menu>
+      <div class="body-page">
+        <sidebar></sidebar>
 
         <keep-alive>
           <router-view></router-view>
@@ -16,25 +15,63 @@
 
 <script>
   import Toolbar from "@/layouts/Toolbar.vue";
-  import Menu from "@/layouts/Menu.vue";
+  import Sidebar from "@/layouts/Sidebar.vue";
   export default {
     name: 'App',
-    components: {Menu, Toolbar}
+    components: {Sidebar, Toolbar},
+    async created() {
+      await this.$store.dispatch('loadFolders');
+      await this.$store.dispatch('loadMovies');
+    }
   }
 </script>
 
 <style lang="scss">
   html, body {
-    height: 100%;
-    background-color: #2b2549;
-    color: white;
+    overflow: auto !important;
   }
 
   #app {
-    font-family: Poppins, sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Barlow', sans-serif;
+    --toolbar-size: 64px;
+    overflow: hidden;
+
+    .body-page {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      padding-top: var(--toolbar-size);
+      top: 0;
+      left: 0;
+      display: flex;
+
+      background-image: url("https://free4kwallpapers.com/uploads/originals/2019/08/28/gradient-blur-wallpaper.jpg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
   }
 
-  .theme--dark.v-application {
-    background-color: #25294a !important;
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 12px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background-color: #2f2f2f;
+    border-radius: 15px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+    background: #535353;
+
+    &:hover {
+      background: #616161;
+    }
   }
 </style>

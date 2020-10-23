@@ -1,46 +1,45 @@
 <template>
-    <div class="toolbar">
-        <div class="logo-container">
-            <img class="logo" :src="require('../assets/img/conan_logo.png')" alt="deteconan">
-            <h1 class="title theme-font">Deteconan</h1>
-        </div>
-    </div>
+    <v-app-bar fixed app flat height="64px">
+        <v-app-bar-nav-icon @click.stop="toggleMainSidebar"></v-app-bar-nav-icon>
+
+        <v-toolbar-title class="font-weight-bold" style="letter-spacing: 1px">
+            <span>FLE</span>
+            <span class="text-primary">X</span>
+        </v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <v-text-field class="search" prepend-inner-icon="search" v-model="search" placeholder="Rechercher un film" solo flat hide-details single-line></v-text-field>
+
+        <v-btn v-if="$route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
+            <v-icon>backup</v-icon>
+            <span class="ml-1">Upload</span>
+        </v-btn>
+    </v-app-bar>
 </template>
 
 <script>
     export default {
-        name: "Toolbar"
+        name: "Toolbar",
+        data() {
+            return {
+                search: null
+            }
+        }
     }
 </script>
 
-<style lang="scss" scoped>
-    .toolbar {
-        display: flex;
-        align-items: center;
-        padding: 1.5em;
+<style lang="scss">
+    header {
+        .search {
+            max-width: 500px !important;
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 0.3em;
-            border-radius: 30px;
-            width: 250px;
-            margin-left: 1px;
-
-            .logo {
-                width: 60px;
-                height: 60px;
-                border-radius: 20px;
+            input::placeholder {
+                letter-spacing: 0.5px !important;
             }
 
-            .title {
-                margin-left: 1.5em;
-                font-size: 1em !important;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 2px !important;
-                color: rgba(255, 255, 255, 0.8);
+            .v-input__control, .v-input__slot {
+                background-color: rgba(255, 255, 255, 0.05) !important;
             }
         }
     }

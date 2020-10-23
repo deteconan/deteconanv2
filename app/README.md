@@ -1,4 +1,4 @@
-# deteconan
+# deteconanv2
 
 ## Project setup
 ```
