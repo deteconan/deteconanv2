@@ -96,7 +96,7 @@
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
-                border: 2px solid white;
+                border: 2px solid rgba(255, 255, 255, 0.8);
                 background-color: rgba(0, 0, 0, 0.3);
                 display: none;
                 align-items: center;
@@ -107,6 +107,10 @@
                 transform: translate(-50%, -50%);
                 cursor: pointer;
                 transition: 200ms;
+
+                i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
 
                 &:hover {
                     background-color: var(--v-primary-base);
