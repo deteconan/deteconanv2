@@ -8,7 +8,8 @@ export default new Vuex.Store({
     state: {
         sidebarVisible: true,
         folders: [],
-        movies: []
+        movies: [],
+        playingMovie: null
     },
     mutations: {
         toggleSidebar(state) {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
         },
         setMovies(state, movies) {
             state.movies = movies;
+        },
+        setMovie(state, movie) {
+            state.playingMovie = movie;
         }
     },
     actions: {

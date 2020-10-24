@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Movies from "@/views/Movies.vue"
 import Upload from "@/views/Upload.vue"
+import PlayingMovie from "@/views/PlayingMovie.vue"
 
 Vue.use(Router)
 
@@ -17,6 +18,11 @@ export default new Router({
             path: `/upload`,
             name: `upload`,
             component: Upload
+        },
+        {
+            path: `/movie`,
+            name: `movie`,
+            component: PlayingMovie
         }
     ]
 })

@@ -2,7 +2,7 @@
     <div class="movie-preview">
         <div class="img-container">
             <img @load="imageLoaded = true" v-show="imageLoaded" :src="movie.image" :alt="movie.title">
-            <div class="play-btn">
+            <div class="play-btn" @click.stop="playMovie(movie)">
                 <v-icon>play_arrow</v-icon>
             </div>
             <v-btn @click.stop="deleteMovie" class="delete-btn" icon>

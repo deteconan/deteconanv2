@@ -68,7 +68,7 @@ export default class DriveHelper {
             accounts = await Credentials.find();
 
         for (let account of accounts) {
-            const jwToken = new google.auth.JWT(
+            const token = new google.auth.JWT(
                 account.client_email,
                 null,
                 account.private_key,
@@ -78,7 +78,7 @@ export default class DriveHelper {
 
             const res = await drive.about.get({
                 fields: 'storageQuota',
-                auth: jwToken
+                auth: token
             });
 
             const remaining = parseInt(res.data.storageQuota.limit) - parseInt(res.data.storageQuota.usage);
@@ -327,7 +327,7 @@ export default class DriveHelper {
         });
 
         await this.updateQuota(admin.client_email);
-        await FileAccount.deleteOne({ file_id: file.file_id });
+        await FileAccount.deleteOne({ file_id: fileId });
     }
 
     static async createFolder(name, parentId) {

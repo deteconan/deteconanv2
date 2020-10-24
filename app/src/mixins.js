@@ -10,6 +10,9 @@ Vue.mixin({
         },
         movies() {
             return this.$store.state.movies;
+        },
+        playingMovie() {
+            return this.$store.state.playingMovie;
         }
     },
     methods: {
@@ -22,6 +25,10 @@ Vue.mixin({
         },
         toggleMainSidebar() {
             this.$store.commit('toggleSidebar');
+        },
+        playMovie(movie) {
+            this.$store.commit('setMovie', movie);
+            this.reach('/movie');
         }
     }
 });
