@@ -13,6 +13,9 @@ Vue.mixin({
         },
         playingMovie() {
             return this.$store.state.playingMovie;
+        },
+        totalUsage() {
+            return this.$store.state.totalUsage;
         }
     },
     methods: {

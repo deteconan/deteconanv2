@@ -9,7 +9,8 @@ export default new Vuex.Store({
         sidebarVisible: true,
         folders: [],
         movies: [],
-        playingMovie: null
+        playingMovie: null,
+        totalUsage: 0
     },
     mutations: {
         toggleSidebar(state) {
@@ -23,6 +24,9 @@ export default new Vuex.Store({
         },
         setMovie(state, movie) {
             state.playingMovie = movie;
+        },
+        setTotalUsage(state, usage) {
+            state.totalUsage = usage;
         }
     },
     actions: {
@@ -34,6 +38,11 @@ export default new Vuex.Store({
         loadMovies({ commit }) {
             return Network.get('/movies').then(res => {
                 commit('setMovies', res.data);
+            });
+        },
+        getTotalUsage({ commit }) {
+            return Network.get('/usage/total').then(res => {
+                commit('setTotalUsage', res.data);
             });
         }
     }

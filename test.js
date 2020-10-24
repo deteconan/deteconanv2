@@ -25,8 +25,8 @@ async function test() {
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);
     });*/
-    const quota = await DriveHelper.getQuota('z055081a37@flex-293422.iam.gserviceaccount.com');
-    console.log(parseInt(quota.limit) - parseInt(quota.usage));
+    // const quota = await DriveHelper.getQuota('z055081a37@flex-293422.iam.gserviceaccount.com');
+    // console.log(parseInt(quota.limit) - parseInt(quota.usage));
     // let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
     // console.log(files);
     // await DriveHelper.createFolder('Navets', '5f8a78a89a206e33c0450a58');

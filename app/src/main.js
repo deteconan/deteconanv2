@@ -4,6 +4,7 @@ import vuetify from "@/plugins/vuetify.js"
 import router from "@/router.js"
 import store from "@/store.js"
 import './mixins.js'
+import './filters.js'
 import './assets/style/global.scss'
 import io from 'socket.io-client'
 

@@ -12,8 +12,8 @@ export default {
                     sockets.emit('error', 'parent does not exist');
 
                 if (media.link.startsWith('magnet')) {
-                    DriveHelper.uploadFromTorrent(media.name, media.link, media.parent_id, media.image, media.year, progress => {
-                        sockets.emit('progress', {progress, link: media.link, name: media.name});
+                    DriveHelper.uploadFromTorrent(media.name, media.link, media.parent_id, media.image, media.year, ({ progress, speed }) => {
+                        sockets.emit('progress', {progress, speed, link: media.link, name: media.name});
                     }).then(() => {
                         sockets.emit('finish', media.link);
                     }).catch(err => {

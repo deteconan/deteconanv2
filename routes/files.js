@@ -17,12 +17,12 @@ TorrentSearchApi.enableProvider('Rarbg');
 const router = express.Router();
 
 router.get('/files/tree', async (req, res) => {
-  try {
-    const tree = await DriveHelper.buildTree();
-    res.json(tree);
-  } catch (err) {
-    sendError(err, req, res);
-  }
+    try {
+        const tree = await DriveHelper.buildTree();
+        res.json(tree);
+    } catch (err) {
+        sendError(err, req, res);
+    }
 });
 
 router.get('/folders', async (req, res) => {
@@ -56,61 +56,70 @@ router.get('/movies', async (req, res) => {
 });
 
 router.post('/files/delete', checkRequiredPOST('file_id'), async (req, res) => {
-  try {
-    await DriveHelper.deleteFile(req.body.file_id);
-    res.json(HTTP_OK);
-  } catch (err) {
-    sendError(err, req, res);
-  }
+    try {
+        await DriveHelper.deleteFile(req.body.file_id);
+        res.json(HTTP_OK);
+    } catch (err) {
+        sendError(err, req, res);
+    }
 });
 
 router.post('/movies/autocomplete', checkRequiredPOST('name'), async (req, res) => {
-  try {
-    let movies = await imdb.simpleSearch(req.body.name);
+    try {
+        let movies = await imdb.simpleSearch(req.body.name);
 
-    if (!movies || !movies.d)
-      return res.status(HTTP_BAD_REQUEST).send('No result');
+        if (!movies || !movies.d)
+            return res.status(HTTP_BAD_REQUEST).send('No result');
 
-    movies = movies.d.filter(m => m.i).map(m => {
-      return {
-        id: m.id,
-        name: m.l,
-        image: m.i.shift(),
-        year: m.y
-      }
-    }).slice(0, 6);
+        movies = movies.d.filter(m => m.i).map(m => {
+            return {
+                id: m.id,
+                name: m.l,
+                image: m.i.shift(),
+                year: m.y
+            }
+        }).slice(0, 6);
 
-    res.json(movies);
-  } catch (err) {
-    sendError(err, req, res);
-  }
+        res.json(movies);
+    } catch (err) {
+        sendError(err, req, res);
+    }
 });
 
 router.post('/movies/torrents', checkRequiredPOST('name'), async (req, res) => {
-  try {
-    let torrents = await TorrentSearchApi.search(req.body.name, null, 10);
-    for (let torrent of torrents) {
-      if (!torrent.magnet)
-          torrent.magnet = await TorrentSearchApi.getMagnet(torrent);
-    }
-    torrents = torrents.filter(t => t.title !== 'No results returned' && t.magnet); // The Pirate Bay returns an error object so need to remove it
-    torrents = torrents.map(t => {
-      return {
-        id: t.id,
-        title: t.title,
-        size: t.size,
-        magnet: t.magnet,
-        peers: t.peers,
-        seeds: t.seeds,
-        provider: t.provider,
-        time: t.time
-      }
-    });
+    try {
+        let torrents = await TorrentSearchApi.search(req.body.name, null, 10);
+        for (let torrent of torrents) {
+            if (!torrent.magnet)
+                torrent.magnet = await TorrentSearchApi.getMagnet(torrent);
+        }
+        torrents = torrents.filter(t => t.title !== 'No results returned' && t.magnet); // The Pirate Bay returns an error object so need to remove it
+        torrents = torrents.map(t => {
+            return {
+                id: t.id,
+                title: t.title,
+                size: t.size,
+                magnet: t.magnet,
+                peers: t.peers,
+                seeds: t.seeds,
+                provider: t.provider,
+                time: t.time
+            }
+        });
 
-    res.json(torrents);
-  } catch (err) {
-    sendError(err, req, res);
-  }
+        res.json(torrents);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
+router.get('/usage/total', async (req, res) => {
+    try {
+        const total = await DriveHelper.getTotalUsage();
+        res.json(total);
+    } catch (err) {
+        sendError(err, req, res);
+    }
 });
 
 export default router;

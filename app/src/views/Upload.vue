@@ -12,6 +12,8 @@
                             </v-btn>
                             <v-list-item-content class="ml-2">{{ file.name }}</v-list-item-content>
 
+                            <span class="text-success f-500" v-if="file.speed">{{ file.speed | speed }}</span>
+
                             <v-list-item-action>
                                 <v-icon v-if="file.progress === 100" size="35px" color="success">check_circle</v-icon>
                                 <v-progress-circular v-else-if="file.progress >= 0" color="blue" :value="file.progress" :indeterminate="!file.progress"></v-progress-circular>
@@ -22,6 +24,10 @@
                     <v-card-text v-else class="text-center py-5 no-upload">Aucun téléchargement en cours</v-card-text>
 
                     <v-card-actions>
+                        <div class="ml-2">
+                            <span>Usage:</span>
+                            <span class="ml-1">{{ totalUsage | bytes }}</span>
+                        </div>
                         <v-spacer></v-spacer>
                         <v-btn color="primary" @click.stop="dialogVisible = true">
                             <v-icon>add</v-icon>
@@ -49,8 +55,8 @@
             }
         },
         mounted() {
-            this.$socket.on('progress', ({progress, link, name}) => {
-                this.addToQueue({name, link, progress});
+            this.$socket.on('progress', ({progress, speed, link, name}) => {
+                this.addToQueue({name, link, progress, speed});
             });
 
             this.$socket.on('finish', link => {
@@ -59,6 +65,7 @@
                     media.progress = 100;
                 this.$forceUpdate();
                 this.$store.dispatch('loadMovies');
+                this.$store.dispatch('getTotalUsage');
             });
 
             this.$socket.on('error', ({err, link}) => {

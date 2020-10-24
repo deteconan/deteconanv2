@@ -22,6 +22,7 @@
     async created() {
       await this.$store.dispatch('loadFolders');
       await this.$store.dispatch('loadMovies');
+      await this.$store.dispatch('getTotalUsage');
     }
   }
 </script>

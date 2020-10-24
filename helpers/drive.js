@@ -87,6 +87,18 @@ export default class DriveHelper {
         }
     }
 
+    static async getTotalUsage() {
+        const accounts = await Credentials.find();
+
+        let total = 0;
+        for (let account of accounts) {
+            let quota = await this.getQuota(account.client_email);
+            total += parseInt(quota.usage);
+        }
+
+        return total;
+    }
+
     static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, onProgress) {
         let response = null;
         let client = new WebTorrent();
@@ -156,7 +168,10 @@ export default class DriveHelper {
                     let now = new Date().getTime();
 
                     if (now - time >= 2000) {
-                        onProgress(progress);
+                        onProgress({
+                            progress,
+                            speed: client.downloadSpeed
+                        });
                         time = now;
                     }
                 }
