@@ -38,22 +38,26 @@
                             </template>
                         </v-text-field>
 
-                        <v-select v-model="folderSelected" :items="folders" item-text="name" item-value="id" label="Dossier" outlined>
+                        <v-select hide-details v-model="folderSelected" :items="folders" item-text="name" item-value="id" label="Dossier" outlined>
                             <template #prepend-inner>
                                 <v-icon class="material-icons-outlined">folder</v-icon>
                             </template>
                         </v-select>
 
-                        <div class="d-flex align-center justify-space-between">
-                            <v-btn text class="opacity-80">
+                        <div class="d-flex align-center justify-space-between my-5">
+                            <v-btn text class="opacity-80" @click.stop="moreOptions = !moreOptions">
                                 <span>Plus d'options</span>
-                                <v-icon class="ml-1">keyboard_arrow_down</v-icon>
+                                <v-icon class="ml-1">{{ moreOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</v-icon>
                             </v-btn>
                             <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents"
                                    v-if="autocomplete.length === 0 && torrents.length === 0">
                                 <v-icon>search</v-icon>
                                 <span class="ml-1">Rechercher</span>
                             </v-btn>
+                        </div>
+
+                        <div v-if="moreOptions" class="d-flex flex-wrap">
+                            <v-select v-model="selectedProviders" label="Hébergeurs" :items="providers" item-text="name" item-value="value" multiple></v-select>
                         </div>
 
                         <template v-if="autocomplete.length > 0 || torrents.length > 0">
@@ -157,6 +161,15 @@
 <script>
     import Network from "@/helpers/Network.js";
 
+    const providers = [
+        { name: 'Torrent9', value: 'Torrent9' },
+        { name: 'The Pirate Bay', value: 'ThePirateBay' },
+        { name: 'Lime Torrents', value: 'Limetorrents' },
+        { name: 'Rarbg', value: 'Rarbg' },
+        { name: 'Torrentz2', value: 'Torrentz2' },
+        { name: 'Kickass Torrents', value: 'KickassTorrents' },
+    ];
+
     export default {
         name: "UploadDialog",
         props: {
@@ -179,7 +192,9 @@
                 loadingMoviesInfo: false,
                 loadingMoviesTorrents: false,
                 folderSelected: null,
-                moreOptions: false
+                moreOptions: false,
+                providers: providers,
+                selectedProviders: providers.map(p => p.value)
             }
         },
         computed: {
