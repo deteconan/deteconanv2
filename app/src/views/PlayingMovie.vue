@@ -20,7 +20,7 @@
                     </v-btn>
                     <v-btn block outlined color="error" class="mt-3" @click.stop="deleteDialog = true">
                         <v-icon class="material-icons-outlined">delete</v-icon>
-                        <span class="ml-1">Delete</span>
+                        <span class="ml-1">Supprimer</span>
                     </v-btn>
                 </div>
             </div>
