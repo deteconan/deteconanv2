@@ -16,6 +16,9 @@ Vue.mixin({
         },
         totalUsage() {
             return this.$store.state.totalUsage;
+        },
+        window() {
+            return window;
         }
     },
     methods: {

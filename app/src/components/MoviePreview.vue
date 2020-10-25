@@ -5,17 +5,12 @@
             <div class="play-btn">
                 <v-icon>play_arrow</v-icon>
             </div>
-            <v-btn @click.stop="deleteMovie" class="delete-btn" icon>
-                <v-icon color="error" class="material-icons-outlined">delete</v-icon>
-            </v-btn>
         </div>
         <div :title="movie.name" class="movie-title" @click.stop="playMovie(movie)">{{ movie.name }}</div>
     </div>
 </template>
 
 <script>
-    import Network from "@/helpers/Network.js";
-
     export default {
         name: "MoviePreview",
         props: {
@@ -27,20 +22,6 @@
         data() {
             return {
                 imageLoaded: false
-            }
-        },
-        methods: {
-            deleteMovie() {
-                if (!this.movie.id)
-                    return;
-
-                Network.post('/files/delete', {
-                    file_id: this.movie.id
-                }).then(() => {
-                    this.$store.dispatch('loadMovies');
-                }).catch(err => {
-                    console.error(err);
-                });
             }
         }
     }
@@ -68,17 +49,6 @@
 
                 .play-btn {
                     display: flex;
-                }
-            }
-
-            .delete-btn {
-                opacity: 0;
-                position: absolute;
-                bottom: 0;
-                right: 0;
-
-                &:hover {
-                    opacity: 1;
                 }
             }
 

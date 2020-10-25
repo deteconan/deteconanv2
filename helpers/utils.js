@@ -13,7 +13,6 @@ export function sendError(err, req, res, next) {
 export function uploadImage(url) {
     return new Promise((resolve, reject) => {
         imgur.upload(url, (err, res) => {
-            console.log(res);
             if (err) {
                 console.error(err);
                 reject(err);

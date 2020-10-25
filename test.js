@@ -27,8 +27,8 @@ async function test() {
     });*/
     // const quota = await DriveHelper.getQuota('z055081a37@flex-293422.iam.gserviceaccount.com');
     // console.log(parseInt(quota.limit) - parseInt(quota.usage));
-    let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
-    console.log(files);
+    // let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
+    // console.log(files);
     // await DriveHelper.createFolder('Navets', '5f8a78a89a206e33c0450a58');
     // await DriveHelper.uploadFromUrl('test', 'https://img.theculturetrip.com/768x432/wp-content/uploads/2015/12/56-3639490-1428514993312c2c5529f443b6b5fe7ffe0b4e4973.jpg', config.fileId);
     // const acc = await IamHelper.getAccountWithEnoughQuota(1610612);
