@@ -113,6 +113,16 @@ router.post('/movies/torrents', checkRequiredPOST('name'), async (req, res) => {
     }
 });
 
+router.post('/movies/update', checkRequiredPOST('id'), async (req, res) => {
+    try {
+        await DriveHelper.updateFile(req.body);
+
+        res.sendStatus(HTTP_OK);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
 router.get('/usage/total', async (req, res) => {
     try {
         const total = await DriveHelper.getTotalUsage();

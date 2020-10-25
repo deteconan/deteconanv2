@@ -16,10 +16,10 @@
         components: {MovieSection, MainPage},
         computed: {
             processingMovies() {
-                return this.movies.filter(m => !m.thumbnailLink);
+                return this.movies.filter(m => !m.thumbnailLink).sort((a, b) => b.createdTime > a.createdTime ? 1 : -1);
             },
             recentlyAddedMovies() {
-                return this.movies.filter(m => m.thumbnailLink);
+                return this.movies.filter(m => m.thumbnailLink).sort((a, b) => b.createdTime > a.createdTime ? 1 : -1);
             }
         }
     }

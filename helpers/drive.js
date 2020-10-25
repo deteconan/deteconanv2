@@ -307,19 +307,33 @@ export default class DriveHelper {
         return files;
     }
 
-    static async updateFile(fileId, params) {
-        if (!params)
-            return;
+    static async updateFile(file) {
+        const fileAccount = await FileAccount.findOne({ file_id: file.id });
+        const cred = await Credentials.findOne({ client_email: fileAccount.account_email });
 
-        const res = await drive.files.update({
-            fileId: fileId,
+        const token = new google.auth.JWT(
+            cred.client_email,
+            null,
+            cred.private_key,
+            ['https://www.googleapis.com/auth/drive'],
+            null
+        );
+
+        await drive.files.update({
+            fileId: file.id,
+            auth: token,
             resource: {
-                name: params.name,
-                description: params.description
+                name: file.name,
+                description: file.description,
+                appProperties: {
+                    image: file.image,
+                    year: file.year,
+                    parentId: file.parentId
+                }
             }
+        }).catch(err => {
+            console.error(err);
         });
-
-        return res.data;
     }
 
     static async deleteFile(fileId) {

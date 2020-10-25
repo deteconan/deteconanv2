@@ -1,15 +1,15 @@
 <template>
     <div class="movie-preview">
-        <div class="img-container">
+        <div class="img-container" @click.stop="playMovie(movie)">
             <img @load="imageLoaded = true" v-show="imageLoaded" :src="movie.image" :alt="movie.title">
-            <div class="play-btn" @click.stop="playMovie(movie)">
+            <div class="play-btn">
                 <v-icon>play_arrow</v-icon>
             </div>
             <v-btn @click.stop="deleteMovie" class="delete-btn" icon>
                 <v-icon color="error" class="material-icons-outlined">delete</v-icon>
             </v-btn>
         </div>
-        <div :title="movie.name" class="movie-title">{{ movie.name }}</div>
+        <div :title="movie.name" class="movie-title" @click.stop="playMovie(movie)">{{ movie.name }}</div>
     </div>
 </template>
 
@@ -96,7 +96,7 @@
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
-                border: 2px solid white;
+                border: 2px solid rgba(255, 255, 255, 0.8);
                 background-color: rgba(0, 0, 0, 0.3);
                 display: none;
                 align-items: center;
@@ -107,6 +107,10 @@
                 transform: translate(-50%, -50%);
                 cursor: pointer;
                 transition: 200ms;
+
+                i {
+                    color: rgba(255, 255, 255, 0.8);
+                }
 
                 &:hover {
                     background-color: var(--v-primary-base);
