@@ -44,11 +44,17 @@
                             </template>
                         </v-select>
 
-                        <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents"
-                               class="d-block mx-auto" v-if="autocomplete.length === 0 && torrents.length === 0">
-                            <v-icon>search</v-icon>
-                            <span class="ml-1">Rechercher</span>
-                        </v-btn>
+                        <div class="d-flex align-center justify-space-between">
+                            <v-btn text class="opacity-80">
+                                <span>Plus d'options</span>
+                                <v-icon class="ml-1">keyboard_arrow_down</v-icon>
+                            </v-btn>
+                            <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents"
+                                   v-if="autocomplete.length === 0 && torrents.length === 0">
+                                <v-icon>search</v-icon>
+                                <span class="ml-1">Rechercher</span>
+                            </v-btn>
+                        </div>
 
                         <template v-if="autocomplete.length > 0 || torrents.length > 0">
                             <v-tabs v-model="moviesTab" grow>
@@ -172,7 +178,8 @@
                 moviesTab: 'info',
                 loadingMoviesInfo: false,
                 loadingMoviesTorrents: false,
-                folderSelected: null
+                folderSelected: null,
+                moreOptions: false
             }
         },
         computed: {
