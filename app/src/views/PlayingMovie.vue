@@ -95,7 +95,6 @@
         },
         methods: {
             updateMovie() {
-                console.log(this.playingMovie);
                 if (!this.playingMovie.id)
                     return;
 
@@ -110,6 +109,8 @@
             deleteMovie() {
                 if (!this.playingMovie.id)
                     return;
+
+                this.deleteDialog = false;
 
                 Network.post('/files/delete', {
                     file_id: this.playingMovie.id
