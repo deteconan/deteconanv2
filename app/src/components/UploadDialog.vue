@@ -228,7 +228,8 @@
                 if (!this.movieTorrent) {
                     this.loadingMoviesTorrents = true;
                     Network.post('/movies/torrents', {
-                        name: this.file.name
+                        name: this.file.name,
+                        providers: this.selectedProviders
                     }).then(res => {
                         this.torrents = res.data;
                     }).catch(err => {

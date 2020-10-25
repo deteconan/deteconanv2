@@ -1,18 +1,11 @@
 import express from 'express';
 import DriveHelper from "../helpers/drive.js";
-import {checkRequiredGET, checkRequiredPOST} from "../helpers/middlewares.js";
+import {checkRequiredPOST} from "../helpers/middlewares.js";
 import {sendError} from "../helpers/utils.js";
 import imdb from 'imdb-scrapper';
 import TorrentSearchApi from 'torrent-search-api';
 import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
-
-TorrentSearchApi.enableProvider('Torrent9');
-// TorrentSearchApi.enableProvider('Torrentz2');
-TorrentSearchApi.enableProvider('Limetorrents');
-TorrentSearchApi.enableProvider('ThePirateBay');
-// TorrentSearchApi.enableProvider('KickassTorrents');
-TorrentSearchApi.enableProvider('Rarbg');
 
 const router = express.Router();
 
@@ -86,8 +79,11 @@ router.post('/movies/autocomplete', checkRequiredPOST('name'), async (req, res) 
     }
 });
 
-router.post('/movies/torrents', checkRequiredPOST('name'), async (req, res) => {
+router.post('/movies/torrents', checkRequiredPOST('name', 'providers'), async (req, res) => {
     try {
+        await TorrentSearchApi.disableAllProviders();
+        for (let provider of req.body.providers)
+            await TorrentSearchApi.enableProvider(provider);
         let torrents = await TorrentSearchApi.search(req.body.name, null, 10);
         for (let torrent of torrents) {
             if (!torrent.magnet)
