@@ -14,7 +14,11 @@
                     <h2 class="opacity-80 text-spaced">{{ playingMovie.year }}</h2>
                 </div>
                 <div class="ml-auto actions">
-                    <v-btn block outlined @click.stop="editDialog = true">
+                    <v-btn block outlined @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
+                        <v-icon class="material-icons-outlined">subtitles</v-icon>
+                        <span class="ml-1">Sous-titres</span>
+                    </v-btn>
+                    <v-btn block outlined class="mt-3" @click.stop="editDialog = true">
                         <v-icon class="material-icons-outlined">edit</v-icon>
                         <span class="ml-1">Modifier</span>
                     </v-btn>
@@ -91,7 +95,6 @@
         },
         methods: {
             updateMovie() {
-                console.log(this.playingMovie);
                 if (!this.playingMovie.id)
                     return;
 
@@ -106,6 +109,8 @@
             deleteMovie() {
                 if (!this.playingMovie.id)
                     return;
+
+                this.deleteDialog = false;
 
                 Network.post('/files/delete', {
                     file_id: this.playingMovie.id
@@ -151,6 +156,16 @@
 
         &:hover {
             opacity: 1;
+        }
+
+        button {
+            width: 180px;
+            display: flex;
+            justify-content: left;
+
+            i {
+                margin-right: 0.5rem;
+            }
         }
     }
 </style>

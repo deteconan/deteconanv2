@@ -61,8 +61,10 @@
 
             this.$socket.on('finish', link => {
                 const media = this.queue.find(f => f.link === link);
-                if (media)
+                if (media) {
                     media.progress = 100;
+                    media.speed = null;
+                }
                 this.$forceUpdate();
                 this.$store.dispatch('loadMovies');
                 this.$store.dispatch('getTotalUsage');
@@ -70,8 +72,10 @@
 
             this.$socket.on('error', ({err, link}) => {
                 const media = this.queue.find(f => f.link === link);
-                if (media)
+                if (media) {
                     media.progress = -1;
+                    media.speed = null;
+                }
                 console.error(err);
             });
         },
