@@ -33,7 +33,8 @@ Vue.mixin({
             this.$store.commit('toggleSidebar');
         },
         playMovie(movie) {
-            this.$store.commit('setMovie', movie);
+            if (!this.$store.state.playingMovie || this.$store.state.playingMovie.id !== movie.id)
+                this.$store.commit('setMovie', movie);
             this.reach('/movie');
         }
     }

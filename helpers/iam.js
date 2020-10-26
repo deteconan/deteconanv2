@@ -100,7 +100,7 @@ export default class IamHelper {
         if (!cred) { // If there is no account with enough quota
             // Create a new one
             cred = await this.createServiceAccount(config.projectId);
-            await DriveHelper.grantUserPermission(config.fileId, cred.client_email);
+            await DriveHelper.grantUserWritePermission(config.fileId, cred.client_email);
         }
         return cred;
     }

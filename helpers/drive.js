@@ -27,11 +27,24 @@ const drive = google.drive({
 
 export default class DriveHelper {
 
-    static async grantUserPermission(fileId, email) {
+    static async grantUserWritePermission(fileId, email) {
         const res = await drive.permissions.create({
             resource: {
                 type: 'user',
                 role: 'writer',
+                emailAddress: email
+            },
+            fileId: fileId
+        });
+
+        return res.data;
+    }
+
+    static async grantUserReadPermission(fileId, email) {
+        const res = await drive.permissions.create({
+            resource: {
+                type: 'user',
+                role: 'reader',
                 emailAddress: email
             },
             fileId: fileId

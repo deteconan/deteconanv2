@@ -38,6 +38,9 @@ async function test() {
     // const image = await uploadImage('https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_.jpg');
     // console.log(image);
 
+    await DriveHelper.grantUserReadPermission(config.fileId, 'sunwize98@gmail.com');
+    console.log('granted');
+
     DB.close();
 }
 

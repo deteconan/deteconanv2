@@ -4,6 +4,7 @@
             <div class="movie-container">
                 <div class="iframe-container">
                     <iframe :src="url" allowfullscreen frameborder="0"></iframe>
+                    <v-progress-circular class="loading" indeterminate></v-progress-circular>
                 </div>
             </div>
 
@@ -85,7 +86,7 @@
         },
         computed: {
             url() {
-                return 'https://drive.google.com/file/d/' + this.playingMovie.id + '/preview';
+                return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
             }
         },
         activated() {
@@ -132,6 +133,16 @@
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+
+            .loading {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1;
+            }
 
             iframe {
                 position: absolute;
@@ -140,6 +151,7 @@
                 width: 100%;
                 height: 100%;
                 border-radius: 3px;
+                z-index: 2;
             }
         }
     }
