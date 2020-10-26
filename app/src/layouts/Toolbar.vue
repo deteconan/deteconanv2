@@ -9,7 +9,8 @@
 
         <v-spacer></v-spacer>
 
-        <v-text-field class="search" prepend-inner-icon="search" v-model="search" placeholder="Rechercher un film" solo flat hide-details single-line></v-text-field>
+        <v-text-field class="search" prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
+                      solo flat hide-details single-line clearable @click:clear="clearSearch"></v-text-field>
 
         <v-btn v-if="$route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
             <v-icon>backup</v-icon>
@@ -24,6 +25,14 @@
         data() {
             return {
                 search: null
+            }
+        },
+        methods: {
+            searchMovie() {
+                this.$store.commit('searchMovie', this.search);
+            },
+            clearSearch() {
+                this.$store.commit('searchMovie', '');
             }
         }
     }

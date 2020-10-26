@@ -54,8 +54,10 @@
 
             img {
                 object-fit: cover;
-                width: 150px;
-                height: 225px;
+                // width: 150px;
+                // height: 225px;
+                width: 100%;
+                height: 100%;
                 cursor: pointer;
                 transition: 200ms;
                 border-radius: 3px;

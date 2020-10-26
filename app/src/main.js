@@ -7,10 +7,12 @@ import './mixins.js'
 import './filters.js'
 import './assets/style/global.scss'
 import io from 'socket.io-client'
+import moment from 'moment'
 
 Vue.config.productionTip = false
 
 Vue.prototype.$socket = io(`${process.env.VUE_APP_API_URL}/upload`)
+Vue.prototype.$moment = moment
 
 new Vue({
   vuetify,

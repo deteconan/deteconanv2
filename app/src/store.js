@@ -10,7 +10,8 @@ export default new Vuex.Store({
         folders: [],
         movies: [],
         playingMovie: null,
-        totalUsage: 0
+        totalUsage: 0,
+        searchMovie: ''
     },
     mutations: {
         toggleSidebar(state) {
@@ -27,6 +28,9 @@ export default new Vuex.Store({
         },
         setTotalUsage(state, usage) {
             state.totalUsage = usage;
+        },
+        searchMovie(state, search) {
+            state.searchMovie = search;
         }
     },
     actions: {
