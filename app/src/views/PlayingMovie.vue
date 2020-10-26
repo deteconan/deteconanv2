@@ -1,6 +1,6 @@
 <template>
     <main-page>
-        <v-container class="pa-10" style="width: 70%" v-if="playingMovie">
+        <v-container class="pa-10" style="width: 68%" v-if="playingMovie">
             <div class="movie-container">
                 <div class="iframe-container">
                     <iframe :src="url" allowfullscreen frameborder="0"></iframe>
@@ -117,6 +117,7 @@
                     file_id: this.playingMovie.id
                 }).then(() => {
                     this.$store.dispatch('loadMovies');
+                    this.reach('/movies');
                 }).catch(err => {
                     console.error(err);
                 });
