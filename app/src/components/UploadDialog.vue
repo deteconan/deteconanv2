@@ -49,8 +49,7 @@
                                 <span>Plus d'options</span>
                                 <v-icon class="ml-1">{{ moreOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</v-icon>
                             </v-btn>
-                            <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents"
-                                   v-if="autocomplete.length === 0 && torrents.length === 0">
+                            <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents">
                                 <v-icon>search</v-icon>
                                 <span class="ml-1">Rechercher</span>
                             </v-btn>
