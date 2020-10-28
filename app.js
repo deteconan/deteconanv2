@@ -3,12 +3,13 @@ import path from 'path';
 import { sendError } from './helpers/utils.js';
 import DB from './helpers/DB.js';
 import './helpers/mongodb.js';
+import DriveHelper from "./helpers/drive.js";
 import http from 'http';
 import SocketIO from 'socket.io';
 import Sockets from './helpers/sockets.js';
 import schedule from 'node-schedule';
 import filesRoutes from './routes/files.js';
-import DriveHelper from "./helpers/drive.js";
+import usersRoutes from './routes/users.js';
 
 const app = express();
 DB.init();
@@ -47,6 +48,7 @@ app.get(/^(?:(?!\bapi\b).)*$/, (req, res) => {
 });
 
 app.use('/api', filesRoutes);
+app.use('/api', usersRoutes);
 
 // Error handler
 app.use(sendError);

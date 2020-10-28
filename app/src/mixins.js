@@ -2,6 +2,9 @@ import Vue from "vue";
 
 Vue.mixin({
     computed: {
+        user() {
+            return this.$store.state.user;
+        },
         sidebarVisible() {
             return this.$store.state.sidebarVisible;
         },
@@ -19,6 +22,12 @@ Vue.mixin({
         },
         window() {
             return window;
+        },
+        apiURL() {
+            return process.env.VUE_APP_API_URL;
+        },
+        isAdmin() {
+            return this.user && this.user.admin;
         }
     },
     methods: {

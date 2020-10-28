@@ -6,6 +6,7 @@ import imdb from 'imdb-scrapper';
 import TorrentSearchApi from 'torrent-search-api';
 import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
+import {needAdmin, needAuth} from "../helpers/auth.js";
 
 const router = express.Router();
 
@@ -48,7 +49,7 @@ router.get('/movies', async (req, res) => {
   }
 });
 
-router.post('/files/delete', checkRequiredPOST('file_id'), async (req, res) => {
+router.post('/files/delete', needAdmin, checkRequiredPOST('file_id'), async (req, res) => {
     try {
         await DriveHelper.deleteFile(req.body.file_id);
         res.json(HTTP_OK);
@@ -57,7 +58,7 @@ router.post('/files/delete', checkRequiredPOST('file_id'), async (req, res) => {
     }
 });
 
-router.post('/movies/autocomplete', checkRequiredPOST('name'), async (req, res) => {
+router.post('/movies/autocomplete', needAdmin, checkRequiredPOST('name'), async (req, res) => {
     try {
         let movies = await imdb.simpleSearch(req.body.name);
 
@@ -79,7 +80,7 @@ router.post('/movies/autocomplete', checkRequiredPOST('name'), async (req, res) 
     }
 });
 
-router.post('/movies/torrents', checkRequiredPOST('name', 'providers'), async (req, res) => {
+router.post('/movies/torrents', needAdmin, checkRequiredPOST('name', 'providers'), async (req, res) => {
     try {
         await TorrentSearchApi.disableAllProviders();
         for (let provider of req.body.providers)
@@ -109,7 +110,7 @@ router.post('/movies/torrents', checkRequiredPOST('name', 'providers'), async (r
     }
 });
 
-router.post('/movies/update', checkRequiredPOST('id'), async (req, res) => {
+router.post('/movies/update', needAdmin, checkRequiredPOST('id'), async (req, res) => {
     try {
         await DriveHelper.updateFile(req.body);
 

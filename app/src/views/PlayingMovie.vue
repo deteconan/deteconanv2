@@ -19,14 +19,16 @@
                         <v-icon class="material-icons-outlined">subtitles</v-icon>
                         <span class="ml-1">Sous-titres</span>
                     </v-btn>
-                    <v-btn block outlined class="mt-3" @click.stop="editDialog = true">
-                        <v-icon class="material-icons-outlined">edit</v-icon>
-                        <span class="ml-1">Modifier</span>
-                    </v-btn>
-                    <v-btn block outlined color="error" class="mt-3" @click.stop="deleteDialog = true">
-                        <v-icon class="material-icons-outlined">delete</v-icon>
-                        <span class="ml-1">Supprimer</span>
-                    </v-btn>
+                    <template v-if="isAdmin">
+                        <v-btn block outlined class="mt-3" @click.stop="editDialog = true">
+                            <v-icon class="material-icons-outlined">edit</v-icon>
+                            <span class="ml-1">Modifier</span>
+                        </v-btn>
+                        <v-btn block outlined color="error" class="mt-3" @click.stop="deleteDialog = true">
+                            <v-icon class="material-icons-outlined">delete</v-icon>
+                            <span class="ml-1">Supprimer</span>
+                        </v-btn>
+                    </template>
                 </div>
             </div>
         </v-container>
@@ -164,17 +166,23 @@
     }
 
     .actions {
-        opacity: 0;
         transition: opacity 300ms ease;
 
         &:hover {
-            opacity: 1;
+            button {
+                opacity: 1 !important;
+            }
         }
 
         button {
+            opacity: 0;
             width: 180px;
             display: flex;
             justify-content: left;
+
+            &:first-child {
+                opacity: 1;
+            }
 
             i {
                 margin-right: 0.5rem;

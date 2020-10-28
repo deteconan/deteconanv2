@@ -8,11 +8,16 @@ import './filters.js'
 import './assets/style/global.scss'
 import io from 'socket.io-client'
 import moment from 'moment'
+import { LoaderPlugin } from 'vue-google-login'
 
 Vue.config.productionTip = false
 
 Vue.prototype.$socket = io(`${process.env.VUE_APP_API_URL}/upload`)
 Vue.prototype.$moment = moment
+
+Vue.use(LoaderPlugin, {
+  client_id: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com'
+})
 
 new Vue({
   vuetify,

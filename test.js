@@ -9,6 +9,7 @@ import Credentials from './models/credentials.js';
 import FileAccount from './models/files_accounts.js';
 import TorrentSearchApi from 'torrent-search-api';
 import moment from 'moment';
+import GoogleAuthLibrary from "google-auth-library";
 
 import googleapis from 'googleapis';
 const { google } = googleapis;
@@ -38,8 +39,9 @@ async function test() {
     // const image = await uploadImage('https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_.jpg');
     // console.log(image);
 
-    await DriveHelper.grantUserReadPermission(config.fileId, 'sunwize98@gmail.com');
-    console.log('granted');
+    const GoogleClient = new GoogleAuthLibrary.OAuth2Client('22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com');
+    const info = await GoogleClient.getTokenInfo("ya29.A0AfH6SMBs3GqJDhxohkel1UCnk0YQyrnWK3qDFcrbV2ol7aH3IuqVnKCUABeQVPZBmeXEhi6novHNchLhGlf2c0Ua1WlgKvX6VPNrHX3o7AIOs2b92anBPaoiQdd08t1F4vHOZVPRtDJEo1rVg_kP37DgSDCKwkzskOQJBGKsyLM");
+    console.log(info);
 
     DB.close();
 }

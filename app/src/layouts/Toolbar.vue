@@ -12,10 +12,37 @@
         <v-text-field v-if="$route.fullPath !== '/upload'" class="search" prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
                       solo flat hide-details single-line clearable @click:clear="clearSearch"></v-text-field>
 
-        <v-btn v-if="$route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
+        <v-btn v-if="isAdmin && $route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
             <v-icon>backup</v-icon>
             <span class="ml-1">Upload</span>
         </v-btn>
+
+        <v-btn v-if="!user" @click="$store.dispatch('login')" color="blue" class="ml-3">
+            <v-avatar color="white" size="25">
+                <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
+            </v-avatar>
+            <span class="ml-2">Se connecter</span>
+        </v-btn>
+
+        <v-menu v-else bottom offset-y rounded min-width="200px" :position-y="70" absolute transition="slide-y-transition">
+            <template #activator="{ on }">
+                <v-btn icon rounded x-large v-on="on" class="ml-3 mr-0">
+                    <v-avatar size="40">
+                        <v-img :src="user.avatar"></v-img>
+                    </v-avatar>
+                </v-btn>
+            </template>
+            <v-card>
+                <v-list-item-content class="justify-center">
+                    <div class="mx-auto text-center">
+                        <h3>{{ user.name }}</h3>
+                        <p class="caption mt-2">{{ user.email }}</p>
+                        <v-divider class="my-3"></v-divider>
+                        <v-btn @click.stop="$store.dispatch('logout')" color="error" text>Se déconnecter</v-btn>
+                    </div>
+                </v-list-item-content>
+            </v-card>
+        </v-menu>
     </v-app-bar>
 </template>
 

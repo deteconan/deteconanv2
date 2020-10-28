@@ -20,6 +20,7 @@
     name: 'App',
     components: {Sidebar, Toolbar},
     async created() {
+      await this.$store.dispatch('getCurrentUser');
       await this.$store.dispatch('loadFolders');
       await this.$store.dispatch('loadMovies');
       await this.$store.dispatch('getTotalUsage');

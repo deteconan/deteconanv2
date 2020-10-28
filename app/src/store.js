@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        user: null,
         sidebarVisible: true,
         folders: [],
         movies: [],
@@ -14,6 +15,9 @@ export default new Vuex.Store({
         searchMovie: ''
     },
     mutations: {
+        setUser(state, user) {
+            state.user = user;
+        },
         toggleSidebar(state) {
             state.sidebarVisible = !state.sidebarVisible;
         },
@@ -47,6 +51,48 @@ export default new Vuex.Store({
         getTotalUsage({ commit }) {
             return Network.get('/usage/total').then(res => {
                 commit('setTotalUsage', res.data);
+            });
+        },
+        login({ commit, dispatch }) {
+            return Vue.GoogleAuth.then(auth2 => {
+                auth2.signIn().then(() => {
+                    const token = auth2.currentUser.get().wc.access_token;
+                    localStorage.setItem('token', token);
+                }).then(() => Network.post('/users/grant-access')).then(() => {
+                    dispatch('getCurrentUser');
+                }).catch(err => {
+                    console.error(err);
+                    commit('setUser', null);
+                    Network.removeToken();
+                });
+            });
+        },
+        logout({ commit }) {
+            return Vue.GoogleAuth.then(auth2 => {
+                auth2.signOut().then(() => {
+                    commit('setUser', null);
+                    Network.removeToken();
+                });
+            });
+        },
+        getCurrentUser({ commit }) {
+            return Network.get('/users/current-user').then(res => {
+                Vue.GoogleAuth.then(auth2 => {
+                    if (auth2.isSignedIn.get()) {
+                        const user = {
+                            email: res.data.email,
+                            admin: res.data.admin,
+                            name: auth2.currentUser.get().tt.Ad,
+                            avatar: auth2.currentUser.get().tt.dK
+                        };
+                        commit('setUser', user);
+                    } else {
+                        commit('setUser', null);
+                        Network.removeToken();
+                    }
+                });
+            }).catch(() => {
+                commit('setUser', null);
             });
         }
     }
