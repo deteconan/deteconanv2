@@ -7,15 +7,25 @@
                 </v-col>
                 <v-col cols="9">
                     <div class="details">
-                        <h1>{{ movie.name }}</h1>
+                        <div class="d-flex align-center">
+                            <h1>{{ movie.name }}</h1>
+                            <template v-if="isAdmin">
+                                <v-btn class="ml-auto" icon @click.stop="editDialog = true">
+                                    <v-icon class="material-icons-outlined">edit</v-icon>
+                                </v-btn>
+                                <v-btn class="ml-3" icon @click.stop="deleteDialog = true">
+                                    <v-icon class="material-icons-outlined text-error">delete</v-icon>
+                                </v-btn>
+                            </template>
+                        </div>
                         <h2 class="text-spaced">{{ movie.year }}</h2>
-                        <div class="font-weight-bold text-spaced opacity-80 my-5 d-flex align-center">
+                        <div class="font-weight-bold text-spaced opacity-80 mt-5 d-flex align-center">
                             <div class="mr-5">{{ details.runtime }}</div>
                             <v-img :src="require('../assets/img/popcorn.svg')" max-width="1.2em" max-height="1.2em" title="Note du public"></v-img>
                             <div class="ml-1">{{ details.rating * 10 }}%</div>
                         </div>
 
-                        <v-btn color="primary black--text" class="mr-auto mb-5" @click.stop="openPlayer">
+                        <v-btn color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
                             <v-icon>play_arrow</v-icon>
                             <span class="ml-1">Lire</span>
                         </v-btn>
@@ -49,36 +59,11 @@
             </div>
             <div class="d-flex overflow-auto hide-scrollbar actors" ref="actors">
                 <div v-for="actor in details.cast" :key="actor.id" style="width: 20%" class="text-center mr-10">
-                    <v-avatar size="150">
+                    <v-avatar size="150" color="indigo">
                         <v-img :src="actor.image"></v-img>
                     </v-avatar>
                     <div class="font-weight-bold mt-3">{{ actor.name }}</div>
                     <div class="opacity-80 f-500 f-11">{{ actor.role }}</div>
-                </div>
-            </div>
-
-            <div v-if="false" class="d-flex mt-5">
-                <img :src="movie.image" :alt="movie.title">
-                <div class="ml-10">
-                    <h1>{{ movie.name }}</h1>
-                    <h2 class="opacity-80 text-spaced">{{ movie.year }}</h2>
-                    <h5 v-if="details">{{ details.story }}</h5>
-                </div>
-                <div class="ml-auto actions">
-                    <v-btn block outlined @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
-                        <v-icon class="material-icons-outlined">subtitles</v-icon>
-                        <span class="ml-1">Sous-titres</span>
-                    </v-btn>
-                    <template v-if="isAdmin">
-                        <v-btn block outlined class="mt-3" @click.stop="editDialog = true">
-                            <v-icon class="material-icons-outlined">edit</v-icon>
-                            <span class="ml-1">Modifier</span>
-                        </v-btn>
-                        <v-btn block outlined color="error" class="mt-3" @click.stop="deleteDialog = true">
-                            <v-icon class="material-icons-outlined">delete</v-icon>
-                            <span class="ml-1">Supprimer</span>
-                        </v-btn>
-                    </template>
                 </div>
             </div>
         </div>

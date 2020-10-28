@@ -13,9 +13,11 @@
                     <v-btn @click.stop="togglePlayer" icon>
                         <v-icon>expand_more</v-icon>
                     </v-btn>
+
                     <h3 class="ml-5 opacity-80 text-spaced f-500">{{ playingMovie.name }}</h3>
-                    <v-btn class="ml-auto" icon>
-                        <v-icon>cast</v-icon>
+
+                    <v-btn class="ml-auto" icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
+                        <v-icon class="material-icons-outlined">subtitles</v-icon>
                     </v-btn>
                 </div>
                 <div class="flex-grow-1 position-relative">
