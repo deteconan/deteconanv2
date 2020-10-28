@@ -1,15 +1,17 @@
 import axios from 'axios';
 
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : window.location.origin;
+
 export default class Network {
 
     static get(url) {
         this.setToken();
-        return axios.get(`${process.env.VUE_APP_API_URL}/api${url}`);
+        return axios.get(`${API_URL}/api${url}`);
     }
 
     static post(url, params) {
         this.setToken();
-        return axios.post(`${process.env.VUE_APP_API_URL}/api${url}`, params);
+        return axios.post(`${API_URL}/api${url}`, params);
     }
 
     static setToken() {
