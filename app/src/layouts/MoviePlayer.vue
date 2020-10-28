@@ -3,6 +3,10 @@
         <v-card class="minimized" v-if="playingMovie" elevation="15" @click.stop="togglePlayer">
             <img :src="playingMovie.image" style="border-radius: 3px">
             <div class="resume">
+                <v-btn class="position-absolute" style="top: 5px; right: 5px;" icon @click.stop="$store.commit('setMovie', null)">
+                    <v-icon>close</v-icon>
+                </v-btn>
+
                 <v-icon>play_arrow</v-icon>
                 <span class="ml-1">Reprendre</span>
             </div>
