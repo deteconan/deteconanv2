@@ -2,10 +2,12 @@
     <main-page :loading="loading">
         <div class="pa-15" v-if="movie && details">
             <v-row>
-                <v-col cols="3">
-                    <v-img :src="movie.image" style="border-radius: 5px"></v-img>
+                <v-col cols="4" class="pr-0">
+                    <div style="height: 100%">
+                        <v-img :src="movie.image" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
+                    </div>
                 </v-col>
-                <v-col cols="9">
+                <v-col cols="8" class="pl-0">
                     <div class="details">
                         <div class="d-flex align-center">
                             <h1>{{ movie.name }}</h1>
@@ -27,7 +29,7 @@
 
                         <v-btn color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
                             <v-icon>play_arrow</v-icon>
-                            <span class="ml-1">Lire</span>
+                            <span class="ml-1 f-600">Lire</span>
                         </v-btn>
 
                         <div class="text-justify f-500 mb-5">{{ details.story }}</div>
@@ -207,7 +209,8 @@
         background: rgb(0 0 0 / 0.3);
         backdrop-filter: blur(5px);
         padding: 1.5em 2em 2em 2em;
-        border-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
         height: 100%;
         display: flex;
         flex-direction: column;

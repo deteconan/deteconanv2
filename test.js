@@ -40,8 +40,8 @@ async function test() {
     // const image = await uploadImage('https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_.jpg');
     // console.log(image);
 
-    let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
-    console.log(files);
+    // let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
+    // console.log(files);
     /* for (let file of files) {
         const movie = (await imdb.simpleSearch(file.name.normalize('NFD').replace(/[\u0300-\u036f]/g, ""))).d.shift();
         await DriveHelper.updateFile({
@@ -55,7 +55,8 @@ async function test() {
         });
         console.log(movie.l, movie.id);
     } */
-    // const movies = await imdb.simpleSearch('fifth element');
+
+    // const movies = await imdb.getFull("tt0109830");
     // console.log(movies);
 
     DB.close();
