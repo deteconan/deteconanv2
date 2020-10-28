@@ -47,7 +47,8 @@ export default class DriveHelper {
                 role: 'reader',
                 emailAddress: email
             },
-            fileId: fileId
+            fileId: fileId,
+            sendNotificationEmail: false
         });
 
         return res.data;
