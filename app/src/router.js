@@ -20,7 +20,7 @@ export default new Router({
             component: Upload
         },
         {
-            path: `/movie`,
+            path: `/movie/:id`,
             name: `movie`,
             component: PlayingMovie
         }

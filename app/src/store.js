@@ -8,6 +8,7 @@ export default new Vuex.Store({
     state: {
         user: null,
         sidebarVisible: true,
+        playerVisible: false,
         folders: [],
         movies: [],
         playingMovie: null,
@@ -20,6 +21,9 @@ export default new Vuex.Store({
         },
         toggleSidebar(state) {
             state.sidebarVisible = !state.sidebarVisible;
+        },
+        togglePlayer(state) {
+            state.playerVisible = !state.playerVisible;
         },
         setFolders(state, folders) {
             state.folders = folders;

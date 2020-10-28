@@ -8,6 +8,9 @@ Vue.mixin({
         sidebarVisible() {
             return this.$store.state.sidebarVisible;
         },
+        playerVisible() {
+            return this.$store.state.playerVisible;
+        },
         folders() {
             return this.$store.state.folders;
         },
@@ -41,10 +44,11 @@ Vue.mixin({
         toggleMainSidebar() {
             this.$store.commit('toggleSidebar');
         },
+        togglePlayer() {
+            this.$store.commit('togglePlayer');
+        },
         playMovie(movie) {
-            if (!this.$store.state.playingMovie || this.$store.state.playingMovie.id !== movie.id)
-                this.$store.commit('setMovie', movie);
-            this.reach('/movie');
+            this.reach(`/movie/${movie.id}`);
         }
     }
 });

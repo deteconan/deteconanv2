@@ -259,7 +259,8 @@
                     parentId: this.folderSelected,
                     progress: 0,
                     image: this.movieDetails.image,
-                    year: this.movieDetails.year
+                    year: this.movieDetails.year,
+                    imdbId: this.movieDetails.id
                 });
             }
         }

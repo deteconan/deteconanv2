@@ -24,6 +24,10 @@
   opacity: 0.8 !important;
 }
 
+.opacity-50 {
+  opacity: 0.5 !important;
+}
+
 .cursor-pointer {
   cursor: pointer !important;
 }
@@ -38,6 +42,16 @@
 
 .f-500 {
   font-weight: 500 !important;
+}
+
+.f-11 {
+  font-size: 11pt !important;
+}
+
+.hide-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes fade {

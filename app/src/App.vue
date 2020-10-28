@@ -4,6 +4,7 @@
       <toolbar></toolbar>
       <div class="body-page">
         <sidebar></sidebar>
+        <movie-player></movie-player>
 
         <keep-alive>
           <router-view></router-view>
@@ -16,9 +17,10 @@
 <script>
   import Toolbar from "@/layouts/Toolbar.vue";
   import Sidebar from "@/layouts/Sidebar.vue";
+  import MoviePlayer from "@/layouts/MoviePlayer.vue";
   export default {
     name: 'App',
-    components: {Sidebar, Toolbar},
+    components: {MoviePlayer, Sidebar, Toolbar},
     async created() {
       await this.$store.dispatch('getCurrentUser');
       await this.$store.dispatch('loadFolders');

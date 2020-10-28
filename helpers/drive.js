@@ -112,7 +112,7 @@ export default class DriveHelper {
         return total;
     }
 
-    static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, onProgress) {
+    static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, imdbId, onProgress) {
         let response = null;
         let client = new WebTorrent();
         let fileSize = 0, filename = '';
@@ -146,6 +146,7 @@ export default class DriveHelper {
                 parentId,
                 image,
                 year,
+                imdbId,
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
@@ -341,7 +342,8 @@ export default class DriveHelper {
                 appProperties: {
                     image: file.image,
                     year: file.year,
-                    parentId: file.parentId
+                    parentId: file.parentId,
+                    imdbId: file.imdbId
                 }
             }
         }).catch(err => {

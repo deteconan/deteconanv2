@@ -1,6 +1,6 @@
 import express from 'express';
 import DriveHelper from "../helpers/drive.js";
-import {checkRequiredPOST} from "../helpers/middlewares.js";
+import {checkRequiredGET, checkRequiredPOST} from "../helpers/middlewares.js";
 import {sendError} from "../helpers/utils.js";
 import imdb from 'imdb-scrapper';
 import TorrentSearchApi from 'torrent-search-api';
@@ -41,6 +41,7 @@ router.get('/movies', async (req, res) => {
           m.image = m.appProperties.image;
           m.year = m.appProperties.year;
           m.parentId = m.appProperties.parentId;
+          m.imdbId = m.appProperties.imdbId;
           delete m.appProperties;
       });
       res.json(movies);
@@ -65,7 +66,7 @@ router.post('/movies/autocomplete', needAdmin, checkRequiredPOST('name'), async 
         if (!movies || !movies.d)
             return res.status(HTTP_BAD_REQUEST).send('No result');
 
-        movies = movies.d.filter(m => m.i).map(m => {
+        movies = movies.d.filter(m => m.i && m.q === 'feature').map(m => {
             return {
                 id: m.id,
                 name: m.l,
@@ -110,10 +111,18 @@ router.post('/movies/torrents', needAdmin, checkRequiredPOST('name', 'providers'
     }
 });
 
+router.get('/movies/details/:imdb_id', checkRequiredGET('imdb_id'), async (req, res) => {
+    try {
+        const movie = await imdb.getFull(req.params.imdb_id);
+        res.json(movie);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
 router.post('/movies/update', needAdmin, checkRequiredPOST('id'), async (req, res) => {
     try {
         await DriveHelper.updateFile(req.body);
-
         res.sendStatus(HTTP_OK);
     } catch (err) {
         sendError(err, req, res);

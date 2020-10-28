@@ -82,21 +82,5 @@
                 margin-right: 0;
             }
         }
-
-        .prev-btn {
-            z-index: 1;
-            position: absolute;
-            top: 50%;
-            left: -40px;
-            transform: translateY(-80%);
-        }
-
-        .next-btn {
-            z-index: 1;
-            position: absolute;
-            top: 50%;
-            right: -40px;
-            transform: translateY(-80%);
-        }
     }
 </style>

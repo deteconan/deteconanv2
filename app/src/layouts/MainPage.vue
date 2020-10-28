@@ -1,12 +1,23 @@
 <template>
     <v-main class="pt-0 main-page" :class="{'sidebar-visible': sidebarVisible}">
-        <slot></slot>
+        <v-overlay v-if="loading" :value="true" absolute>
+            <v-progress-circular color="primary" indeterminate></v-progress-circular>
+        </v-overlay>
+        <div v-else class="default">
+            <slot></slot>
+        </div>
     </v-main>
 </template>
 
 <script>
     export default {
-        name: "MainPage"
+        name: "MainPage",
+        props: {
+            loading: {
+                type: Boolean,
+                default: false
+            }
+        }
     }
 </script>
 
@@ -15,11 +26,14 @@
         position: relative;
         overflow: auto;
         width: calc(100% - 56px);
-        animation: scrollY 300ms ease;
 
         &.sidebar-visible {
             width: calc(100% - 220px);
         }
+    }
+
+    .default {
+        animation: scrollY 300ms ease;
     }
 
     @keyframes scrollY {
