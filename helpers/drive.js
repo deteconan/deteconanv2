@@ -11,6 +11,7 @@ import Credentials from "../models/credentials.js";
 import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
 import moment from 'moment';
+import fs from 'fs';
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
@@ -73,6 +74,15 @@ export default class DriveHelper {
         return res.data.storageQuota;
     }
 
+    static async addQuota(accountEmail, quota) {
+        if (!accountEmail || !quota)
+            return;
+
+        const account = await Credentials.findOne({ client_email: accountEmail });
+
+        await Credentials.findOneAndUpdate({ client_email: accountEmail }, { remaining_quota: account.remaining_quota - quota });
+    }
+
     static async updateQuota(accountEmail = null) {
         let accounts = [];
 
@@ -116,7 +126,7 @@ export default class DriveHelper {
     static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, imdbId, onProgress) {
         let response = null;
         let client = new WebTorrent();
-        let fileSize = 0, filename = '';
+        let fileSize = 0, filename = '', filePath = null;
 
         await new Promise(resolve => {
             client.add(url, torrent => {
@@ -128,6 +138,7 @@ export default class DriveHelper {
 
                 fileSize = selected.length;
                 filename = selected.name;
+                filePath = selected.path;
 
                 response = selected.createReadStream();
                 resolve();
@@ -166,6 +177,8 @@ export default class DriveHelper {
             null
         );
 
+        await this.addQuota(cred.client_email, fileSize); // Reserve quota for simultaneous uploads
+
         let time = new Date().getTime();
         const res = await drive.files.create({
             auth: token,
@@ -193,6 +206,12 @@ export default class DriveHelper {
             }
         }).catch(err => {
             console.error(err);
+        }).finally(() => {
+            if (filePath) {
+                fs.rmdirSync(filePath, { // Delete file at the end of upload
+                    recursive: true
+                });
+            }
         });
 
         const fileAccount = new FileAccount({
