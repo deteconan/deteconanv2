@@ -53,7 +53,7 @@
       left: 0;
       display: flex;
 
-      background-image: url("https://free4kwallpapers.com/uploads/originals/2019/08/28/gradient-blur-wallpaper.jpg");
+      background-image: url("./assets/img/gradient-blur-wallpaper.jpg");
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
