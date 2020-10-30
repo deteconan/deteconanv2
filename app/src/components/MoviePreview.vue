@@ -103,6 +103,7 @@
             text-overflow: ellipsis;
             cursor: pointer;
             margin-top: 0.5em;
+            text-align: center;
 
             &:hover {
                 text-decoration: underline;

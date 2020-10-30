@@ -1,6 +1,12 @@
 <template>
     <v-navigation-drawer permanent :mini-variant="!sidebarVisible" width="220px">
         <v-list>
+            <v-list-item to="/" link>
+                <v-list-item-icon>
+                    <v-icon>home</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>Accueil</v-list-item-content>
+            </v-list-item>
             <v-list-item to="/movies" link>
                 <v-list-item-icon>
                     <v-icon class="material-icons-outlined">theaters</v-icon>
