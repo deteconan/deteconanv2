@@ -6,8 +6,8 @@
   "scripts": {
     "test": "node --experimental-modules --experimental-json-modules test.js",
     "start-dev": "nodemon --experimental-modules --experimental-json-modules app.js",
-    "start": "set NODE_ENV=production && node --experimental-modules --experimental-json-modules app.js",
-    "build": "df -h /tmp && cd app && npm cache -f clean && npm i chalk && npm i --only=dev && npm run build"
+    "start": "rm /tmp/* && set NODE_ENV=production && node --experimental-modules --experimental-json-modules app.js",
+    "build": "cd app && npm cache -f clean && npm i chalk && npm i --only=dev && npm run build"
   },
   "dependencies": {
     "axios": "^0.20.0",
