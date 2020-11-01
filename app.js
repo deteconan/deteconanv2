@@ -15,6 +15,7 @@ const app = express();
 DB.init();
 
 if (process.env.NODE_ENV) { // Not in local
+  DriveHelper.updateQuota();
   schedule.scheduleJob({hour: 23, minute: 0}, async () => { // Every days at 11pm
     await DriveHelper.updateQuota();
   });
