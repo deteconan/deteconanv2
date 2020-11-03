@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Network from "@/helpers/Network.js";
+import Network from "@/helpers/Network.js"
+import router from "@/router.js"
 
 Vue.use(Vuex)
 
@@ -76,6 +77,8 @@ export default new Vuex.Store({
                 auth2.signOut().then(() => {
                     commit('setUser', null);
                     Network.removeToken();
+                    if (router.currentRoute.fullPath !== '/')
+                        router.push('/');
                 });
             });
         },

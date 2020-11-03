@@ -1,4 +1,5 @@
 import GoogleAuthLibrary from "google-auth-library";
+const GoogleClient = new GoogleAuthLibrary.OAuth2Client('22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com');
 
 const admins = ['molpick98@gmail.com'];
 
@@ -7,7 +8,6 @@ export function needAuth(req, res, next) {
         return res.sendStatus(HTTP_UNAUTHORIZED);
 
     const token = req.header('Authorization').replace('Bearer ', '');
-    const GoogleClient = new GoogleAuthLibrary.OAuth2Client('22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com');
     GoogleClient.getTokenInfo(token)
         .then(info => {
             req.user = {
@@ -25,7 +25,6 @@ export function needAdmin(req, res, next) {
         return res.sendStatus(HTTP_UNAUTHORIZED);
 
     const token = req.header('Authorization').replace('Bearer ', '');
-    const GoogleClient = new GoogleAuthLibrary.OAuth2Client('22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com');
     GoogleClient.getTokenInfo(token)
         .then(info => {
             if (admins.includes(info.email)) {

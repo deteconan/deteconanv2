@@ -7,6 +7,15 @@ import PlayingMovie from "@/views/PlayingMovie.vue"
 
 Vue.use(Router)
 
+function needAuthentication(to, from, next) {
+    const token = localStorage.getItem('token');
+
+    if (token)
+        next();
+    else
+        next('/');
+}
+
 export default new Router({
     mode: `history`,
     routes: [
@@ -23,7 +32,8 @@ export default new Router({
         {
             path: `/upload`,
             name: `upload`,
-            component: Upload
+            component: Upload,
+            beforeEnter: needAuthentication
         },
         {
             path: `/movie/:id`,
