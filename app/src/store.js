@@ -61,7 +61,7 @@ export default new Vuex.Store({
         login({ commit, dispatch }) {
             return Vue.GoogleAuth.then(auth2 => {
                 auth2.signIn().then(() => {
-                    const token = auth2.currentUser.get().wc.access_token;
+                    const token = auth2.currentUser.get().xc.access_token;
                     localStorage.setItem('token', token);
                 }).then(() => Network.post('/users/grant-access')).then(() => {
                     dispatch('getCurrentUser');
@@ -89,8 +89,8 @@ export default new Vuex.Store({
                         const user = {
                             email: res.data.email,
                             admin: res.data.admin,
-                            name: auth2.currentUser.get().tt.Ad,
-                            avatar: auth2.currentUser.get().tt.dK
+                            name: auth2.currentUser.get().wt.Ad,
+                            avatar: auth2.currentUser.get().wt.hK
                         };
                         commit('setUser', user);
                     } else {
