@@ -93,8 +93,8 @@ export default new Vuex.Store({
                         const user = {
                             email: res.data.email,
                             admin: res.data.admin,
-                            name: auth2.currentUser.get().Mt.DW,
-                            avatar: auth2.currentUser.get().Mt.eL
+                            name: auth2.currentUser.get().Es.sd,
+                            avatar: auth2.currentUser.get().Es.vI
                         };
                         commit('setUser', user);
                     } else {
