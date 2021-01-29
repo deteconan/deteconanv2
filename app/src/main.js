@@ -12,7 +12,11 @@ import { LoaderPlugin } from 'vue-google-login'
 
 Vue.config.productionTip = false
 
-Vue.prototype.$socket = io(`${process.env.VUE_APP_API_URL}/upload`)
+let socketEnpoint = window.origin;
+if (process.env.NODE_ENV === 'development')
+  socketEnpoint = process.env.VUE_APP_API_URL;
+
+Vue.prototype.$socket = io(`${socketEnpoint}/upload`)
 Vue.prototype.$moment = moment
 
 Vue.use(LoaderPlugin, {

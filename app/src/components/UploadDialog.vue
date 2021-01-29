@@ -91,6 +91,15 @@
                                 <v-tab-item value="torrents">
                                     <v-progress-linear v-if="loadingMoviesTorrents" indeterminate></v-progress-linear>
                                     <v-list v-if="!movieTorrent" class="pa-0">
+                                        <v-list-item>
+                                            <v-list-item-content>
+                                                <v-text-field v-model="customMagnet" label="Lien magnet" prepend-inner-icon="link" outlined hide-details dense></v-text-field>
+                                            </v-list-item-content>
+                                            <v-list-item-action>
+                                                <v-btn @click.stop="setCustomMagnet" color="primary" :disabled="!customMagnet">Valider</v-btn>
+                                            </v-list-item-action>
+                                        </v-list-item>
+
                                         <v-list-item v-for="(torrent, index) in torrents" :key="index" link @click.stop="movieTorrent = torrent">
                                             <v-list-item-content>
                                                 <div class="text-ellipsis line-spaced" :title="torrent.title">{{ torrent.title }}</div>
@@ -98,14 +107,14 @@
                                             </v-list-item-content>
                                             <v-list-item-action>
                                                 <div class="f-500">
-                                                <span class="text-success mr-1">
-                                                    <span>{{ torrent.seeds }}</span>
-                                                    <v-icon color="success">arrow_upward</v-icon>
-                                                </span>
+                                                    <span class="text-success mr-1">
+                                                        <span>{{ torrent.seeds }}</span>
+                                                        <v-icon color="success">arrow_upward</v-icon>
+                                                    </span>
                                                     <span class="text-error">
-                                                    <span>{{ torrent.peers }}</span>
-                                                    <v-icon color="error">arrow_downward</v-icon>
-                                                </span>
+                                                        <span>{{ torrent.peers }}</span>
+                                                        <v-icon color="error">arrow_downward</v-icon>
+                                                    </span>
                                                 </div>
                                                 <div class="text-primary f-500">{{ torrent.size }}</div>
                                             </v-list-item-action>
@@ -118,7 +127,7 @@
                                                 <div class="text-ellipsis line-spaced" :title="movieTorrent.title">{{ movieTorrent.title }}</div>
                                                 <div class="opacity-80 subtitle-2">{{ movieTorrent.provider }}</div>
                                             </v-list-item-content>
-                                            <v-list-item-action>
+                                            <v-list-item-action v-if="movieTorrent.seeds && movieTorrent.peers">
                                                 <div class="f-500">
                                                 <span class="text-success mr-1">
                                                     <span>{{ movieTorrent.seeds }}</span>
@@ -129,7 +138,7 @@
                                                     <v-icon color="error">arrow_downward</v-icon>
                                                 </span>
                                                 </div>
-                                                <div class="text-primary f-500">{{ movieTorrent.size }}</div>
+                                                <div v-if="movieTorrent.size" class="text-primary f-500">{{ movieTorrent.size }}</div>
                                             </v-list-item-action>
                                         </v-list-item>
 
@@ -193,7 +202,8 @@
                 folderSelected: null,
                 moreOptions: false,
                 providers: providers,
-                selectedProviders: providers.map(p => p.value)
+                selectedProviders: providers.map(p => p.value),
+                customMagnet: null
             }
         },
         computed: {
@@ -208,6 +218,17 @@
             }
         },
         methods: {
+            setCustomMagnet() {
+                if (!this.customMagnet)
+                    return;
+
+                this.movieTorrent = {
+                    magnet: this.customMagnet,
+                    title: this.customMagnet
+                };
+
+                this.customMagnet = null;
+            },
             searchMovieInfo() {
                 if (!this.file.name)
                     return;
