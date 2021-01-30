@@ -17,7 +17,7 @@
             <span class="ml-1">Upload</span>
         </v-btn>
 
-        <v-btn v-if="!user" @click="$store.dispatch('login')" color="blue" class="ml-3">
+        <v-btn v-if="!user" @click.stop="$store.dispatch('login')" color="blue" class="ml-3">
             <v-avatar color="white" size="25">
                 <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
             </v-avatar>
@@ -47,6 +47,12 @@
 </template>
 
 <script>
+    // const google = {
+    //     appId: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com',
+    //     redirectUri: `${window.origin}/auth/google`,
+    //     state: 'flex'
+    // };
+
     export default {
         name: "Toolbar",
         data() {

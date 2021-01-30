@@ -58,50 +58,51 @@ export default new Vuex.Store({
                 commit('setTotalUsage', res.data);
             });
         },
-        login({ commit, dispatch }) {
-            return Vue.GoogleAuth.then(auth2 => {
-                auth2.signIn().then(() => {
-                    let token = null, auth = auth2.currentUser.get();
-                    Object.keys(auth).forEach(k => {
-                        if (auth[k].access_token)
-                            token = auth[k].access_token;
-                    });
-                    localStorage.setItem('token', token);
-                }).then(() => Network.post('/users/grant-access')).then(() => {
-                    dispatch('getCurrentUser');
-                }).catch(err => {
-                    console.error(err);
+        async login({ commit, dispatch }) {
+            // eslint-disable-next-line no-undef
+            const auth = gapi.auth2.getAuthInstance();
+            await auth.signIn();
+            const token = auth.currentUser.get().getAuthResponse(true).access_token;
+            localStorage.setItem('token', token);
+
+            return Network.post('/users/grant-access')
+                .then(() => dispatch('getCurrentUser'))
+                .catch(err => {
+                    console.error(err.response.data);
                     commit('setUser', null);
                     Network.removeToken();
                 });
-            });
         },
-        logout({ commit }) {
-            return Vue.GoogleAuth.then(auth2 => {
-                auth2.signOut().then(() => {
-                    commit('setUser', null);
-                    Network.removeToken();
-                    if (router.currentRoute.fullPath !== '/')
-                        router.push('/');
-                });
-            });
+        async logout({ commit }) {
+            // eslint-disable-next-line no-undef
+            const auth = gapi.auth2.getAuthInstance();
+            await auth.signOut();
+            commit('setUser', null);
+            Network.removeToken();
+            if (router.currentRoute.fullPath !== '/')
+                router.push('/');
         },
         getCurrentUser({ commit }) {
             return Network.get('/users/current-user').then(res => {
-                Vue.GoogleAuth.then(auth2 => {
-                    if (auth2.isSignedIn.get()) {
+                try {
+                    // eslint-disable-next-line no-undef
+                    Vue.prototype.$gauth.then(() => {
+                        // eslint-disable-next-line no-undef
+                        const auth = gapi.auth2.getAuthInstance();
+                        const profile = auth.currentUser.get().getBasicProfile();
                         const user = {
                             email: res.data.email,
                             admin: res.data.admin,
-                            name: auth2.currentUser.get().Es.sd,
-                            avatar: auth2.currentUser.get().Es.vI
+                            name: profile.getGivenName(),
+                            avatar: profile.getImageUrl()
                         };
                         commit('setUser', user);
-                    } else {
-                        commit('setUser', null);
-                        Network.removeToken();
-                    }
-                });
+                    });
+                } catch (err) {
+                    console.error(err);
+                    commit('setUser', null);
+                    Network.removeToken();
+                }
             }).catch(() => {
                 commit('setUser', null);
             });
