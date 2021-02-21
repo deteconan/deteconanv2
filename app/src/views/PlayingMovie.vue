@@ -1,17 +1,17 @@
 <template>
     <main-page :loading="loading">
-        <div class="pa-15" v-if="movie && details">
+        <div class="pa-0 pa-lg-15 overflow-x-hidden" v-if="movie && details">
             <v-row>
-                <v-col cols="4" class="pr-0">
+                <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pr-0">
                     <div style="height: 100%">
                         <v-img :src="movie.image" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
                     </div>
                 </v-col>
-                <v-col cols="8" class="pl-0">
+                <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3">
                     <div class="details">
                         <div class="d-flex align-center">
                             <h1>{{ movie.name }}</h1>
-                            <template v-if="isAdmin">
+                            <template v-if="!isMobileLayout && isAdmin">
                                 <v-btn class="ml-auto" icon @click.stop="editDialog = true">
                                     <v-icon class="material-icons-outlined">edit</v-icon>
                                 </v-btn>
@@ -50,7 +50,7 @@
                 </v-col>
             </v-row>
 
-            <div class="d-flex align-center">
+            <div v-if="!isMobileLayout" class="d-flex align-center">
                 <h3 class="mt-5 mb-5">Acteurs</h3>
                 <v-btn @click="scrollX('actors', -1)" rounded icon class="ml-auto">
                     <v-icon>chevron_left</v-icon>
@@ -59,7 +59,7 @@
                     <v-icon>chevron_right</v-icon>
                 </v-btn>
             </div>
-            <div class="d-flex overflow-auto hide-scrollbar actors" ref="actors">
+            <div v-if="!isMobileLayout" class="d-flex overflow-auto hide-scrollbar actors" ref="actors">
                 <div v-for="actor in details.cast" :key="actor.id" style="width: 20%" class="text-center mr-10">
                     <v-avatar size="150" color="indigo">
                         <v-img :src="actor.image"></v-img>

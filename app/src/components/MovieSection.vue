@@ -1,23 +1,31 @@
 <template>
     <div class="movie-section" ref="movies">
-        <div class="mb-3 d-flex align-center">
-            <h3 class="text-spaced" v-if="title">{{ title }}</h3>
+        <template v-if="!isMobileLayout">
+            <div class="mb-3 d-flex align-center">
+                <h3 class="text-spaced" v-if="title">{{ title }}</h3>
 
-            <v-btn @click="prev" rounded icon class="ml-auto" :disabled="!canPrev">
-                <v-icon>chevron_left</v-icon>
-            </v-btn>
-            <v-btn @click="next" rounded icon :disabled="!canNext">
-                <v-icon>chevron_right</v-icon>
-            </v-btn>
-        </div>
+                <v-btn @click="prev" rounded icon class="ml-auto" :disabled="!canPrev">
+                    <v-icon>chevron_left</v-icon>
+                </v-btn>
+                <v-btn @click="next" rounded icon :disabled="!canNext">
+                    <v-icon>chevron_right</v-icon>
+                </v-btn>
+            </div>
 
-        <v-window v-model="onboarding">
-            <v-window-item v-for="n in Math.ceil(localMovies.length / elementsPerPage)" :key="n">
-                <div class="d-flex">
-                    <movie-preview v-for="(movie, index) in currents(n)" :key="index" :movie="movie" class="movie"></movie-preview>
-                </div>
-            </v-window-item>
-        </v-window>
+            <v-window v-model="onboarding">
+                <v-window-item v-for="n in Math.ceil(localMovies.length / elementsPerPage)" :key="n">
+                    <div class="d-flex">
+                        <movie-preview v-for="(movie, index) in currents(n)" :key="index" :movie="movie" class="movie"></movie-preview>
+                    </div>
+                </v-window-item>
+            </v-window>
+        </template>
+        <template v-else>
+            <h3 class="text-spaced mb-3" v-if="title">{{ title }}</h3>
+            <div class="scroll">
+                <movie-preview v-for="(movie, index) in localMovies" :key="index" :movie="movie" class="movie"></movie-preview>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -80,6 +88,27 @@
 
             &:last-child {
                 margin-right: 0;
+            }
+        }
+    }
+
+    .mobile {
+        .movie-section {
+            .scroll {
+                white-space: nowrap;
+                overflow: auto;
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+            }
+
+            .movie {
+                display: inline-block;
             }
         }
     }
