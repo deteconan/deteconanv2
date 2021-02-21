@@ -31,6 +31,9 @@ Vue.mixin({
         },
         isAdmin() {
             return this.user && this.user.admin;
+        },
+        isMobileLayout() {
+            return this.$store.state.isMobileLayout;
         }
     },
     methods: {

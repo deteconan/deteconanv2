@@ -18,17 +18,9 @@ if (process.env.NODE_ENV === 'development')
 Vue.prototype.$socket = io(`${socketEnpoint}/upload`)
 Vue.prototype.$moment = moment
 
-// eslint-disable-next-line no-undef
-gapi.load('auth2', () => {
-  // eslint-disable-next-line no-undef
-  Vue.prototype.$gauth = gapi.auth2.init({
-    client_id: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com'
-  })
-
-  new Vue({
-    vuetify,
-    store,
-    router,
-    render: h => h(App),
-  }).$mount('#app')
-});
+new Vue({
+  vuetify,
+  store,
+  router,
+  render: h => h(App),
+}).$mount('#app')

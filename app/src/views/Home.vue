@@ -1,6 +1,6 @@
 <template>
     <main-page>
-        <div class="pa-10">
+        <div class="pa-5 pa-lg-10">
             <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-10"></movie-section>
             <movie-section v-if="recentlyAddedMovies.length > 0" title="Ajouts récents" :local-movies="recentlyAddedMovies" class="mb-10"></movie-section>
             <movie-section v-if="otherMovies.length > 0" title="Tous les films" :local-movies="otherMovies"></movie-section>

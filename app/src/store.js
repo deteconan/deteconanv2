@@ -14,7 +14,8 @@ export default new Vuex.Store({
         movies: [],
         playingMovie: null,
         totalUsage: 0,
-        searchMovie: ''
+        searchMovie: '',
+        isMobileLayout: false
     },
     mutations: {
         setUser(state, user) {
@@ -40,6 +41,9 @@ export default new Vuex.Store({
         },
         searchMovie(state, search) {
             state.searchMovie = search;
+        },
+        updateLayout(state) {
+            state.isMobileLayout = window.innerWidth < 600;
         }
     },
     actions: {
@@ -82,22 +86,30 @@ export default new Vuex.Store({
             if (router.currentRoute.fullPath !== '/')
                 router.push('/');
         },
+        loadGoogleAuthApi() {
+            return new Promise((resolve, reject) => {
+                // eslint-disable-next-line no-undef
+                gapi.load('auth2', () => {
+                    // eslint-disable-next-line no-undef
+                    Vue.prototype.$gauth = gapi.auth2.init({ client_id: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com' })
+                        .then(resolve)
+                        .catch(reject);
+                });
+            });
+        },
         getCurrentUser({ commit }) {
             return Network.get('/users/current-user').then(res => {
                 try {
                     // eslint-disable-next-line no-undef
-                    Vue.prototype.$gauth.then(() => {
-                        // eslint-disable-next-line no-undef
-                        const auth = gapi.auth2.getAuthInstance();
-                        const profile = auth.currentUser.get().getBasicProfile();
-                        const user = {
-                            email: res.data.email,
-                            admin: res.data.admin,
-                            name: profile.getGivenName(),
-                            avatar: profile.getImageUrl()
-                        };
-                        commit('setUser', user);
-                    });
+                    const auth = gapi.auth2.getAuthInstance();
+                    const profile = auth.currentUser.get().getBasicProfile();
+                    const user = {
+                        email: res.data.email,
+                        admin: res.data.admin,
+                        name: profile.getGivenName(),
+                        avatar: profile.getImageUrl()
+                    };
+                    commit('setUser', user);
                 } catch (err) {
                     console.error(err);
                     commit('setUser', null);

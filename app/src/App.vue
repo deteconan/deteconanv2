@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-app>
+    <v-app :class="{'mobile': isMobileLayout}">
       <toolbar></toolbar>
       <div class="body-page">
         <sidebar></sidebar>
@@ -22,10 +22,15 @@
     name: 'App',
     components: {MoviePlayer, Sidebar, Toolbar},
     async created() {
-      await this.$store.dispatch('getCurrentUser');
+      this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
       await this.$store.dispatch('loadFolders');
       await this.$store.dispatch('loadMovies');
       await this.$store.dispatch('getTotalUsage');
+
+      this.$store.commit('updateLayout');
+      window.addEventListener(`resize`, () => {
+        this.$store.commit('updateLayout');
+      });
     }
   }
 </script>
