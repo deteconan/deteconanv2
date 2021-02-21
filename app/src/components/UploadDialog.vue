@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="value" width="600" persistent scrollable>
+    <v-dialog :value="value" width="600" persistent scrollable :fullscreen="isMobileLayout">
         <v-card>
             <v-card-title class="d-flex align-center pr-3">
                 <span>Ajouter du contenu</span>
@@ -23,7 +23,7 @@
                         <v-icon class="material-icons-outlined">videocam</v-icon>
                         <div>Vidéo</div>
                     </div>
-                    <div class="upload-type" @click.stop="uploadType = 'file'" :class="{checked: uploadType === 'file'}" v-ripple>
+                    <div v-if="false" class="upload-type" @click.stop="uploadType = 'file'" :class="{checked: uploadType === 'file'}" v-ripple>
                         <v-icon class="material-icons-outlined">insert_drive_file</v-icon>
                         <div>Fichier</div>
                     </div>
@@ -51,7 +51,7 @@
                             </v-btn>
                             <v-btn @click.stop="searchMovieInfo" :disabled="!file.name" :loading="loadingMoviesInfo || loadingMoviesTorrents">
                                 <v-icon>search</v-icon>
-                                <span class="ml-1">Rechercher</span>
+                                <span v-if="!isMobileLayout" class="ml-1">Rechercher</span>
                             </v-btn>
                         </div>
 
@@ -69,15 +69,15 @@
                                 <v-tab-item value="info">
                                     <v-progress-linear v-if="loadingMoviesInfo" indeterminate></v-progress-linear>
                                     <v-row class="px-3" v-if="!movieDetails">
-                                        <v-col cols="4" v-for="movie in autocomplete" :key="movie.id" class="text-center cursor-pointer" @click.stop="movieDetails = movie" v-ripple>
-                                            <img :src="movie.image" :alt="movie.name" class="rounded" width="100%" height="255px">
+                                        <v-col cols="6" lg="4" v-for="movie in autocomplete" :key="movie.id" class="text-center cursor-pointer" @click.stop="movieDetails = movie" v-ripple>
+                                            <img :src="movie.image" :alt="movie.name" class="rounded" width="100%">
                                             <div class="subtitle-1">{{ movie.name }}</div>
                                             <div class="subtitle-2 opacity-80">{{ movie.year }}</div>
                                         </v-col>
                                     </v-row>
 
                                     <div v-else class="d-flex justify-center pa-5">
-                                        <img :src="movieDetails.image" :alt="movieDetails.name" class="rounded" width="120px" height="180px">
+                                        <img :src="movieDetails.image" :alt="movieDetails.name" class="rounded" width="120px">
                                         <div class="ml-3 d-flex flex-column">
                                             <div class="title">{{ movieDetails.name }}</div>
                                             <div class="subtitle-1">{{ movieDetails.year }}</div>
@@ -93,7 +93,7 @@
                                     <v-list v-if="!movieTorrent" class="pa-0">
                                         <v-list-item>
                                             <v-list-item-content>
-                                                <v-text-field v-model="customMagnet" label="Lien magnet" prepend-inner-icon="link" outlined hide-details dense></v-text-field>
+                                                <v-text-field v-model="customMagnet" label="Lien magnet" prepend-inner-icon="link" outlined hide-details dense autocomplete="off"></v-text-field>
                                             </v-list-item-content>
                                             <v-list-item-action>
                                                 <v-btn @click.stop="setCustomMagnet" color="primary" :disabled="!customMagnet">Valider</v-btn>
@@ -187,7 +187,7 @@
         },
         data() {
             return {
-                uploadType: null,
+                uploadType: 'movie',
                 autocomplete: [],
                 torrents: [],
                 movieDetails: null,
@@ -202,7 +202,7 @@
                 folderSelected: null,
                 moreOptions: false,
                 providers: providers,
-                selectedProviders: providers.map(p => p.value),
+                selectedProviders: ['ThePirateBay'],
                 customMagnet: null
             }
         },
@@ -324,6 +324,12 @@
             &:nth-child(odd) {
                 background: rgba(255, 255, 255, 0.05);
             }
+        }
+    }
+
+    .mobile {
+        .dialog-content {
+            height: 100%;
         }
     }
 </style>

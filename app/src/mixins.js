@@ -52,6 +52,9 @@ Vue.mixin({
         },
         playMovie(movie) {
             this.reach(`/movie/${movie.id}`);
+        },
+        rippleDelay(callback) {
+            setTimeout(callback, 250);
         }
     }
 });

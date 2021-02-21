@@ -1,6 +1,6 @@
 <template>
     <main-page>
-        <div class="pa-10">
+        <div class="pa-5 pa-lg-10">
             <v-row justify="center">
                 <v-card width="700">
                     <v-card-title>File d'attente</v-card-title>

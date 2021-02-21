@@ -1,30 +1,34 @@
 <template>
     <v-app-bar fixed app flat height="64px">
-        <v-app-bar-nav-icon @click.stop="toggleMainSidebar"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon v-if="!isMobileLayout || (isMobileLayout && !searchMode)" @click.stop="toggleMainSidebar"></v-app-bar-nav-icon>
 
-        <v-toolbar-title class="font-weight-bold" style="letter-spacing: 1px">
+        <v-btn v-if="isMobileLayout && searchMode" @click.stop="toggleSearchMode" class="mr-1" icon>
+            <v-icon>arrow_back</v-icon>
+        </v-btn>
+
+        <v-toolbar-title v-if="!isMobileLayout" class="font-weight-bold" style="letter-spacing: 1px">
             <span>FLE</span>
             <span class="text-primary">X</span>
         </v-toolbar-title>
 
-        <v-spacer></v-spacer>
+        <v-spacer v-if="!isMobileLayout || (isMobileLayout && !searchMode)"></v-spacer>
 
-        <v-text-field v-if="$route.fullPath !== '/upload'" class="search" prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
+        <v-text-field ref="search" v-show="(isMobileLayout && searchMode) || (!isMobileLayout && $route.fullPath !== '/upload')" class="search" prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
                       solo flat hide-details single-line clearable @click:clear="clearSearch" autocomplete="off"></v-text-field>
 
-        <v-btn v-if="isAdmin && $route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
+        <v-btn v-if="!isMobileLayout && isAdmin && $route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">
             <v-icon>backup</v-icon>
             <span class="ml-1">Upload</span>
         </v-btn>
 
-        <v-btn v-if="!user" @click.stop="$store.dispatch('login')" color="blue" class="ml-3">
+        <v-btn v-if="!isMobileLayout && !user" @click.stop="$store.dispatch('login')" color="blue" class="ml-3">
             <v-avatar color="white" size="25">
                 <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
             </v-avatar>
             <span class="ml-2">Se connecter</span>
         </v-btn>
 
-        <v-menu v-else bottom offset-y rounded min-width="200px" :position-y="70" absolute transition="slide-y-transition">
+        <v-menu v-else-if="!isMobileLayout" bottom offset-y rounded min-width="200px" :position-y="70" absolute transition="slide-y-transition">
             <template #activator="{ on }">
                 <v-btn icon rounded x-large v-on="on" class="ml-3 mr-0">
                     <v-avatar size="40">
@@ -43,6 +47,10 @@
                 </v-list-item-content>
             </v-card>
         </v-menu>
+
+        <v-btn v-if="isMobileLayout && !searchMode && $route.fullPath !== '/upload'" @click.stop="toggleSearchMode" class="ml-3" icon>
+            <v-icon>search</v-icon>
+        </v-btn>
     </v-app-bar>
 </template>
 
@@ -57,7 +65,8 @@
         name: "Toolbar",
         data() {
             return {
-                search: null
+                search: null,
+                searchMode: false
             }
         },
         methods: {
@@ -66,6 +75,15 @@
             },
             clearSearch() {
                 this.$store.commit('searchMovie', '');
+            },
+            toggleSearchMode() {
+                this.searchMode = !this.searchMode;
+
+                if (this.searchMode) {
+                    this.$nextTick(() => {
+                        this.$refs.search.focus();
+                    });
+                }
             }
         }
     }

@@ -14,13 +14,47 @@
                 </v-list-item-icon>
                 <v-list-item-content>Films</v-list-item-content>
             </v-list-item>
+            <v-list-item v-if="isMobileLayout && isAdmin" to="/upload" link>
+                <v-list-item-icon>
+                    <v-icon class="material-icons-outlined">backup</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>Upload</v-list-item-content>
+            </v-list-item>
         </v-list>
+
+        <template #append>
+            <div v-if="isMobileLayout" class="pa-2">
+                <v-btn v-if="user" @click.stop="logout" color="error" block text large>
+                    <v-icon class="mr-1">logout</v-icon>
+                    <span class="font-weight-bold">Se déconnecter</span>
+                </v-btn>
+
+                <v-btn v-else @click.stop="login" color="blue" block large>
+                    <v-avatar color="white" size="25" class="mr-2">
+                        <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
+                    </v-avatar>
+                    <span class="font-weight-bold">Se connecter</span>
+                </v-btn>
+            </div>
+        </template>
     </v-navigation-drawer>
 </template>
 
 <script>
     export default {
-        name: "Sidebar"
+        name: "Sidebar",
+        methods: {
+            login() {
+                this.$store.dispatch('login').then(() => {
+                    this.$store.state.sidebarVisible = false;
+                });
+            },
+            logout() {
+                this.$store.dispatch('logout').then(() => {
+                    this.$store.state.sidebarVisible = false;
+                });
+            }
+        }
     }
 </script>
 
@@ -38,7 +72,7 @@
     .mobile {
         .v-navigation-drawer {
             background: #2f2f2f !important;
-            top: 64px !important;
+            padding-top: 64px !important;
 
             .v-navigation-drawer__content {
                 background: inherit;
