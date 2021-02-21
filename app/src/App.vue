@@ -22,15 +22,16 @@
     name: 'App',
     components: {MoviePlayer, Sidebar, Toolbar},
     async created() {
-      this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
-      await this.$store.dispatch('loadFolders');
-      await this.$store.dispatch('loadMovies');
-      await this.$store.dispatch('getTotalUsage');
-
       this.$store.commit('updateLayout');
       window.addEventListener(`resize`, () => {
         this.$store.commit('updateLayout');
       });
+      this.$store.state.sidebarVisible = !this.isMobileLayout;
+
+      this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
+      await this.$store.dispatch('loadFolders');
+      await this.$store.dispatch('loadMovies');
+      await this.$store.dispatch('getTotalUsage');
     }
   }
 </script>

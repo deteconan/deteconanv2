@@ -1,5 +1,6 @@
 <template>
-    <v-navigation-drawer permanent :mini-variant="!sidebarVisible" width="220px">
+    <v-navigation-drawer :value="isMobileLayout && sidebarVisible" @input="$store.state.sidebarVisible = $event" :permanent="!isMobileLayout" :mini-variant="!isMobileLayout && !sidebarVisible"
+                         width="100%" touchless :absolute="isMobileLayout">
         <v-list>
             <v-list-item to="/" link>
                 <v-list-item-icon>
@@ -31,6 +32,17 @@
         .v-navigation-drawer__content {
             // background: #272727;
             background: transparent;
+        }
+    }
+
+    .mobile {
+        .v-navigation-drawer {
+            background: #2f2f2f !important;
+            top: 64px !important;
+
+            .v-navigation-drawer__content {
+                background: inherit;
+            }
         }
     }
 </style>

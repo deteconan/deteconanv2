@@ -32,6 +32,16 @@
         }
     }
 
+    .mobile {
+        .main-page {
+            width: 100% !important;
+
+            &.sidebar-visible {
+                width: 100% !important;
+            }
+        }
+    }
+
     .default {
         animation: scrollY 300ms ease;
     }
