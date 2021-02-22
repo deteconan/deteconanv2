@@ -176,6 +176,9 @@
         { name: 'Rarbg', value: 'Rarbg' },
         { name: 'Torrentz2', value: 'Torrentz2' },
         { name: 'Kickass Torrents', value: 'KickassTorrents' },
+        { name: 'Yts', value: 'Yts' },
+        { name: 'Eztv', value: 'Eztv' },
+        { name: '1337x', value: '1337x' }
     ];
 
     export default {
