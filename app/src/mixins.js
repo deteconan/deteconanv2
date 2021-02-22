@@ -44,9 +44,6 @@ Vue.mixin({
         switchTheme() {
             this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
         },
-        toggleMainSidebar() {
-            this.$store.commit('toggleSidebar');
-        },
         togglePlayer() {
             this.$store.commit('togglePlayer');
         },

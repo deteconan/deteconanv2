@@ -23,10 +23,9 @@
     components: {MoviePlayer, Sidebar, Toolbar},
     async created() {
       this.$store.commit('updateLayout');
-      window.addEventListener(`resize`, () => {
+      window.addEventListener('resize', async () => {
         this.$store.commit('updateLayout');
       });
-      this.$store.state.sidebarVisible = !this.isMobileLayout;
 
       this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
       await this.$store.dispatch('loadFolders');

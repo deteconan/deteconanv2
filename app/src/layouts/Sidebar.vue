@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer :value="isMobileLayout && sidebarVisible" @input="$store.state.sidebarVisible = $event" :permanent="!isMobileLayout" :mini-variant="!isMobileLayout && !sidebarVisible"
+    <v-navigation-drawer :value="sidebarVisible" @input="$store.commit('toggleSidebar', $event)" :permanent="!isMobileLayout" :mini-variant="!isMobileLayout && !sidebarVisible"
                          width="100%" touchless :absolute="isMobileLayout">
         <v-list>
             <v-list-item to="/" link>
@@ -43,15 +43,20 @@
 <script>
     export default {
         name: "Sidebar",
+        async mounted() {
+            await this.$nextTick();
+            if (this.isMobileLayout)
+                this.$store.commit('toggleSidebar', false);
+        },
         methods: {
             login() {
                 this.$store.dispatch('login').then(() => {
-                    this.$store.state.sidebarVisible = false;
+                    this.$store.commit('toggleSidebar', false);
                 });
             },
             logout() {
                 this.$store.dispatch('logout').then(() => {
-                    this.$store.state.sidebarVisible = false;
+                    this.$store.commit('toggleSidebar', false);
                 });
             }
         }
@@ -72,7 +77,7 @@
     .mobile {
         .v-navigation-drawer {
             background: #2f2f2f !important;
-            padding-top: 64px !important;
+            padding-top: var(--toolbar-size) !important;
 
             .v-navigation-drawer__content {
                 background: inherit;

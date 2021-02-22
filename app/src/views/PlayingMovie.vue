@@ -1,13 +1,13 @@
 <template>
     <main-page :loading="loading">
-        <div class="pa-0 pa-lg-15 overflow-x-hidden" v-if="movie && details">
-            <v-row>
+        <div class="pa-0 pa-lg-15 overflow-x-hidden" :class="{'h-100': isMobileLayout}" v-if="movie && details">
+            <v-row :class="{'h-100': isMobileLayout}">
                 <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pr-0">
                     <div style="height: 100%">
                         <v-img :src="movie.image" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
                     </div>
                 </v-col>
-                <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3">
+                <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3" :class="{'h-100': isMobileLayout}">
                     <div class="details">
                         <div class="d-flex align-center">
                             <h1>{{ movie.name }}</h1>

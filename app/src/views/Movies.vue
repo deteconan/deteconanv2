@@ -28,4 +28,10 @@
         display: flex;
         flex-wrap: wrap;
     }
+
+    .mobile {
+        .grid {
+            justify-content: space-around;
+        }
+    }
 </style>

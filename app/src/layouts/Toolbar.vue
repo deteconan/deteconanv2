@@ -1,6 +1,6 @@
 <template>
     <v-app-bar fixed app flat height="64px">
-        <v-app-bar-nav-icon v-if="!isMobileLayout || (isMobileLayout && !searchMode)" @click.stop="toggleMainSidebar"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon v-if="!isMobileLayout || (isMobileLayout && !searchMode)" @click.stop="$store.commit('toggleSidebar')"></v-app-bar-nav-icon>
 
         <v-btn v-if="isMobileLayout && searchMode" @click.stop="toggleSearchMode" class="mr-1" icon>
             <v-icon>arrow_back</v-icon>
@@ -10,6 +10,8 @@
             <span>FLE</span>
             <span class="text-primary">X</span>
         </v-toolbar-title>
+
+        <v-toolbar-title v-else-if="!searchMode" class="text-capitalize">{{ $route.name }}</v-toolbar-title>
 
         <v-spacer v-if="!isMobileLayout || (isMobileLayout && !searchMode)"></v-spacer>
 

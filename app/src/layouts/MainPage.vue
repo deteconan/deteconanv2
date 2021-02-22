@@ -3,7 +3,7 @@
         <v-overlay v-if="loading" :value="true" absolute>
             <v-progress-circular color="primary" indeterminate></v-progress-circular>
         </v-overlay>
-        <div v-else class="default">
+        <div v-else class="default" :class="{'h-100': isMobileLayout}">
             <slot></slot>
         </div>
     </v-main>

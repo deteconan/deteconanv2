@@ -28,12 +28,12 @@ export default new Router({
     routes: [
         {
             path: `/`,
-            name: `home`,
+            name: `accueil`,
             component: Home
         },
         {
             path: `/movies`,
-            name: `movies`,
+            name: `films`,
             component: Movies
         },
         {
@@ -44,7 +44,7 @@ export default new Router({
         },
         {
             path: `/movie/:id`,
-            name: `movie`,
+            name: `film`,
             component: PlayingMovie
         }
     ]

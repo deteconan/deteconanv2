@@ -21,8 +21,11 @@ export default new Vuex.Store({
         setUser(state, user) {
             state.user = user;
         },
-        toggleSidebar(state) {
-            state.sidebarVisible = !state.sidebarVisible;
+        toggleSidebar(state, visible = null) {
+            if (visible === null)
+                state.sidebarVisible = !state.sidebarVisible;
+            else
+                state.sidebarVisible = visible;
         },
         togglePlayer(state) {
             state.playerVisible = !state.playerVisible;
@@ -91,7 +94,7 @@ export default new Vuex.Store({
                 // eslint-disable-next-line no-undef
                 gapi.load('auth2', () => {
                     // eslint-disable-next-line no-undef
-                    Vue.prototype.$gauth = gapi.auth2.init({ client_id: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com' })
+                    gapi.auth2.init({ client_id: '22198592066-5d2g6ruijvqt2ne5psd5hdhlbhq8dotd.apps.googleusercontent.com' })
                         .then(resolve)
                         .catch(reject);
                 });
