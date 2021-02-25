@@ -10,6 +10,7 @@ import Sockets from './helpers/sockets.js';
 import schedule from 'node-schedule';
 import filesRoutes from './routes/files.js';
 import usersRoutes from './routes/users.js';
+import compression from 'compression';
 
 const app = express();
 DB.init();
@@ -32,6 +33,7 @@ global.HTTP_INTERNAL_ERROR = 500;
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(compression());
 
 // CORS headers
 app.use((req, res, next) => {
