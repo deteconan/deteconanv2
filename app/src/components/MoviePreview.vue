@@ -1,7 +1,7 @@
 <template>
     <div class="movie-preview">
         <div class="img-container" @click.stop="playMovie(movie)">
-            <img @load="imageLoaded = true" v-show="imageLoaded" :src="movie.image" loading="auto" :alt="movie.name">
+            <img @load="imageLoaded = true" v-show="imageLoaded" :src="movie.thumbnail" loading="auto" :alt="movie.name">
 <!--            <v-img :src="movie.image" :alt="movie.name" :lazy-src="require('../assets/img/popcorn.svg')"></v-img>-->
             <div class="play-btn">
                 <v-icon>play_arrow</v-icon>

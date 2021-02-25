@@ -15,7 +15,7 @@
         computed: {
             moviesFiltered() {
                 if (!this.$store.state.searchMovie)
-                    return this.movies;
+                    return this.movies.filter(() => true).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
                 else
                     return this.movies.filter(m => m.name.toLowerCase().includes(this.$store.state.searchMovie.toLowerCase()));
             }

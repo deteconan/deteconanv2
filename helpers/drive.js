@@ -12,6 +12,8 @@ import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
 import moment from 'moment';
 import fs from 'fs';
+import Imdb from 'vimdb';
+const vimdb = new Imdb.default();
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
@@ -145,10 +147,15 @@ export default class DriveHelper {
             });
         });
 
+        console.log('Uploading thumbnail...');
+        const info = await vimdb.getShow(imdbId);
+        const thumbnail = await uploadImage(info.image.small);
+        console.log('Thumbnail uploaded: ' + thumbnail);
+
         if (image) {
-            console.log('Uploading image');
+            console.log('Uploading poster...');
             image = await uploadImage(image);
-            console.log('Image uploaded: ' + image);
+            console.log('Poster uploaded: ' + image);
         }
 
         let metadata = {
@@ -157,6 +164,7 @@ export default class DriveHelper {
             appProperties: {
                 parentId,
                 image,
+                thumbnail,
                 year,
                 imdbId,
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
@@ -361,6 +369,7 @@ export default class DriveHelper {
                 description: file.description,
                 appProperties: {
                     image: file.image,
+                    thumbnail: file.thumbnail,
                     year: file.year,
                     parentId: file.parentId,
                     imdbId: file.imdbId

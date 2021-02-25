@@ -12,6 +12,9 @@ import moment from 'moment';
 import GoogleAuthLibrary from "google-auth-library";
 import imdb from 'imdb-scrapper';
 
+import Imdb from 'vimdb';
+const vimdb = new Imdb.default();
+
 import googleapis from 'googleapis';
 const { google } = googleapis;
 
@@ -24,6 +27,24 @@ async function test() {
     // const res = await IamHelper.createServiceAccount(config.projectId);
 
     DB.init();
+    let movies = await DriveHelper.listFiles('1tDiCGwWbC0-ushih95AhDZD-50oLaNmZ');
+    movies.forEach(m => {
+        m.image = m.appProperties.image;
+        m.thumbnail = m.appProperties.thumbnail;
+        m.year = m.appProperties.year;
+        m.parentId = m.appProperties.parentId;
+        m.imdbId = m.appProperties.imdbId;
+        delete m.appProperties;
+    });
+
+    for (let movie of movies) {
+        // const info = await vimdb.getShow(movie.imdbId);
+        // movie.thumbnail = await uploadImage(info.image.small);
+        // await DriveHelper.updateFile(movie);
+
+        console.log(movie);
+    }
+
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);
     });*/

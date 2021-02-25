@@ -39,6 +39,7 @@ router.get('/movies', async (req, res) => {
       let movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
       movies.forEach(m => {
           m.image = m.appProperties.image;
+          m.thumbnail = m.appProperties.thumbnail;
           m.year = m.appProperties.year;
           m.parentId = m.appProperties.parentId;
           m.imdbId = m.appProperties.imdbId;
@@ -114,6 +115,7 @@ router.post('/movies/torrents', needAdmin, checkRequiredPOST('name', 'providers'
 router.get('/movies/details/:imdb_id', checkRequiredGET('imdb_id'), async (req, res) => {
     try {
         const movie = await imdb.getFull(req.params.imdb_id);
+
         res.json(movie);
     } catch (err) {
         sendError(err, req, res);
