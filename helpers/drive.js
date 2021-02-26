@@ -152,7 +152,7 @@ export default class DriveHelper {
 
             if (image) {
                 console.log('Uploading thumbnail...');
-                const thumbnailLink = image.replace('QL50', 'UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
+                const thumbnailLink = image.split('_QL50').join('_UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
                 const thumbnail = await uploadImage(thumbnailLink);
                 console.log('Thumbnail uploaded: ' + thumbnail);
             }
@@ -251,7 +251,7 @@ export default class DriveHelper {
 
             if (image) {
                 console.log('Uploading thumbnail...');
-                const thumbnailLink = image.replace('QL50', 'UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
+                const thumbnailLink = image.split('_QL50').join('_UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
                 const thumbnail = await uploadImage(thumbnailLink);
                 console.log('Thumbnail uploaded: ' + thumbnail);
             }
