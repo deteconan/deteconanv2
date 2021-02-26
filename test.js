@@ -12,9 +12,6 @@ import moment from 'moment';
 import GoogleAuthLibrary from "google-auth-library";
 import imdb from 'imdb-scrapper';
 
-import Imdb from 'vimdb';
-const vimdb = new Imdb.default();
-
 import googleapis from 'googleapis';
 const { google } = googleapis;
 
@@ -37,13 +34,11 @@ async function test() {
         delete m.appProperties;
     });
 
-    for (let movie of movies) {
-        // const info = await vimdb.getShow(movie.imdbId);
-        // movie.thumbnail = await uploadImage(info.image.small);
-        // await DriveHelper.updateFile(movie);
-
-        console.log(movie);
-    }
+    const link = 'https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_UX182_CR0,0,182,268_AL_.jpg';
+    const yourName = movies.find(m => m.name.includes('Your Name'));
+    yourName.thumbnail = await uploadImage(link);
+    await DriveHelper.updateFile(yourName);
+    console.log(yourName);
 
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);

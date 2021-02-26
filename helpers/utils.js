@@ -20,7 +20,7 @@ export function uploadImage(url) {
             else if (res.data)
                 resolve(res.data.link);
             else
-                resolve('none');
+                resolve(false);
         });
     });
 }

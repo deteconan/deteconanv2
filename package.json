@@ -33,7 +33,6 @@
     "socket.io": "^2.3.0",
     "torrent-search-api": "^2.1.3",
     "uuid": "^8.3.1",
-    "vimdb": "^3.5.4",
     "webtorrent": "^0.108.6"
   }
 }

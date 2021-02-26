@@ -12,8 +12,6 @@ import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
 import moment from 'moment';
 import fs from 'fs';
-import Imdb from 'vimdb';
-const vimdb = new Imdb.default();
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
@@ -147,15 +145,17 @@ export default class DriveHelper {
             });
         });
 
-        console.log('Uploading thumbnail...');
-        const info = await vimdb.getShow(imdbId);
-        const thumbnail = await uploadImage(info.image.small);
-        console.log('Thumbnail uploaded: ' + thumbnail);
-
         if (image) {
             console.log('Uploading poster...');
             image = await uploadImage(image);
             console.log('Poster uploaded: ' + image);
+
+            if (image) {
+                console.log('Uploading thumbnail...');
+                const thumbnailLink = image.replace('QL50', 'UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
+                const thumbnail = await uploadImage(thumbnailLink);
+                console.log('Thumbnail uploaded: ' + thumbnail);
+            }
         }
 
         let metadata = {
@@ -245,9 +245,16 @@ export default class DriveHelper {
         console.log('quota remaining: ' + ( Number(quota.limit) - (Number(quota.usage) + Number(response.data.headers['content-length'])) ));
 
         if (image) {
-            console.log('Uploading image');
+            console.log('Uploading poster...');
             image = await uploadImage(image);
-            console.log('Image uploaded: ' + image);
+            console.log('Poster uploaded: ' + image);
+
+            if (image) {
+                console.log('Uploading thumbnail...');
+                const thumbnailLink = image.replace('QL50', 'UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
+                const thumbnail = await uploadImage(thumbnailLink);
+                console.log('Thumbnail uploaded: ' + thumbnail);
+            }
         }
 
         let metadata = {
