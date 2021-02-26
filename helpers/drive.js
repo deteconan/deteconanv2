@@ -147,12 +147,14 @@ export default class DriveHelper {
 
         if (image) {
             console.log('Uploading poster...');
+            console.log('Big:', image);
             image = await uploadImage(image);
             console.log('Poster uploaded: ' + image);
 
             if (image) {
                 console.log('Uploading thumbnail...');
                 const thumbnailLink = image.split('_QL50').join('_UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
+                console.log('Small:', thumbnailLink);
                 const thumbnail = await uploadImage(thumbnailLink);
                 console.log('Thumbnail uploaded: ' + thumbnail);
             }
