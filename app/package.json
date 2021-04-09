@@ -9,7 +9,7 @@
     "lint": "./node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "moment": "^2.29.1",
     "sass": "^1.27.0",

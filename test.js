@@ -36,7 +36,8 @@ async function test() {
 
     const link = 'https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_UX182_CR0,0,182,268_AL_.jpg';
     const yourName = movies.find(m => m.name.includes('Your Name'));
-    yourName.thumbnail = await uploadImage(link);
+    // yourName.thumbnail = await uploadImage(link);
+    yourName.imdbId = 'tt5311514';
     await DriveHelper.updateFile(yourName);
     console.log(yourName);
 

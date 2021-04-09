@@ -244,8 +244,9 @@ export default class DriveHelper {
         });
 
         const quota = await this.getQuota();
-        console.log('file size: ' + response.data.headers['content-length']);
-        console.log('quota remaining: ' + ( Number(quota.limit) - (Number(quota.usage) + Number(response.data.headers['content-length'])) ));
+        const fileSize = response.data.headers['content-length'];
+        console.log('file size: ' + fileSize);
+        console.log('quota remaining: ' + ( Number(quota.limit) - (Number(quota.usage) + Number(fileSize)) ));
 
         let thumbnail = null;
         if (image) {

@@ -25,8 +25,9 @@
 
 <style lang="scss" scoped>
     .grid {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 
     .mobile {
