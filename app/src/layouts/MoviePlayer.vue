@@ -1,7 +1,7 @@
 <template>
     <div style="display: contents">
         <v-card class="minimized" v-if="playingMovie" elevation="15" @click.stop="togglePlayer">
-            <img :src="playingMovie.image" style="border-radius: 3px">
+            <img :src="playingMovie.image | tmdbPoster" style="border-radius: 3px">
             <div class="resume">
                 <v-btn class="position-absolute" style="top: 5px; right: 5px;" icon @click.stop="$store.commit('setMovie', null)">
                     <v-icon>close</v-icon>

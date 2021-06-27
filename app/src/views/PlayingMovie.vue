@@ -4,7 +4,7 @@
             <v-row :class="{'h-100': isMobileLayout}">
                 <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pr-0">
                     <div style="height: 100%">
-                        <v-img :src="movie.image" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
+                        <v-img :src="movie.image | tmdbPosterHD" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3" :class="{'h-100': isMobileLayout}">
@@ -20,9 +20,9 @@
                                 </v-btn>
                             </template>
                         </div>
-                        <h2 class="text-spaced">{{ movie.year }}</h2>
+                        <h2 class="text-spaced">{{ $moment(movie.release_date).format('YYYY') }}</h2>
                         <div class="font-weight-bold text-spaced opacity-80 mt-5 d-flex align-center">
-                            <div class="mr-5">{{ details.runtime }}</div>
+                            <div class="mr-5">{{ runtime }}</div>
                             <v-img :src="require('../assets/img/popcorn.svg')" max-width="1.2em" max-height="1.2em" title="Note du public"></v-img>
                             <div class="ml-1">{{ details.rating * 10 }}%</div>
                         </div>
@@ -32,13 +32,13 @@
                             <span class="ml-1 f-600">Lire</span>
                         </v-btn>
 
-                        <div class="text-justify f-500 mb-5">{{ details.story }}</div>
+                        <div class="text-justify f-500 mb-5">{{ details.description }}</div>
 
                         <div class="mt-auto d-flex">
                             <div class="font-weight-bold text-uppercase opacity-50 text-spaced">
                                 <div v-if="directors">Réalisation</div>
                                 <div v-if="writers">Écriture</div>
-                                <div v-if="genres">Genre</div>
+                                <div v-if="genres">Genres</div>
                             </div>
                             <div class="ml-5 f-500">
                                 <div>{{ directors }}</div>
@@ -62,7 +62,7 @@
             <div v-if="!isMobileLayout" class="d-flex overflow-auto hide-scrollbar actors" ref="actors">
                 <div v-for="actor in details.cast" :key="actor.id" style="width: 20%" class="text-center mr-10">
                     <v-avatar size="150" color="indigo">
-                        <v-img :src="actor.image"></v-img>
+                        <v-img :src="actor.image | tmdbPosterHD"></v-img>
                     </v-avatar>
                     <div class="font-weight-bold mt-3">{{ actor.name }}</div>
                     <div class="opacity-80 f-500 f-11">{{ actor.role }}</div>
@@ -91,7 +91,6 @@
                 <v-card-title class="headline">Éditer</v-card-title>
                 <v-card-text>
                     <v-text-field v-model="editMovie.name" label="Nom"></v-text-field>
-                    <v-text-field v-model="editMovie.year" label="Année"></v-text-field>
                     <v-text-field v-model="editMovie.image" label="Miniature"></v-text-field>
                     <v-select v-model="editMovie.parentId" :items="folders" item-text="name" item-value="id" label="Dossier">
                         <template #prepend-inner>
@@ -131,22 +130,36 @@
                 return `https://drive.google.com/file/d/${this.movie.id}/preview`;
             },
             directors() {
-                if (this.details.director)
-                    return this.details.director.join(', ');
+                if (this.details.directors)
+                    return this.details.directors.map(d => d.name).join(', ');
                 else
                     return '';
             },
             writers() {
                 if (this.details.writers)
-                    return this.details.writers.join(', ');
+                    return this.details.writers.map(w => w.name).join(', ');
                 else
                     return '';
             },
             genres() {
-                if (this.details.genre)
-                    return this.details.genre.join(', ');
+                if (this.details.genres)
+                    return this.details.genres.join(', ');
                 else
                     return '';
+            },
+            runtime() {
+                const date = this.$moment().startOf('day').add({ minute: this.details.runtime });
+                const hours = date.hours();
+                const minutes = date.minutes();
+
+                if (hours > 0) {
+                    if (minutes > 0)
+                        return `${hours}h${this.$moment(date).format('mm')}`;
+                    else
+                        return `${hours}h`;
+                }
+                else
+                    return `${minutes}min`;
             }
         },
         activated() {
@@ -158,7 +171,7 @@
             this.editMovie = JSON.parse(JSON.stringify(this.movie));
 
             this.loading = true;
-            Network.get(`/movies/details/${this.movie.imdbId}`).then(res => {
+            Network.get(`/movies/details/${this.movie.tmdbId}`).then(res => {
                 this.details = res.data;
             }).finally(() => this.loading = false);
         },

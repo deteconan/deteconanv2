@@ -70,17 +70,17 @@
                                     <v-progress-linear v-if="loadingMoviesInfo" indeterminate></v-progress-linear>
                                     <v-row class="px-3" v-if="!movieDetails">
                                         <v-col cols="6" lg="4" v-for="movie in autocomplete" :key="movie.id" class="text-center cursor-pointer" @click.stop="movieDetails = movie" v-ripple>
-                                            <img :src="movie.image" :alt="movie.name" class="rounded" width="100%">
+                                            <img :src="movie.image | tmdbPoster" :alt="movie.name" class="rounded" width="100%">
                                             <div class="subtitle-1">{{ movie.name }}</div>
-                                            <div class="subtitle-2 opacity-80">{{ movie.year }}</div>
+                                            <div class="subtitle-2 opacity-80">{{ $moment(movie.release_date).format('YYYY') }}</div>
                                         </v-col>
                                     </v-row>
 
                                     <div v-else class="d-flex justify-center pa-5">
-                                        <img :src="movieDetails.image" :alt="movieDetails.name" class="rounded" width="120px">
+                                        <img :src="movieDetails.image | tmdbPoster" :alt="movieDetails.name" class="rounded" width="120px">
                                         <div class="ml-3 d-flex flex-column">
                                             <div class="title">{{ movieDetails.name }}</div>
-                                            <div class="subtitle-1">{{ movieDetails.year }}</div>
+                                            <div class="subtitle-1">{{ $moment(movieDetails.release_date).format('YYYY') }}</div>
                                             <v-btn class="mt-auto" @click.stop="movieDetails = null">
                                                 <v-icon>close</v-icon>
                                                 <span class="ml-1">Changer</span>
@@ -283,8 +283,8 @@
                     parentId: this.folderSelected,
                     progress: 0,
                     image: this.movieDetails.image,
-                    year: this.movieDetails.year,
-                    imdbId: this.movieDetails.id
+                    release_date: this.movieDetails.release_date,
+                    tmdbId: this.movieDetails.id
                 });
             }
         }

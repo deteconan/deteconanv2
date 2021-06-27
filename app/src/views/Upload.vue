@@ -96,9 +96,9 @@
                     name: media.name,
                     link: media.link,
                     image: media.image,
-                    year: media.year,
+                    release_date: media.release_date,
                     parent_id: media.parentId,
-                    imdbId: media.imdbId
+                    tmdbId: media.tmdbId
                 });
 
                 this.addToQueue(media);

@@ -123,7 +123,7 @@ export default class DriveHelper {
         return total;
     }
 
-    static async uploadFromTorrent(outputName, url, parentId, image = null, year = null, imdbId, onProgress) {
+    static async uploadFromTorrent(outputName, url, parentId, image = null, releaseDate = null, tmdbId, onProgress) {
         let response = null;
         let client = new WebTorrent();
         let fileSize = 0, filename = '', filePath = null;
@@ -145,31 +145,14 @@ export default class DriveHelper {
             });
         });
 
-        let thumbnail = null;
-        if (image) {
-            if (image) {
-                console.log('Uploading thumbnail...');
-                const thumbnailLink = image.split('_V1_').join('_V1_UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
-                console.log('Small:', thumbnailLink);
-                thumbnail = await uploadImage(thumbnailLink);
-                console.log('Thumbnail uploaded: ' + thumbnail);
-            }
-
-            console.log('Uploading poster...');
-            console.log('Big:', image);
-            image = await uploadImage(image);
-            console.log('Poster uploaded: ' + image);
-        }
-
         let metadata = {
             name: outputName,
             parents: [config.fileId],
             appProperties: {
                 parentId,
                 image,
-                thumbnail,
-                year,
-                imdbId,
+                release_date: releaseDate,
+                tmdbId,
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
@@ -236,7 +219,7 @@ export default class DriveHelper {
         return res.data;
     }
 
-    static async uploadFromUrl(outputName, url, parentId, image = null, year = null, onProgress) {
+    static async uploadFromUrl(outputName, url, parentId, image = null, releaseDate = null, onProgress) {
         const response = await axios({
             url,
             method: 'GET',
@@ -383,10 +366,9 @@ export default class DriveHelper {
                 description: file.description,
                 appProperties: {
                     image: file.image,
-                    thumbnail: file.thumbnail,
-                    year: file.year,
+                    release_date: file.release_date,
                     parentId: file.parentId,
-                    imdbId: file.imdbId
+                    tmdbId: file.tmdbId
                 }
             }
         }).catch(err => {

@@ -14,3 +14,11 @@ function bytes(byteVal, perSec = false) {
     }
     return div.toFixed(1) + " " + units[kounter];
 }
+
+Vue.filter('tmdbPoster', val => {
+    return `https://www.themoviedb.org/t/p/w200${val}`;
+});
+
+Vue.filter('tmdbPosterHD', val => {
+    return `https://www.themoviedb.org/t/p/original${val}`;
+});

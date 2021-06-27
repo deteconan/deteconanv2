@@ -3,10 +3,11 @@ import DriveHelper from "../helpers/drive.js";
 import {checkRequiredGET, checkRequiredPOST} from "../helpers/middlewares.js";
 import {sendError} from "../helpers/utils.js";
 import imdb from 'imdb-scrapper';
+import TMDB from "../helpers/tmdb.js";
 import TorrentSearchApi from 'torrent-search-api';
 import Folder from '../models/folders.js';
 import config from '../credentials/config.json';
-import {needAdmin, needAuth} from "../helpers/auth.js";
+import {needAdmin} from "../helpers/auth.js";
 
 const router = express.Router();
 
@@ -39,10 +40,9 @@ router.get('/movies', async (req, res) => {
       let movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
       movies.forEach(m => {
           m.image = m.appProperties.image;
-          m.thumbnail = m.appProperties.thumbnail;
-          m.year = m.appProperties.year;
+          m.release_date = m.appProperties.release_date;
           m.parentId = m.appProperties.parentId;
-          m.imdbId = m.appProperties.imdbId;
+          m.tmdbId = m.appProperties.tmdbId;
           delete m.appProperties;
       });
       res.json(movies);
@@ -62,21 +62,12 @@ router.post('/files/delete', needAdmin, checkRequiredPOST('file_id'), async (req
 
 router.post('/movies/autocomplete', needAdmin, checkRequiredPOST('name'), async (req, res) => {
     try {
-        let movies = await imdb.simpleSearch(req.body.name);
+        const movies = await TMDB.searchMovie(req.body.name);
 
-        if (!movies || !movies.d)
+        if (!movies)
             return res.status(HTTP_BAD_REQUEST).send('No result');
 
-        movies = movies.d.filter(m => m.i && m.q === 'feature').map(m => {
-            return {
-                id: m.id,
-                name: m.l,
-                image: m.i.shift(),
-                year: m.y
-            }
-        }).slice(0, 6);
-
-        res.json(movies);
+        res.json(movies.slice(0, 6));
     } catch (err) {
         sendError(err, req, res);
     }
@@ -112,9 +103,10 @@ router.post('/movies/torrents', needAdmin, checkRequiredPOST('name', 'providers'
     }
 });
 
-router.get('/movies/details/:imdb_id', checkRequiredGET('imdb_id'), async (req, res) => {
+router.get('/movies/details/:tmdb_id', checkRequiredGET('tmdb_id'), async (req, res) => {
     try {
-        const movie = await imdb.getFull(req.params.imdb_id);
+        // const movie = await imdb.getFull(req.params.imdb_id);
+        const movie = await TMDB.getMovie(req.params.tmdb_id);
 
         res.json(movie);
     } catch (err) {

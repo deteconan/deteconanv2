@@ -12,7 +12,7 @@ export default {
                     sockets.emit('error', 'parent does not exist');
 
                 if (media.link.startsWith('magnet')) {
-                    DriveHelper.uploadFromTorrent(media.name, media.link, media.parent_id, media.image, media.year, media.imdbId, ({ progress, speed }) => {
+                    DriveHelper.uploadFromTorrent(media.name, media.link, media.parent_id, media.image, media.release_date, media.tmdbId, ({ progress, speed }) => {
                         sockets.emit('progress', {progress, speed, link: media.link, name: media.name});
                     }).then(() => {
                         sockets.emit('finish', media.link);
@@ -20,7 +20,7 @@ export default {
                         sockets.emit('error', {err, link: media.link, name: media.name});
                     });
                 } else {
-                    DriveHelper.uploadFromUrl(media.name, media.link, media.parent_id, media.image, media.year, progress => {
+                    DriveHelper.uploadFromUrl(media.name, media.link, media.parent_id, media.image, media.release_date, progress => {
                         sockets.emit('progress', {progress, link: media.link, name: media.name});
                     }).then(() => {
                         sockets.emit('finish', media.link);
