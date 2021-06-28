@@ -27,7 +27,7 @@
     .grid {
         display: grid;
         gap: 1rem;
-        grid-template-columns: repeat(auto-fit, 170px);
+        grid-template-columns: repeat(auto-fit, 160px);
     }
 
     .mobile {
