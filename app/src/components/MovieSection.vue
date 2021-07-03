@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!isMobileLayout" ref="scrollContainer" class="scroll-container px-10">
+        <div v-if="!isMobileLayout" ref="scrollContainer" class="scroll-container px-10" style="min-width: auto">
             <div class="d-flex align-center mb-3">
                 <h3 class="text-spaced" v-if="title">{{ title }}</h3>
 
@@ -76,10 +76,24 @@ export default {
             this.canScrollLeft = this.scroll > 0;
             this.canScrollRight = this.scroll > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100));
 
-            el.addEventListener('wheel', event => {
+            new ResizeObserver(entries => {
+                const elWidth = entries[0].contentRect.width;
+                this.canScrollRight = this.canScrollRight && elWidth > this.$refs.scrollContainer.clientWidth;
+            }).observe(this.$refs.scroller);
+
+            this.$refs.scroller.addEventListener('wheel', event => {
                 event.preventDefault();
                 event.stopPropagation();
                 event.stopImmediatePropagation();
+
+                if (event.deltaY > 0 && !this.canScrollRight) {
+                    // Scrolling right
+                    return;
+                } else if (event.deltaY < 0 && !this.canScrollLeft) {
+                    // Scrolling left
+                    return;
+                }
+
                 this.scroll -= event.deltaY;
                 this.scroll = Math.min(this.scroll, 0);
                 this.scroll = Math.max(this.scroll, -(this.$refs.scroller.getBoundingClientRect().width - (el.clientWidth - 100)));
@@ -90,6 +104,9 @@ export default {
         scroll(val) {
             this.canScrollLeft = val < 0;
             this.canScrollRight = val > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100));
+        },
+        '$refs.scroller.scrollWidth'(val) {
+            console.log(val);
         }
     }
 }

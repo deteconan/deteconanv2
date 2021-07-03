@@ -120,17 +120,6 @@ export default class TMDB {
         }).catch(err => console.error(err.response.data));
     }
 
-    static getMoviePosters(tmdbId) {
-        return api.get(`/movie/${tmdbId}/images`, {
-            params: {
-                language: 'fr-FR',
-                include_image_language: 'fr'
-            }
-        }).then(res => {
-            console.log(res.data);
-        }).catch(err => console.error(err.response.data));
-    }
-
     static async getUpcomingMovies() {
         const moviesPage1 = await api.get('/movie/upcoming', {
             params: {
