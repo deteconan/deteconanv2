@@ -20,7 +20,10 @@
                                 </v-btn>
                             </template>
                         </div>
-                        <h3 class="text-spaced f-500">{{ date }}</h3>
+                        <h3 class="text-spaced f-500 d-flex align-center mt-2">
+                            <v-icon v-if="!isReleased" class="mr-2">event</v-icon>
+                            <span>{{ date }}</span>
+                        </h3>
                         <div class="font-weight-bold text-spaced opacity-80 mt-5 d-flex align-center">
                             <div class="mr-5">{{ runtime }}</div>
                             <v-img :src="require('../assets/img/popcorn.svg')" max-width="1.2em" max-height="1.2em" title="Note du public"></v-img>

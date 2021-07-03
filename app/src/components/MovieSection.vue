@@ -76,7 +76,7 @@ export default {
             new ResizeObserver(entries => {
                 const elWidth = entries[0].contentRect.width;
                 this.canScrollRight = this.scroll > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100)) && elWidth > this.$refs.scrollContainer.clientWidth;
-                this.canScrollLeft = this.scroll > 0;
+                this.canScrollLeft = this.scroll < 0;
             }).observe(this.$refs.scroller);
 
             this.$refs.scroller.addEventListener('wheel', event => {
