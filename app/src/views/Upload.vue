@@ -38,7 +38,7 @@
             </v-row>
         </div>
 
-        <upload-dialog v-model="dialogVisible" @upload="upload"></upload-dialog>
+        <upload-dialog v-model="dialogVisible" :movie-title.sync="movieTitleQuery" @upload="upload"></upload-dialog>
     </main-page>
 </template>
 
@@ -51,7 +51,15 @@
         data() {
             return {
                 queue: [],
-                dialogVisible: false
+                dialogVisible: false,
+                movieTitleQuery: null
+            }
+        },
+        activated() {
+            this.movieTitleQuery = this.$route.query.q
+
+            if (this.movieTitleQuery) {
+                this.dialogVisible = true;
             }
         },
         mounted() {

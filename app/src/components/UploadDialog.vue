@@ -186,6 +186,9 @@
         props: {
             value: {
                 type: Boolean
+            },
+            movieTitle: {
+                type: String
             }
         },
         data() {
@@ -218,6 +221,12 @@
             value(val) {
                 if (!val)
                     this.reset();
+                else {
+                    this.uploadType = 'movie';
+                    this.file.name = this.movieTitle;
+                    this.searchMovieInfo();
+                    this.$emit('update:movie-title', null);
+                }
             }
         },
         methods: {

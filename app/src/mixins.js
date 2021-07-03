@@ -48,7 +48,7 @@ Vue.mixin({
             this.$store.commit('togglePlayer');
         },
         playMovie(movie) {
-            this.reach(`/movie/${movie.id}`);
+            this.reach(`/movie/${movie.tmdbId}`);
         },
         rippleDelay(callback) {
             setTimeout(callback, 250);

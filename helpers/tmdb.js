@@ -36,11 +36,14 @@ export default class TMDB {
         }).then(async res => {
             const movie = res.data;
             const credits = await this.getMovieCredits(tmdbId);
+            const enTitle = await this.getEnglishMovieTitle(tmdbId);
 
             return {
                 id: movie.id,
                 imdbId: movie.imdb_id,
                 name: movie.title,
+                original_title: movie.original_title,
+                en_title: enTitle,
                 description: movie.overview,
                 image: movie.poster_path,
                 rating: movie.vote_average,
@@ -123,9 +126,55 @@ export default class TMDB {
                 language: 'fr-FR',
                 include_image_language: 'fr'
             }
+        }).then(res => {
+            console.log(res.data);
+        }).catch(err => console.error(err.response.data));
+    }
+
+    static async getUpcomingMovies() {
+        const moviesPage1 = await api.get('/movie/upcoming', {
+            params: {
+                language: 'fr-FR',
+                page: 1
+            }
+        }).then(res => {
+            const movies = res.data.results;
+
+            return movies.map(m => ({
+                tmdbId: m.id,
+                name: m.title,
+                image: m.poster_path,
+                release_date: m.release_date
+            }));
+        });
+
+        const moviesPage2 = await api.get('/movie/upcoming', {
+            params: {
+                language: 'fr-FR',
+                page: 2
+            }
+        }).then(res => {
+            const movies = res.data.results;
+
+            return movies.map(m => ({
+                tmdbId: m.id,
+                name: m.title,
+                image: m.poster_path,
+                release_date: m.release_date
+            }));
+        });
+
+        return moviesPage1.concat(moviesPage2);
+    }
+
+    static getEnglishMovieTitle(tmdbId) {
+        return api.get(`/movie/${tmdbId}`, {
+            params: {
+                language: 'en-US'
+            }
         })
         .then(res => {
-            console.log(res.data);
+            return res.data.title;
         }).catch(err => console.error(err.response.data));
     }
 

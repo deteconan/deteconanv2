@@ -1,115 +1,126 @@
 <template>
-    <div class="movie-section" ref="movies">
-        <template v-if="!isMobileLayout">
-            <div class="mb-3 d-flex align-center">
+    <div>
+        <div v-if="!isMobileLayout" ref="scrollContainer" class="scroll-container px-10">
+            <div class="d-flex align-center mb-3">
                 <h3 class="text-spaced" v-if="title">{{ title }}</h3>
 
-                <v-btn @click="prev" rounded icon class="ml-auto" :disabled="!canPrev">
-                    <v-icon>chevron_left</v-icon>
-                </v-btn>
-                <v-btn @click="next" rounded icon :disabled="!canNext">
-                    <v-icon>chevron_right</v-icon>
-                </v-btn>
+                <template v-if="canScrollLeft || canScrollRight">
+                    <v-btn @click.stop="prev" rounded icon :disabled="!canScrollLeft" class="ml-auto">
+                        <v-icon>chevron_left</v-icon>
+                    </v-btn>
+                    <v-btn @click.stop="next" rounded icon :disabled="!canScrollRight">
+                        <v-icon>chevron_right</v-icon>
+                    </v-btn>
+                </template>
             </div>
 
-            <v-window v-model="onboarding">
-                <v-window-item v-for="n in Math.ceil(localMovies.length / elementsPerPage)" :key="n">
-                    <div class="d-flex">
-                        <movie-preview v-for="(movie, index) in currents(n)" :key="index" :movie="movie" class="movie"></movie-preview>
-                    </div>
-                </v-window-item>
-            </v-window>
-        </template>
-        <template v-else>
+            <div ref="scroller" class="scroller" :style="scrollStyle">
+                <movie-preview v-for="(movie, index) in localMovies" :key="index" :movie="movie" class="movie"></movie-preview>
+            </div>
+        </div>
+        <div v-else class="pa-5">
             <h3 class="text-spaced mb-3" v-if="title">{{ title }}</h3>
             <div class="scroll">
                 <movie-preview v-for="(movie, index) in localMovies" :key="index" :movie="movie" class="movie"></movie-preview>
             </div>
-        </template>
+        </div>
     </div>
 </template>
 
 <script>
-    import MoviePreview from "@/components/MoviePreview.vue";
-    export default {
-        name: "MovieSection",
-        components: {MoviePreview},
-        props: {
-            localMovies: {
-                type: Array,
-                required: true
-            },
-            title: {
-                type: String
-            }
+import MoviePreview from "@/components/MoviePreview.vue";
+
+export default {
+    name: "MovieSection",
+    components: {MoviePreview},
+    props: {
+        localMovies: {
+            type: Array,
+            required: true
         },
-        data() {
-            return {
-                elementsPerPage: 5,
-                onboarding: 0
-            }
+        title: {
+            type: String
+        }
+    },
+    data() {
+        return {
+            scroll: 0,
+            canScrollLeft: true,
+            canScrollRight: true
+        }
+    },
+    computed: {
+        scrollStyle() {
+            return `transform: translateX(${this.scroll}px);`
+        }
+    },
+    async created() {
+        await this.$nextTick();
+        this.setupListeners();
+    },
+    methods: {
+        prev() {
+            this.scroll += this.$refs.scrollContainer.clientWidth;
+            this.scroll = Math.min(this.scroll, 0);
         },
-        computed: {
-            canPrev() {
-                return (this.onboarding - 1) * this.elementsPerPage >= 0;
-            },
-            canNext() {
-                return (this.onboarding + 1) * this.elementsPerPage <= (this.localMovies.length - 1);
-            }
+        next() {
+            this.scroll -= this.$refs.scrollContainer.clientWidth;
+            this.scroll = Math.max(this.scroll, -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100)));
         },
-        mounted() {
-            this.elementsPerPage = Math.round(this.$refs.movies.clientWidth / 182);
-        },
-        methods: {
-            next() {
-                const index = (this.onboarding + 1) * this.elementsPerPage;
-                this.onboarding = index > (this.localMovies.length - 1)
-                    ? this.onboarding
-                    : this.onboarding + 1
-            },
-            prev() {
-                const index = (this.onboarding - 1) * this.elementsPerPage;
-                this.onboarding = index < 0
-                    ? this.onboarding
-                    : this.onboarding - 1
-            },
-            currents(n) {
-                n--;
-                return this.localMovies.slice(n * this.elementsPerPage, n * this.elementsPerPage + this.elementsPerPage);
-            }
+        setupListeners() {
+            const el = this.$refs.scrollContainer;
+
+            if (!el)
+                return;
+
+            this.canScrollLeft = this.scroll > 0;
+            this.canScrollRight = this.scroll > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100));
+
+            el.addEventListener('wheel', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                this.scroll -= event.deltaY;
+                this.scroll = Math.min(this.scroll, 0);
+                this.scroll = Math.max(this.scroll, -(this.$refs.scroller.getBoundingClientRect().width - (el.clientWidth - 100)));
+            });
+        }
+    },
+    watch: {
+        scroll(val) {
+            this.canScrollLeft = val < 0;
+            this.canScrollRight = val > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100));
         }
     }
+}
 </script>
 
 <style lang="scss" scoped>
-    .movie-section {
-        .movie {
-            margin-right: 2em;
+.scroll-container {
+    overflow-x: hidden;
+    overflow-y: hidden;
 
-            &:last-child {
-                margin-right: 0;
-            }
-        }
+    .scroller {
+        display: inline-flex;
+        gap: 1.5rem;
+        transition: transform 100ms ease;
+        will-change: transform;
     }
+}
 
-    .mobile {
-        .movie-section {
-            .scroll {
-                white-space: nowrap;
-                overflow: auto;
-                margin-left: -20px;
-                margin-right: -20px;
-                padding-left: 20px;
-                padding-right: 20px;
+.scroll {
+    white-space: nowrap;
+    overflow: auto;
+    display: flex;
+    gap: 1.5rem;
 
-                &::-webkit-scrollbar {
-                    display: none;
-                }
-            }
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
 
-            .movie {
-                display: inline-block;
-            }
-        }
+    &::-webkit-scrollbar {
+        display: none;
     }
+}
 </style>

@@ -1,8 +1,10 @@
 <template>
     <main-page>
-        <div class="pa-5 pa-lg-10">
-            <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-10"></movie-section>
-            <movie-section v-if="recentlyAddedMovies.length > 0" title="Ajouts récents" :local-movies="recentlyAddedMovies" class="mb-10"></movie-section>
+        <div class="py-5 py-lg-10">
+            <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-5 mb-lg-10"></movie-section>
+            <movie-section v-if="recentlyAddedMovies.length > 0" title="Ajouts récents" :local-movies="recentlyAddedMovies" class="mb-5 mb-lg-10"></movie-section>
+
+            <movie-section v-if="upcomingMovies.length > 0" title="Nouveautés" :local-movies="upcomingMovies" class="mb-5 mb-lg-10"></movie-section>
             <movie-section v-if="otherMovies.length > 0" title="Tous les films" :local-movies="otherMovies"></movie-section>
         </div>
     </main-page>
@@ -10,11 +12,17 @@
 
 <script>
     import MainPage from "@/layouts/MainPage.vue";
+    import Network from "@/helpers/Network.js";
     import MovieSection from "@/components/MovieSection.vue";
 
     export default {
         name: "Home",
         components: {MovieSection, MainPage},
+        data() {
+            return {
+                upcomingMovies: []
+            }
+        },
         computed: {
             filteredMovies() {
                 if (!this.$store.state.searchMovie)
@@ -32,6 +40,11 @@
             otherMovies() {
                 return this.filteredMovies.filter(m => m.thumbnailLink).sort((a, b) => a.name > b.name ? 1 : -1);
             }
+        },
+        mounted() {
+            Network.get('/movies/upcoming').then(res => {
+                this.upcomingMovies = res.data;
+            }).catch(err => console.error(err.response.data));
         }
     }
 </script>

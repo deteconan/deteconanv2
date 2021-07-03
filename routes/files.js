@@ -2,7 +2,6 @@ import express from 'express';
 import DriveHelper from "../helpers/drive.js";
 import {checkRequiredGET, checkRequiredPOST} from "../helpers/middlewares.js";
 import {sendError} from "../helpers/utils.js";
-import imdb from 'imdb-scrapper';
 import TMDB from "../helpers/tmdb.js";
 import TorrentSearchApi from 'torrent-search-api';
 import Folder from '../models/folders.js';
@@ -118,6 +117,15 @@ router.post('/movies/update', needAdmin, checkRequiredPOST('id'), async (req, re
     try {
         await DriveHelper.updateFile(req.body);
         res.sendStatus(HTTP_OK);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
+router.get('/movies/upcoming', async (req, res) => {
+    try {
+        const trends = await TMDB.getUpcomingMovies();
+        res.json(trends);
     } catch (err) {
         sendError(err, req, res);
     }

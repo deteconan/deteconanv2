@@ -1,17 +1,17 @@
 <template>
     <main-page :loading="loading">
-        <div class="pa-0 pa-lg-15 overflow-x-hidden" :class="{'h-100': isMobileLayout}" v-if="movie && details">
+        <div class="pa-0 pa-lg-15 overflow-x-hidden" :class="{'h-100': isMobileLayout}" v-if="details">
             <v-row :class="{'h-100': isMobileLayout}">
                 <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pr-0">
                     <div style="height: 100%">
-                        <v-img :src="movie.image | tmdbPosterHD" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
+                        <v-img :src="details.image | tmdbPosterHD" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3" :class="{'h-100': isMobileLayout}">
                     <div class="details">
                         <div class="d-flex align-center">
-                            <h1>{{ movie.name }}</h1>
-                            <template v-if="!isMobileLayout && isAdmin">
+                            <h1>{{ details.name }}</h1>
+                            <template v-if="!isMobileLayout && isAdmin && movie">
                                 <v-btn class="ml-auto" icon @click.stop="editDialog = true">
                                     <v-icon class="material-icons-outlined">edit</v-icon>
                                 </v-btn>
@@ -20,19 +20,24 @@
                                 </v-btn>
                             </template>
                         </div>
-                        <h2 class="text-spaced">{{ $moment(movie.release_date).format('YYYY') }}</h2>
+                        <h3 class="text-spaced f-500">{{ date }}</h3>
                         <div class="font-weight-bold text-spaced opacity-80 mt-5 d-flex align-center">
                             <div class="mr-5">{{ runtime }}</div>
                             <v-img :src="require('../assets/img/popcorn.svg')" max-width="1.2em" max-height="1.2em" title="Note du public"></v-img>
                             <div class="ml-1">{{ details.rating * 10 }}%</div>
                         </div>
 
-                        <v-btn color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
+                        <v-btn v-if="movie" color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
                             <v-icon>play_arrow</v-icon>
                             <span class="ml-1 f-600">Lire</span>
                         </v-btn>
 
-                        <div class="text-justify f-500 mb-5">{{ details.description }}</div>
+                        <v-btn v-else-if="isReleased && isAdmin" @click.stop="download" color="success white--text" class="mr-auto mt-5">
+                            <v-icon>cloud_download</v-icon>
+                            <span class="ml-1 f-600">Télécharger</span>
+                        </v-btn>
+
+                        <div class="text-justify f-500 my-5">{{ details.description }}</div>
 
                         <div class="mt-auto d-flex">
                             <div class="font-weight-bold text-uppercase opacity-50 text-spaced">
@@ -160,18 +165,25 @@
                 }
                 else
                     return `${minutes}min`;
+            },
+            isReleased() {
+                return this.$moment().isSameOrAfter(this.$moment(this.details.release_date));
+            },
+            date() {
+                if (this.isReleased)
+                    return this.$moment(this.details.release_date).format('YYYY');
+                else
+                    return `À venir : ${this.$moment(this.details.release_date).locale('fr').format('LL')}`;
             }
         },
         activated() {
-            this.movie = this.movies.find(m => m.id === this.$route.params.id);
+            this.movie = this.movies.find(m => m.tmdbId === this.$route.params.id);
 
-            if (!this.movie)
-                return this.reach('/movies');
-
-            this.editMovie = JSON.parse(JSON.stringify(this.movie));
+            if (this.movie)
+                this.editMovie = JSON.parse(JSON.stringify(this.movie));
 
             this.loading = true;
-            Network.get(`/movies/details/${this.movie.tmdbId}`).then(res => {
+            Network.get(`/movies/details/${this.$route.params.id}`).then(res => {
                 this.details = res.data;
             }).finally(() => this.loading = false);
         },
@@ -212,6 +224,9 @@
             openPlayer() {
                 this.$store.commit('setMovie', this.movie);
                 this.togglePlayer();
+            },
+            download() {
+                this.reach(`/upload?q=${this.details.en_title}`);
             }
         }
     }
