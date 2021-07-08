@@ -15,7 +15,8 @@ export default new Vuex.Store({
         playingMovie: null,
         totalUsage: 0,
         searchMovie: '',
-        isMobileLayout: false
+        isMobileLayout: false,
+        genres: []
     },
     mutations: {
         setUser(state, user) {
@@ -47,6 +48,9 @@ export default new Vuex.Store({
         },
         updateLayout(state) {
             state.isMobileLayout = window.innerWidth < 600;
+        },
+        setGenres(state, genres) {
+            state.genres = genres;
         }
     },
     actions: {
@@ -121,6 +125,11 @@ export default new Vuex.Store({
             }).catch(() => {
                 commit('setUser', null);
             });
+        },
+        loadGenres({ commit }) {
+            return Network.get('/movies/genres')
+                .then(res => commit('setGenres', res.data))
+                .catch(err => console.error(err.response.data));
         }
     }
 })

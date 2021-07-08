@@ -23,7 +23,8 @@ export default class TMDB {
                     id: m.id,
                     name: m.title,
                     image: m.poster_path,
-                    release_date: m.release_date
+                    release_date: m.release_date,
+                    genre_ids: m.genre_ids
                 }));
         }).catch(err => console.error(err.response.data));
     }
@@ -51,7 +52,7 @@ export default class TMDB {
                 cast: credits.cast,
                 directors: credits.directors,
                 writers: credits.writers,
-                genres: movie.genres.map(g => g.name),
+                genre_ids: movie.genres.map(g => g.id),
                 release_date: movie.release_date
             };
         }).catch(err => console.error(err.response.data));
@@ -105,7 +106,7 @@ export default class TMDB {
                     image: c.profile_path
                 }));
 
-                writers = credits.crew.filter(c => c.job === 'Screenstory').map(c => ({
+                writers = credits.crew.filter(c => ['Screenstory', 'Screenplay'].includes(c.job)).map(c => ({
                     name: c.name,
                     job: c.department,
                     image: c.profile_path
@@ -133,7 +134,8 @@ export default class TMDB {
                 tmdbId: m.id,
                 name: m.title,
                 image: m.poster_path,
-                release_date: m.release_date
+                release_date: m.release_date,
+                genre_ids: m.genre_ids
             }));
         });
 
@@ -149,7 +151,8 @@ export default class TMDB {
                 tmdbId: m.id,
                 name: m.title,
                 image: m.poster_path,
-                release_date: m.release_date
+                release_date: m.release_date,
+                genre_ids: m.genre_ids
             }));
         });
 
@@ -166,5 +169,16 @@ export default class TMDB {
             return res.data.title;
         }).catch(err => console.error(err.response.data));
     }
+
+    static getMovieGenres() {
+        return api.get('/genre/movie/list', {
+            params: {
+                language: 'fr-FR'
+            }
+        }).then(res => {
+            return res.data.genres;
+        }).catch(err => console.error(err.response.data));
+    }
+
 
 }

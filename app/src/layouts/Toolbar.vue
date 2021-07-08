@@ -15,7 +15,8 @@
 
         <v-spacer v-if="!isMobileLayout || (isMobileLayout && !searchMode)"></v-spacer>
 
-        <v-text-field ref="search" v-show="(isMobileLayout && searchMode) || (!isMobileLayout && $route.fullPath !== '/upload')" class="search" prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
+        <v-text-field ref="search" v-show="(isMobileLayout && searchMode) || (!isMobileLayout && $route.fullPath !== '/upload')" class="search" dense
+                      prepend-inner-icon="search" v-model="search" @keypress.13="searchMovie" placeholder="Rechercher un film"
                       solo flat hide-details single-line clearable @click:clear="clearSearch" autocomplete="off"></v-text-field>
 
         <v-btn v-if="!isMobileLayout && isAdmin && $route.fullPath !== '/upload'" color="primary" class="ml-5" to="/upload">

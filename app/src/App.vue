@@ -30,6 +30,7 @@
       this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
       await this.$store.dispatch('loadFolders');
       await this.$store.dispatch('loadMovies');
+      await this.$store.dispatch('loadGenres');
       await this.$store.dispatch('getTotalUsage');
     }
   }

@@ -11,6 +11,7 @@ import TorrentSearchApi from 'torrent-search-api';
 import moment from 'moment';
 import GoogleAuthLibrary from "google-auth-library";
 import imdb from 'imdb-scrapper';
+import TMDB from "./helpers/tmdb.js";
 
 import googleapis from 'googleapis';
 const { google } = googleapis;
@@ -23,23 +24,21 @@ async function test() {
     // await DriveHelper.deleteFile('14C065B_5Nl8mz9H7aeKfz6_9xxlcbcNX');
     // const res = await IamHelper.createServiceAccount(config.projectId);
 
-    DB.init();
-    let movies = await DriveHelper.listFiles('1tDiCGwWbC0-ushih95AhDZD-50oLaNmZ');
-    movies.forEach(m => {
-        m.image = m.appProperties.image;
-        m.thumbnail = m.appProperties.thumbnail;
-        m.year = m.appProperties.year;
-        m.parentId = m.appProperties.parentId;
-        m.imdbId = m.appProperties.imdbId;
-        delete m.appProperties;
-    });
+    // let movies = await DriveHelper.listFiles('1tDiCGwWbC0-ushih95AhDZD-50oLaNmZ');
+    // movies.forEach(m => {
+    //     m.image = m.appProperties.image;
+    //     m.thumbnail = m.appProperties.thumbnail;
+    //     m.year = m.appProperties.year;
+    //     m.parentId = m.appProperties.parentId;
+    //     m.imdbId = m.appProperties.imdbId;
+    //     delete m.appProperties;
+    // });
 
-    const link = 'https://m.media-amazon.com/images/M/MV5BODRmZDVmNzUtZDA4ZC00NjhkLWI2M2UtN2M0ZDIzNDcxYThjL2ltYWdlXkEyXkFqcGdeQXVyNTk0MzMzODA@._V1_UX182_CR0,0,182,268_AL_.jpg';
-    const yourName = movies.find(m => m.name.includes('Your Name'));
-    // yourName.thumbnail = await uploadImage(link);
-    yourName.imdbId = 'tt5311514';
-    await DriveHelper.updateFile(yourName);
-    console.log(yourName);
+    // const movies = await TMDB.searchMovie('Chronicle');
+    // const movie = await TMDB.getMovie(movies[0].id);
+    // console.log(movie);
+
+    // await DriveHelper.updateQuota();
 
     /*await DriveHelper.uploadFromTorrent('speed', url, config.fileId, progress => {
         console.log(progress);
@@ -76,7 +75,32 @@ async function test() {
     // const movies = await imdb.getFull("tt0109830");
     // console.log(movies);
 
-    DB.close();
+    // DB.close();
+
+    // const movies = [];
+    let files = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58');
+
+    for (let file of files) {
+        const tmdbId = file.appProperties.tmdbId;
+
+        const movie = await TMDB.getMovie(tmdbId);
+
+        await DriveHelper.updateFile({
+            id: file.id,
+            name: movie.name,
+            description: file.description,
+            image: movie.image,
+            release_date: movie.release_date,
+            parentId: file.appProperties.parentId,
+            tmdbId: movie.id,
+            genre_ids: movie.genre_ids.join(',')
+        });
+
+        if (!movie)
+            console.log(file.name);
+    }
+
+    console.log('the end');
 }
 
 test();

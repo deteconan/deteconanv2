@@ -3,8 +3,9 @@
         <div class="img-container" @click.stop="playMovie(movie)">
 <!--            <img @load="imageLoaded = true" v-show="imageLoaded" :src="movie.image | tmdbPoster" loading="auto" :alt="movie.name">-->
             <v-img :src="movie.image | tmdbPoster" :alt="movie.name"></v-img>
-            <div class="play-btn">
-                <v-icon>play_arrow</v-icon>
+            <div class="play-btn" :class="{ 'downloaded': downloaded }">
+                <v-icon v-if="downloaded">play_arrow</v-icon>
+                <v-icon v-else>arrow_downward</v-icon>
             </div>
         </div>
         <div :title="movie.name" class="movie-title" @click.stop="playMovie(movie)">{{ movie.name }}</div>
@@ -23,6 +24,11 @@
         data() {
             return {
                 imageLoaded: false
+            }
+        },
+        computed: {
+            downloaded() {
+                return this.movies.find(m => +m.tmdbId === +this.movie.tmdbId);
             }
         }
     }
@@ -86,8 +92,13 @@
                 }
 
                 &:hover {
-                    background-color: var(--v-primary-base);
-                    border-color: var(--v-primary-base);
+                    background-color: var(--v-success-base);
+                    border-color: var(--v-success-base);
+
+                    &.downloaded {
+                        background-color: var(--v-primary-base);
+                        border-color: var(--v-primary-base);
+                    }
 
                     i {
                         color: black;

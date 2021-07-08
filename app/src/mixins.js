@@ -20,6 +20,9 @@ Vue.mixin({
         playingMovie() {
             return this.$store.state.playingMovie;
         },
+        genres() {
+            return this.$store.state.genres;
+        },
         totalUsage() {
             return this.$store.state.totalUsage;
         },

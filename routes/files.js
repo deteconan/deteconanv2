@@ -42,6 +42,7 @@ router.get('/movies', async (req, res) => {
           m.release_date = m.appProperties.release_date;
           m.parentId = m.appProperties.parentId;
           m.tmdbId = m.appProperties.tmdbId;
+          m.genre_ids = (m.appProperties.genre_ids || '').split(',').map(id => +id);
           delete m.appProperties;
       });
       res.json(movies);
@@ -126,6 +127,15 @@ router.get('/movies/upcoming', async (req, res) => {
     try {
         const trends = await TMDB.getUpcomingMovies();
         res.json(trends);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
+router.get('/movies/genres', async (req, res) => {
+    try {
+        const genres = await TMDB.getMovieGenres();
+        res.json(genres);
     } catch (err) {
         sendError(err, req, res);
     }

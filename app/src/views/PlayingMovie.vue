@@ -46,12 +46,12 @@
                             <div class="font-weight-bold text-uppercase opacity-50 text-spaced">
                                 <div v-if="directors">Réalisation</div>
                                 <div v-if="writers">Écriture</div>
-                                <div v-if="genres">Genres</div>
+                                <div v-if="movieGenres">Genres</div>
                             </div>
                             <div class="ml-5 f-500">
                                 <div>{{ directors }}</div>
                                 <div>{{ writers }}</div>
-                                <div>{{ genres }}</div>
+                                <div>{{ movieGenres }}</div>
                             </div>
                         </div>
                     </div>
@@ -149,11 +149,8 @@
                 else
                     return '';
             },
-            genres() {
-                if (this.details.genres)
-                    return this.details.genres.join(', ');
-                else
-                    return '';
+            movieGenres() {
+                return this.genres.filter(g => this.details.genre_ids.includes(g.id)).map(g => g.name).join(', ');
             },
             runtime() {
                 const date = this.$moment().startOf('day').add({ minute: this.details.runtime });
@@ -180,7 +177,7 @@
             }
         },
         activated() {
-            this.movie = this.movies.find(m => m.tmdbId === this.$route.params.id);
+            this.movie = this.movies.find(m => +m.tmdbId === +this.$route.params.id);
 
             if (this.movie)
                 this.editMovie = JSON.parse(JSON.stringify(this.movie));

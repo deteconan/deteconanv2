@@ -123,13 +123,13 @@ export default class DriveHelper {
         return total;
     }
 
-    static async uploadFromTorrent(outputName, url, parentId, image = null, releaseDate = null, tmdbId, onProgress) {
+    static async uploadFromTorrent(options, onProgress) {
         let response = null;
         let client = new WebTorrent();
         let fileSize = 0, filename = '', filePath = null;
 
         await new Promise(resolve => {
-            client.add(url, torrent => {
+            client.add(options.url, torrent => {
                 let selected = torrent.files[0];
                 torrent.files.forEach(file => {
                     if (file.length > selected.length)
@@ -146,13 +146,14 @@ export default class DriveHelper {
         });
 
         let metadata = {
-            name: outputName,
+            name: options.outputName,
             parents: [config.fileId],
             appProperties: {
-                parentId,
-                image,
-                release_date: releaseDate,
-                tmdbId,
+                parentId: options.parentId,
+                image: options.image,
+                release_date: options.releaseDate,
+                tmdbId: options.tmdbId,
+                genre_ids: options.genreIds.join(','),
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
@@ -358,6 +359,8 @@ export default class DriveHelper {
             null
         );
 
+        const genreIds = Array.isArray(file.genre_ids) ? file.genre_ids.join(',') : file.genre_ids;
+
         await drive.files.update({
             fileId: file.id,
             auth: token,
@@ -368,7 +371,8 @@ export default class DriveHelper {
                     image: file.image,
                     release_date: file.release_date,
                     parentId: file.parentId,
-                    tmdbId: file.tmdbId
+                    tmdbId: file.tmdbId,
+                    genre_ids: genreIds
                 }
             }
         }).catch(err => {
