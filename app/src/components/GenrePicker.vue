@@ -7,7 +7,7 @@
             </div>
         </div>
 
-        <div v-else ref="scrollContainer" class="overflow-hidden px-10 py-1" style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
+        <div v-else ref="scrollContainer" class="overflow-hidden px-10 py-2" style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
             <div ref="scroller" class="scroller" :style="scrollStyle">
                 <v-chip @click.stop="selectGenre(genre.id)" v-for="genre in genresFiltered" :key="genre.id" class="cursor-pointer"
                         :color="genre.id === selected ? 'primary' : 'secondary'">{{ genre.name }}</v-chip>
@@ -121,7 +121,7 @@ export default {
 
 .scroller {
     display: inline-flex;
-    gap: 0.3rem;
+    gap: 0.5rem;
     transition: transform 100ms ease;
 }
 </style>
