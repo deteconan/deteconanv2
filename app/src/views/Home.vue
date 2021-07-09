@@ -1,7 +1,7 @@
 <template>
     <main-page>
         <div class="pb-5 pb-lg-10 pt-lg-0">
-            <div class="genres dark mb-5">
+            <div v-if="genres.length > 0" class="genres dark mb-5">
                 <genre-picker v-model="selectedGenre"></genre-picker>
             </div>
 
