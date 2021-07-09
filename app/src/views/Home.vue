@@ -1,8 +1,8 @@
 <template>
     <main-page>
         <div class="pb-5 pb-lg-10 pt-lg-0">
-            <div v-if="genres.length > 0" class="genres dark mb-5">
-                <genre-picker v-model="selectedGenre"></genre-picker>
+            <div class="genres dark mb-5">
+                <genre-picker v-if="genres.length > 0" v-model="selectedGenre"></genre-picker>
             </div>
 
             <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-5 mb-lg-10"></movie-section>
