@@ -106,7 +106,8 @@
                     image: media.image,
                     release_date: media.release_date,
                     parent_id: media.parentId,
-                    tmdbId: media.tmdbId
+                    tmdbId: media.tmdbId,
+                    genre_ids: media.genre_ids
                 });
 
                 this.addToQueue(media);
