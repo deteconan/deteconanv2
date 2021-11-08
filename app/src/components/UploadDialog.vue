@@ -174,6 +174,7 @@
         { name: 'Torrent Galaxy', value: 'TorrentGalaxy' },
         { name: 'Lime Torrents', value: 'Limetorrents' },
         { name: 'Rarbg', value: 'Rarbg' },
+        { name: 'Nyaa', value: 'Nyaa' },
         { name: 'Torrent9', value: 'Torrent9' },
         { name: 'Torrentz2', value: 'Torrentz2' },
         { name: 'Kickass Torrents', value: 'KickassTorrents' },

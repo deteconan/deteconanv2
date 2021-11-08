@@ -1,0 +1,23 @@
+{
+  "name": "Nyaa",
+  "baseUrl": "https://nyaa.si",
+  "enableCloudFareBypass": true,
+  "searchUrl": "/?q={query}",
+  "categories": {
+    "All": ""
+  },
+  "defaultCategory": "All",
+  "resultsPerPageCount": 65,
+  "itemsSelector": "tr.default",
+  "itemSelectors": {
+    "title": "td:nth-child(2) a:not(.comments)@text",
+    "magnet": "td:nth-child(3) a[href^=\"magnet\"]@href",
+    "link": "td:nth-child(3) a[href^=\"/download\"]@href",
+    "seeds": "td:nth-child(6)@text | int",
+    "peers": "td:nth-child(7)@text | int",
+    "time": "td:nth-child(5)@text",
+    "size": "td:nth-child(4)@text"
+  },
+  "paginateSelector": "li.next a",
+  "torrentDetailsSelector": "table"
+}

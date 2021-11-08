@@ -15,6 +15,7 @@ import TorrentSearchApi from "torrent-search-api";
 
 // Load custom providers
 TorrentSearchApi.loadProvider(path.resolve('./torrent-providers/TorrentGalaxy.json'));
+TorrentSearchApi.loadProvider(path.resolve('./torrent-providers/Nyaa.json'));
 
 const app = express();
 DB.init();
