@@ -170,10 +170,11 @@
     import Network from "@/helpers/Network.js";
 
     const providers = [
-        { name: 'Torrent9', value: 'Torrent9' },
         { name: 'The Pirate Bay', value: 'ThePirateBay' },
+        { name: 'Torrent Galaxy', value: 'TorrentGalaxy' },
         { name: 'Lime Torrents', value: 'Limetorrents' },
         { name: 'Rarbg', value: 'Rarbg' },
+        { name: 'Torrent9', value: 'Torrent9' },
         { name: 'Torrentz2', value: 'Torrentz2' },
         { name: 'Kickass Torrents', value: 'KickassTorrents' },
         { name: 'Yts', value: 'Yts' },

@@ -11,6 +11,10 @@ import schedule from 'node-schedule';
 import filesRoutes from './routes/files.js';
 import usersRoutes from './routes/users.js';
 import compression from 'compression';
+import TorrentSearchApi from "torrent-search-api";
+
+// Load custom providers
+TorrentSearchApi.loadProvider(path.resolve('./torrent-providers/TorrentGalaxy.json'));
 
 const app = express();
 DB.init();

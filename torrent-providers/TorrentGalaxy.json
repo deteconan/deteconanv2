@@ -1,0 +1,23 @@
+{
+  "name": "TorrentGalaxy",
+  "baseUrl": "https://torrentgalaxy.to",
+  "enableCloudFareBypass": true,
+  "searchUrl": "/torrents.php?search={query}",
+  "categories": {
+    "All": ""
+  },
+  "defaultCategory": "All",
+  "resultsPerPageCount": 50,
+  "itemsSelector": ".tgxtablerow",
+  "itemSelectors": {
+    "title": ".tgxtablecell .txlight b@text",
+    "magnet": ".tgxtablecell:nth-child(5) a:nth-child(2)@href",
+    "link": ".tgxtablecell:nth-child(5) a:nth-child(1)@href",
+    "seeds": ".tgxtablecell:nth-child(11) span[title=\"Seeders/Leechers\"] font[color=\"green\"] b@text | int",
+    "peers": ".tgxtablecell:nth-child(11) span[title=\"Seeders/Leechers\"] font[color=\"#ff0000\"] b@text | int",
+    "time": ".tgxtablecell:nth-child(12)@text",
+    "size": ".tgxtablecell:nth-child(8) span.badge@text"
+  },
+  "paginateSelector": ".page-item:last-child .page-link@href",
+  "torrentDetailsSelector": ".tgxtable@html"
+}
