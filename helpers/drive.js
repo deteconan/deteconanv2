@@ -15,8 +15,8 @@ import fs from 'fs';
 import path from 'path';
 
 import ffmpeg from 'fluent-ffmpeg';
-ffmpeg.setFfmpegPath(path.resolve('../ffmpeg/ffmpeg'));
-ffmpeg.setFfprobePath(path.resolve('../ffmpeg/ffprobe'));
+ffmpeg.setFfmpegPath(path.resolve(process.cwd(), '../ffmpeg/ffmpeg'));
+ffmpeg.setFfprobePath(path.resolve(process.cwd(), '../ffmpeg/ffprobe'));
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
