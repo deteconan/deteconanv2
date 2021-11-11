@@ -132,12 +132,36 @@ export default class DriveHelper {
         return total;
     }
 
+    static async convertToMP4(filePath) {
+        const convertedFileName = `${filePath}.mp4`;
+        console.log(convertedFileName);
+
+        return new Promise((resolve, reject) => {
+            ffmpeg()
+                .input(fs.createReadStream(filePath))
+                .videoCodec('libx264')
+                .audioCodec('libmp3lame')
+                .format('mp4')
+                .on('progress', progress => console.log(progress))
+                .on('error', err => {
+                    console.error(err);
+                    reject(err);
+                })
+                .on('end', () => {
+                    console.log('Finished processing');
+                    resolve(convertedFileName);
+                })
+                .save(convertedFileName);
+        });
+    }
+
     static async uploadFromTorrent(options, onProgress) {
         let client = new WebTorrent();
-        let fileSize = 0, filename = '', filePath = null;
+        let fileSize = 0, filename = '', filePath = null, torrentPath = null;
 
         let stream = await new Promise(resolve => {
             client.add(options.url, torrent => {
+                torrentPath = torrent.path;
                 let selected = torrent.files[0];
                 torrent.files.forEach(file => {
                     if (file.length > selected.length)
@@ -153,14 +177,11 @@ export default class DriveHelper {
         });
 
         if (options.convert) {
+            const fullPath = `${torrentPath}/${filePath}`;
+
             // Convert to MP4 before uploading to Google Drive
-            stream = ffmpeg()
-                .input(stream)
-                .videoCodec('libx264')
-                .audioCodec('libmp3lame')
-                .format('mp4')
-                .on('progress', progress => console.log(progress))
-                .on('end', () => console.log('Finished processing'));
+            const convertedFilePath = await this.convertToMP4(fullPath);
+            stream = fs.createReadStream(convertedFilePath.toString());
         }
 
         const metadata = {
