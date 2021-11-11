@@ -17,7 +17,10 @@ import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegStatic);
-ffmpeg.setFfprobePath(ffprobeStatic);
+ffmpeg.setFfprobePath(ffprobeStatic.path);
+
+console.log('FFMPEG found at', ffmpegStatic);
+console.log('FFPROB found at', ffprobeStatic.path);
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
