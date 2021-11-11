@@ -12,10 +12,11 @@ import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
 import moment from 'moment';
 import fs from 'fs';
+import path from 'path';
 
 import ffmpeg from 'fluent-ffmpeg';
-ffmpeg.setFfmpegPath('../ffmpeg/ffmpeg');
-ffmpeg.setFfprobePath('../ffmpeg/ffprobe');
+ffmpeg.setFfmpegPath(path.resolve('../ffmpeg/ffmpeg'));
+ffmpeg.setFfprobePath(path.resolve('../ffmpeg/ffprobe'));
 
 const jwToken = new google.auth.JWT(
     admin.client_email,
