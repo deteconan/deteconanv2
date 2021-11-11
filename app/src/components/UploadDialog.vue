@@ -55,7 +55,8 @@
                             </v-btn>
                         </div>
 
-                        <div v-if="moreOptions" class="d-flex flex-wrap">
+                        <div v-if="moreOptions">
+                            <v-checkbox v-model="convert" label="Convertir en MP4"></v-checkbox>
                             <v-select v-model="selectedProviders" label="Hébergeurs" :items="providers" item-text="name" item-value="value" multiple></v-select>
                         </div>
 
@@ -211,7 +212,8 @@
                 moreOptions: false,
                 providers: providers,
                 selectedProviders: ['ThePirateBay'],
-                customMagnet: null
+                customMagnet: null,
+                convert: false
             }
         },
         computed: {
@@ -296,7 +298,8 @@
                     image: this.movieDetails.image,
                     release_date: this.movieDetails.release_date,
                     tmdbId: this.movieDetails.id,
-                    genre_ids: this.movieDetails.genre_ids
+                    genre_ids: this.movieDetails.genre_ids,
+                    convert: this.convert
                 });
             }
         }

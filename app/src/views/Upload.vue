@@ -107,7 +107,8 @@
                     release_date: media.release_date,
                     parent_id: media.parentId,
                     tmdbId: media.tmdbId,
-                    genre_ids: media.genre_ids
+                    genre_ids: media.genre_ids,
+                    convert: media.convert
                 });
 
                 this.addToQueue(media);

@@ -13,6 +13,10 @@ import IamHelper from "./iam.js";
 import moment from 'moment';
 import fs from 'fs';
 
+import ffmpeg from 'fluent-ffmpeg';
+ffmpeg.setFfmpegPath('../ffmpeg/ffmpeg');
+ffmpeg.setFfprobePath('../ffmpeg/ffprobe');
+
 const jwToken = new google.auth.JWT(
     admin.client_email,
     null,
@@ -124,11 +128,10 @@ export default class DriveHelper {
     }
 
     static async uploadFromTorrent(options, onProgress) {
-        let response = null;
         let client = new WebTorrent();
         let fileSize = 0, filename = '', filePath = null;
 
-        await new Promise(resolve => {
+        let stream = await new Promise(resolve => {
             client.add(options.url, torrent => {
                 let selected = torrent.files[0];
                 torrent.files.forEach(file => {
@@ -140,12 +143,22 @@ export default class DriveHelper {
                 filename = selected.name;
                 filePath = selected.path;
 
-                response = selected.createReadStream();
-                resolve();
+                resolve(selected.createReadStream());
             });
         });
 
-        let metadata = {
+        if (options.convert) {
+            // Convert to MP4 before uploading to Google Drive
+            stream = ffmpeg()
+                .input(stream)
+                .videoCodec('libx264')
+                .audioCodec('libmp3lame')
+                .format('mp4')
+                .on('progress', progress => console.log(progress))
+                .on('end', () => console.log('Finished processing'));
+        }
+
+        const metadata = {
             name: options.outputName,
             parents: [config.fileId],
             appProperties: {
@@ -160,7 +173,7 @@ export default class DriveHelper {
 
         let media = {
             mimeType: mime.getType(filename),
-            body: response
+            body: stream
         };
 
         const cred = await IamHelper.getAccountWithEnoughQuota(fileSize);

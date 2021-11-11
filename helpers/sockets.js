@@ -19,7 +19,8 @@ export default {
                         image: media.image,
                         releaseDate: media.release_date,
                         tmdbId: media.tmdbId,
-                        genreIds: media.genre_ids
+                        genreIds: media.genre_ids,
+                        convert: media.convert
                     }, ({ progress, speed }) => {
                         sockets.emit('progress', {progress, speed, link: media.link, name: media.name});
                     }).then(() => {
