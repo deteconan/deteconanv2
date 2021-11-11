@@ -12,10 +12,12 @@ import {uploadImage} from "./utils.js";
 import IamHelper from "./iam.js";
 import moment from 'moment';
 import fs from 'fs';
+import path from "path";
 
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
+
 ffmpeg.setFfmpegPath(ffmpegStatic);
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 
@@ -132,13 +134,13 @@ export default class DriveHelper {
         return total;
     }
 
-    static async convertToMP4(filePath) {
+    static async convertToMP4(stream, filePath) {
         const convertedFileName = `${filePath}.mp4`;
-        console.log(convertedFileName);
+        console.log('CONVERTED FILE PATH:', convertedFileName);
 
         return new Promise((resolve, reject) => {
             ffmpeg()
-                .input(fs.createReadStream(filePath))
+                .input(stream)
                 .videoCodec('libx264')
                 .audioCodec('libmp3lame')
                 .format('mp4')
@@ -180,8 +182,9 @@ export default class DriveHelper {
             const fullPath = `${torrentPath}/${filePath}`;
 
             // Convert to MP4 before uploading to Google Drive
-            const convertedFilePath = await this.convertToMP4(fullPath);
-            stream = fs.createReadStream(convertedFilePath.toString());
+            const convertedFilePath = (await this.convertToMP4(stream, fullPath)).toString();
+            stream = fs.createReadStream(convertedFilePath);
+            fileSize = fs.statSync(convertedFilePath).size;
         }
 
         const metadata = {
@@ -211,6 +214,7 @@ export default class DriveHelper {
             null
         );
 
+        console.log('FILE SIZE:', fileSize);
         await this.addQuota(cred.client_email, fileSize); // Reserve quota for simultaneous uploads
 
         let time = new Date().getTime();
