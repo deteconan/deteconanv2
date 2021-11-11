@@ -18,6 +18,8 @@ import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 
+// console.log(path.join(path.resolve('/'), '/tmp/test.mkv'));
+
 ffmpeg.setFfmpegPath(ffmpegStatic);
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 
@@ -144,6 +146,7 @@ export default class DriveHelper {
                 .videoCodec('libx264')
                 .audioCodec('libmp3lame')
                 .format('mp4')
+                .duration('30')
                 .on('progress', progress => console.log(progress))
                 .on('error', err => {
                     console.error(err);
