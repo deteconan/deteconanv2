@@ -119,8 +119,9 @@ export default {
     overflow-y: hidden;
 
     .scroller {
+        position: relative;
         display: inline-flex;
-        gap: 1.5rem;
+        gap: 0.5rem;
         transition: transform 100ms ease;
         will-change: transform;
     }

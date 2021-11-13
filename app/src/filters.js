@@ -16,7 +16,7 @@ function bytes(byteVal, perSec = false) {
 }
 
 Vue.filter('tmdbPoster', val => {
-    return `https://www.themoviedb.org/t/p/w200${val}`;
+    return `https://www.themoviedb.org/t/p/w400${val}`;
 });
 
 Vue.filter('tmdbPosterHD', val => {
