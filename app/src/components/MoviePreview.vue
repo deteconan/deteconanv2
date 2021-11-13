@@ -70,8 +70,9 @@
 
         .name {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 1.2rem;
             letter-spacing: 1px;
+            text-align: center;
         }
     }
 
