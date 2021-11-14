@@ -141,7 +141,10 @@ export default class DriveHelper {
             ffmpeg()
                 .input(stream)
                 .videoCodec('libx264')
-                .audioCodec('libmp3lame')
+                .videoBitrate('10000k')
+                .audioCodec('aac')
+                .audioBitrate('128k')
+                .audioChannels(2)
                 .format('mp4')
                 .on('progress', progress => console.log(progress))
                 .on('error', err => {
