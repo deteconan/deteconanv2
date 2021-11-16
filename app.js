@@ -10,6 +10,7 @@ import Sockets from './helpers/sockets.js';
 import schedule from 'node-schedule';
 import filesRoutes from './routes/files.js';
 import usersRoutes from './routes/users.js';
+import moviesRoutes from './routes/movies.js';
 import compression from 'compression';
 import TorrentSearchApi from "torrent-search-api";
 
@@ -57,6 +58,7 @@ app.get(/^(?:(?!\bapi\b).)*$/, (req, res) => {
 
 app.use('/api', filesRoutes);
 app.use('/api', usersRoutes);
+app.use('/api', moviesRoutes);
 
 // Error handler
 app.use(sendError);

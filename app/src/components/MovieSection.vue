@@ -115,19 +115,22 @@ export default {
 
 <style lang="scss" scoped>
 .scroll-container {
-    overflow-x: hidden;
-    overflow-y: hidden;
+    //overflow-x: hidden;
+    //overflow-y: hidden;
+    position: relative;
 
     .scroller {
         position: relative;
         display: inline-flex;
         gap: 0.5rem;
         transition: transform 100ms ease;
-        will-change: transform;
+        //will-change: transform;
     }
 }
 
+// Mobile version
 .scroll {
+    position: relative;
     white-space: nowrap;
     overflow: auto;
     display: flex;

@@ -41,6 +41,7 @@ export default {
 html, body {
     overflow: auto !important;
     --preview-width: 200px;
+    --preview-height: 300px;
 }
 
 #app {
@@ -54,6 +55,7 @@ html, body {
 
     .mobile {
         --preview-width: 40vw;
+        --preview-height: calc(40vw * 1.5);
     }
 
     .body-page {
@@ -69,6 +71,12 @@ html, body {
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
+    }
+}
+
+.mobile {
+    *::-webkit-scrollbar {
+        width: 4px;
     }
 }
 

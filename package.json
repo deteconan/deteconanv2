@@ -39,6 +39,7 @@
     "socket.io": "^2.3.0",
     "torrent-search-api": "^2.1.4",
     "uuid": "^8.3.1",
-    "webtorrent": "^0.108.6"
+    "webtorrent": "^0.108.6",
+    "ytdl-core": "^4.9.1"
   }
 }

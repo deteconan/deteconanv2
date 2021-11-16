@@ -1,4 +1,5 @@
 import axios from 'axios';
+import ytdl from "ytdl-core";
 
 const api = axios.create({
     baseURL: 'https://api.themoviedb.org/3',
@@ -56,6 +57,38 @@ export default class TMDB {
                 release_date: movie.release_date
             };
         }).catch(err => console.error(err.response.data));
+    }
+
+    static async getMovieTrailer(tmdbId) {
+        let format;
+
+        await api.get(`/movie/${tmdbId}/videos`, {
+            params: {
+                language: 'fr-FR'
+            }
+        })
+        .then(async res => {
+            let trailer;
+            for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
+                try {
+                    trailer = video;
+                    const youtubeId = trailer.key;
+
+                    if (youtubeId) {
+                        const info = await ytdl.getInfo(youtubeId);
+                        info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && format.container === 'mp4');
+                        format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+                    }
+
+                    break;
+                } catch {}
+            }
+
+            return trailer ? trailer.key : null;
+        })
+        .catch(err => console.error(err));
+
+        return format ? format.url : null;
     }
 
     static getMovieFromImdb(imdbID) {
@@ -135,7 +168,8 @@ export default class TMDB {
                 name: m.title,
                 image: m.poster_path,
                 release_date: m.release_date,
-                genre_ids: m.genre_ids
+                genre_ids: m.genre_ids,
+                rating: m.vote_average
             }));
         });
 
@@ -152,7 +186,8 @@ export default class TMDB {
                 name: m.title,
                 image: m.poster_path,
                 release_date: m.release_date,
-                genre_ids: m.genre_ids
+                genre_ids: m.genre_ids,
+                rating: m.vote_average
             }));
         });
 
