@@ -133,11 +133,11 @@
 
 <style lang="scss">
 .fade-enter-active, .fade-leave-active {
-    transition: opacity .2s, transform 150ms;
+    transition: opacity .2s, transform 300ms;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter, .fade-leave-to {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.8);
 }
 
 .movie-preview {

@@ -122,7 +122,7 @@ export default {
     .scroller {
         position: relative;
         display: inline-flex;
-        gap: 0.5rem;
+        gap: 1rem;
         transition: transform 100ms ease;
         //will-change: transform;
     }

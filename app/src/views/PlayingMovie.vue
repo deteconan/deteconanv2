@@ -32,7 +32,7 @@
 
                         <v-btn v-if="movie" color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
                             <v-icon>play_arrow</v-icon>
-                            <span class="ml-1 f-600">Lire</span>
+                            <span class="ml-1 f-600">Lecture</span>
                         </v-btn>
 
                         <v-btn v-else-if="isReleased && isAdmin" @click.stop="download" color="success white--text" class="mr-auto mt-5">
