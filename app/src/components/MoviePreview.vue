@@ -83,7 +83,6 @@
                 clearTimeout(this.timeout);
                 this.previewVisible = false;
                 this.trailer = null;
-                this.muted = false;
                 this.loaded = false;
                 this.trailerError = null;
             },
