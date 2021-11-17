@@ -417,7 +417,8 @@ export default class DriveHelper {
                     release_date: file.release_date,
                     parentId: file.parentId,
                     tmdbId: file.tmdbId,
-                    genre_ids: genreIds
+                    genre_ids: genreIds,
+                    rating: file.rating
                 }
             }
         }).catch(err => {

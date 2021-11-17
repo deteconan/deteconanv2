@@ -41,6 +41,7 @@ router.get('/movies', async (req, res) => {
           m.parentId = m.appProperties.parentId;
           m.tmdbId = m.appProperties.tmdbId;
           m.genre_ids = (m.appProperties.genre_ids || '').split(',').map(id => +id);
+          m.rating = m.appProperties.rating;
           delete m.appProperties;
       });
       res.json(movies);

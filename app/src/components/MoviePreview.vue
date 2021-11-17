@@ -1,13 +1,16 @@
 <template>
-    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" class="movie-preview" @click.stop="playMovie(movie)" :class="{'preview-visible': previewVisible && loaded}">
+    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" class="movie-preview" @click.stop="playMovie(movie)" :class="{'preview-visible': previewVisible}">
         <v-img :src="movie.image | tmdbPoster" :alt="movie.name"></v-img>
 
         <transition name="fade">
-            <div v-if="previewVisible && loaded" @click.stop="" class="overlay elevation-5">
-                <aspect-ratio>
-                    <video v-if="trailer" :src="trailer" autoplay width="100%" :muted="muted"></video>
+            <div v-if="previewVisible" @click.stop="" class="overlay elevation-5">
+                <aspect-ratio style="pointer-events: none">
+                    <div v-if="!loaded" class="d-flex align-center justify-center" style="background: black">
+                        <v-progress-circular indeterminate size="65" width="2"></v-progress-circular>
+                    </div>
+                    <video v-else-if="!trailerError" @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
                     <div v-else class="d-flex align-center justify-center" style="background: black">
-                        <span class="mr-1">Trailer indisponible</span>
+                        <span class="mr-1">{{ trailerError }}</span>
                         <v-icon>sentiment_very_dissatisfied</v-icon>
                     </div>
                 </aspect-ratio>
@@ -54,7 +57,8 @@
                 previewVisible: false,
                 trailer: null,
                 muted: false,
-                loaded: false
+                loaded: false,
+                trailerError: null
             }
         },
         computed: {
@@ -81,6 +85,7 @@
                 this.trailer = null;
                 this.muted = false;
                 this.loaded = false;
+                this.trailerError = null;
             },
             videoElement() {
                 return this.$el.querySelector('video');
@@ -88,12 +93,18 @@
             showPreview() {
                 this.previewVisible = true;
                 this.loaded = false;
+                this.trailerError = null;
+
                 return Network.get(`/movie/trailer/${this.movie.tmdbId}`)
                     .then(res => {
                         if (!this.previewVisible)
                             return;
 
                         this.trailer = res.data;
+
+                        if (!this.trailer)
+                            this.trailerError = 'Trailer indisponible';
+
                         this.loaded = true;
                         this.$nextTick(async () => {
                             if (this.videoElement()) {
@@ -110,13 +121,14 @@
                     .catch(err => console.error(err.response.data));
             },
             onMouseEnter() {
+                this.muted = localStorage.getItem('muted') === 'true';
                 this.previewVisible = false;
                 this.trailer = null;
                 clearTimeout(this.timeout);
 
                 this.timeout = setTimeout(() => {
                     this.showPreview();
-                }, 100);
+                }, 500);
             },
             onMouseLeave() {
                 if (this.videoElement()) {
@@ -126,6 +138,14 @@
                 clearTimeout(this.timeout);
                 this.trailer = null;
                 this.previewVisible = false;
+            },
+            onTrailerError() {
+                this.trailerError = 'Erreur lors du chargement'
+            }
+        },
+        watch: {
+            muted(val) {
+                localStorage.setItem('muted', val);
             }
         }
     }
@@ -168,7 +188,7 @@
         width: calc(var(--preview-width) * 2);
         height: calc(var(--preview-height) * 1.2);
         border-radius: 5px;
-        background: var(--v-dark-base);
+        background: var(--v-dark-darken1);
         z-index: 1;
 
         video {
