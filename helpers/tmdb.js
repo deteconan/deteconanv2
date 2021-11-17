@@ -59,7 +59,7 @@ export default class TMDB {
         }).catch(err => console.error(err.response.data));
     }
 
-    static async getMovieTrailer(tmdbId) {
+    static async getMovieTrailer(tmdbId, hd = true) {
         let format;
 
         await api.get(`/movie/${tmdbId}/videos`, {
@@ -76,8 +76,8 @@ export default class TMDB {
 
                     if (youtubeId) {
                         const info = await ytdl.getInfo(youtubeId);
-                        info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && format.container === 'mp4');
-                        format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+                        info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && ['mp4', 'webm'].includes(format.container));
+                        format = ytdl.chooseFormat(info.formats, { quality: hd ? 'highestvideo' : 'lowestvideo' });
                     }
 
                     break;

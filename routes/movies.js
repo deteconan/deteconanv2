@@ -64,7 +64,8 @@ router.get('/movies/details/:tmdb_id', async (req, res) => {
 
 router.get('/movie/trailer/:tmdb_id', async (req, res) => {
     try {
-        const trailer = await TMDB.getMovieTrailer(req.params.tmdb_id);
+        const hd = req.query.hd === 'true';
+        const trailer = await TMDB.getMovieTrailer(req.params.tmdb_id, hd);
 
         res.json(trailer);
     } catch (err) {

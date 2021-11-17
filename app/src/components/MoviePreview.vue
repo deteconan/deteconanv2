@@ -94,30 +94,34 @@
                 this.loaded = false;
                 this.trailerError = null;
 
-                return Network.get(`/movie/trailer/${this.movie.tmdbId}`)
-                    .then(res => {
-                        if (!this.previewVisible)
-                            return;
+                return Network.get(`/movie/trailer/${this.movie.tmdbId}`, {
+                    params: {
+                        hd: false
+                    }
+                })
+                .then(res => {
+                    if (!this.previewVisible)
+                        return;
 
-                        this.trailer = res.data;
+                    this.trailer = res.data;
 
-                        if (!this.trailer)
-                            this.trailerError = 'Trailer indisponible';
+                    if (!this.trailer)
+                        this.trailerError = 'Trailer indisponible';
 
-                        this.loaded = true;
-                        this.$nextTick(async () => {
-                            if (this.videoElement()) {
-                                this.videoElement().volume = 0.05;
-                                try {
-                                    await this.videoElement().play();
-                                } catch {
-                                    this.muted = true;
-                                    await this.videoElement().play();
-                                }
+                    this.loaded = true;
+                    this.$nextTick(async () => {
+                        if (this.videoElement()) {
+                            this.videoElement().volume = 0.05;
+                            try {
+                                await this.videoElement().play();
+                            } catch {
+                                this.muted = true;
+                                await this.videoElement().play();
                             }
-                        });
-                    })
-                    .catch(err => console.error(err.response.data));
+                        }
+                    });
+                })
+                .catch(err => console.error(err.response.data));
             },
             onMouseEnter() {
                 this.muted = localStorage.getItem('muted') === 'true';

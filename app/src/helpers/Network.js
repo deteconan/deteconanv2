@@ -4,9 +4,9 @@ const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000'
 
 export default class Network {
 
-    static get(url) {
+    static get(url, options) {
         this.setToken();
-        return axios.get(`${API_URL}/api${url}`);
+        return axios.get(`${API_URL}/api${url}`, options);
     }
 
     static post(url, params) {
