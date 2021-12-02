@@ -30,9 +30,9 @@
                             <div class="ml-1">{{ details.rating * 10 }}%</div>
                         </div>
 
-                        <v-btn v-if="movie" color="primary black--text" class="mr-auto my-5" @click.stop="openPlayer">
-                            <v-icon>play_arrow</v-icon>
-                            <span class="ml-1 f-600">Lecture</span>
+                        <v-btn v-if="movie" color="primary" class="mr-auto my-5" @click.stop="openPlayer">
+                            <v-icon color="black">play_arrow</v-icon>
+                            <span class="black--text ml-1 f-600">Lecture</span>
                         </v-btn>
 
                         <v-btn v-else-if="isReleased && isAdmin" @click.stop="download" color="success white--text" class="mr-auto mt-5">

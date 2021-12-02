@@ -1,5 +1,6 @@
 import axios from 'axios';
 import ytdl from "ytdl-core";
+import cheerio from "cheerio";
 
 const api = axios.create({
     baseURL: 'https://api.themoviedb.org/3',
@@ -59,37 +60,82 @@ export default class TMDB {
         }).catch(err => console.error(err.response.data));
     }
 
-    static async getMovieTrailer(tmdbId, hd = true) {
-        let format;
+    static async getYoutubeProxyUrl(youtubeId) {
+        const html = await axios.get(`https://vid.puffyan.us/watch?v=${youtubeId}`, {
+            headers: {
+                "Origin": "vid.puffyan.us",
+                "User-Agent": "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+                "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "Referer": "https://vid.puffyan.us",
+                "Referrer-Policy": "same-origin"
+            }
+        })
+        .then((res => res.data));
 
-        await api.get(`/movie/${tmdbId}/videos`, {
+        const $ = cheerio.load(html);
+
+        return `https://vid.puffyan.us${$('video > source').attr('src')}`;
+    }
+
+    static getMovieTrailer(tmdbId, hd = true) {
+        return api.get(`/movie/${tmdbId}/videos`, {
             params: {
                 language: 'fr-FR'
             }
         })
-        .then(async res => {
-            let trailer;
-            for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
-                try {
-                    trailer = video;
-                    const youtubeId = trailer.key;
+            .then(async res => {
+                let trailer;
+                for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
+                    try {
+                        trailer = video;
+                        const youtubeId = trailer.key;
 
-                    if (youtubeId) {
-                        const info = await ytdl.getInfo(youtubeId);
-                        info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && ['mp4', 'webm'].includes(format.container));
-                        format = ytdl.chooseFormat(info.formats, { quality: hd ? 'highestvideo' : 'lowestvideo' });
-                    }
+                        if (youtubeId) {
+                            await ytdl.getInfo(youtubeId);
+                        }
 
-                    break;
-                } catch {}
-            }
+                        break;
+                    } catch {}
+                }
 
-            return trailer ? trailer.key : null;
-        })
-        .catch(err => console.error(err));
-
-        return format ? format.url : null;
+                return trailer ? this.getYoutubeProxyUrl(trailer.key) : null;
+            })
+            .catch(err => console.error(err));
     }
+
+    // static async getMovieTrailer(tmdbId, hd = true) {
+    //     let format;
+    //
+    //     await api.get(`/movie/${tmdbId}/videos`, {
+    //         params: {
+    //             language: 'fr-FR'
+    //         }
+    //     })
+    //     .then(async res => {
+    //         let trailer;
+    //         for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
+    //             try {
+    //                 trailer = video;
+    //                 const youtubeId = trailer.key;
+    //
+    //                 if (youtubeId) {
+    //                     const info = await ytdl.getInfo(youtubeId);
+    //                     info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && ['mp4', 'webm'].includes(format.container));
+    //                     format = ytdl.chooseFormat(info.formats, { quality: hd ? 'highestvideo' : 'lowestvideo' });
+    //                 }
+    //
+    //                 break;
+    //             } catch {}
+    //         }
+    //
+    //         return trailer ? trailer.key : null;
+    //     })
+    //     .catch(err => console.error(err));
+    //
+    //     return format ? format.url : null;
+    // }
 
     static getMovieFromImdb(imdbID) {
         return api.get(`/find/${imdbID}`, {

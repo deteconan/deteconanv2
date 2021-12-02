@@ -105,9 +105,6 @@ export default {
         scroll(val) {
             this.canScrollLeft = val < 0;
             this.canScrollRight = val > -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 100));
-        },
-        '$refs.scroller.scrollWidth'(val) {
-            console.log(val);
         }
     }
 }

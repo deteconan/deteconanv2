@@ -15,10 +15,14 @@ function bytes(byteVal, perSec = false) {
     return div.toFixed(1) + " " + units[kounter];
 }
 
-Vue.filter('tmdbPoster', val => {
+export function tmdbPoster(val) {
     return `https://www.themoviedb.org/t/p/w400${val}`;
-});
+}
 
-Vue.filter('tmdbPosterHD', val => {
+export function tmdbPosterHD(val) {
     return `https://www.themoviedb.org/t/p/original${val}`;
-});
+}
+
+Vue.filter('tmdbPoster', val => tmdbPoster(val));
+
+Vue.filter('tmdbPosterHD', val => tmdbPosterHD(val));

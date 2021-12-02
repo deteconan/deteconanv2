@@ -16,7 +16,12 @@ export default new Vuex.Store({
         totalUsage: 0,
         searchMovie: '',
         isMobileLayout: false,
-        genres: []
+        genres: [],
+
+        movieDialog: {
+            visible: false,
+            movieId: null
+        }
     },
     mutations: {
         setUser(state, user) {
@@ -51,6 +56,10 @@ export default new Vuex.Store({
         },
         setGenres(state, genres) {
             state.genres = genres;
+        },
+        toggleMovieDialog(state, { visible, movieId }) {
+            state.movieDialog.visible = visible;
+            state.movieDialog.movieId = movieId;
         }
     },
     actions: {

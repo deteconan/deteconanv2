@@ -5,6 +5,7 @@ import router from "@/router.js"
 import store from "@/store.js"
 import './mixins.js'
 import './filters.js'
+import './directives.js'
 import './assets/style/global.scss'
 import io from 'socket.io-client'
 import moment from 'moment'

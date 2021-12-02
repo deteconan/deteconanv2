@@ -2,18 +2,20 @@
     <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" class="movie-preview" @click.stop="playMovie(movie)" :class="{'preview-visible': previewVisible}">
         <v-img :src="movie.image | tmdbPoster" :alt="movie.name"></v-img>
 
-        <transition name="fade">
+        <transition name="fade-scale">
             <div v-if="previewVisible" @click.stop="" class="overlay elevation-5">
-                <aspect-ratio style="pointer-events: none">
-                    <div v-if="!loaded" class="d-flex align-center justify-center" style="background: black">
-                        <v-progress-circular indeterminate size="65" width="2"></v-progress-circular>
-                    </div>
-                    <video v-else-if="!trailerError" @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
-                    <div v-else class="d-flex align-center justify-center" style="background: black">
-                        <span class="mr-1">{{ trailerError }}</span>
-                        <v-icon>sentiment_very_dissatisfied</v-icon>
-                    </div>
-                </aspect-ratio>
+                <div @click.stop="toggleMovieDialog(true, movie.tmdbId)" class="cursor-pointer">
+                    <aspect-ratio style="pointer-events: none">
+                        <transition name="fade">
+                            <div v-if="!loaded || trailerError" class="d-flex align-center justify-center" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
+                            <video v-else @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
+                        </transition>
+                        <!--                    <div v-else class="d-flex align-center justify-center" style="background: black">-->
+                        <!--                        <span class="mr-1">{{ trailerError }}</span>-->
+                        <!--                        <v-icon>sentiment_very_dissatisfied</v-icon>-->
+                        <!--                    </div>-->
+                    </aspect-ratio>
+                </div>
 
                 <div class="px-3 pt-2 pb-3 d-flex flex-column h-100">
                     <div class="d-flex">
@@ -41,6 +43,7 @@
 <script>
     import Network from "@/helpers/Network.js";
     import AspectRatio from "@/components/AspectRatio.vue";
+    import { tmdbPoster } from "@/filters.js";
 
     export default {
         name: "MoviePreview",
@@ -58,7 +61,8 @@
                 trailer: null,
                 muted: false,
                 loaded: false,
-                trailerError: null
+                trailerError: null,
+                tmdbPoster
             }
         },
         computed: {
@@ -155,10 +159,10 @@
 </script>
 
 <style lang="scss">
-.fade-enter-active, .fade-leave-active {
+.fade-scale-enter-active, .fade-scale-leave-active {
     transition: opacity .2s, transform 300ms;
 }
-.fade-enter, .fade-leave-to {
+.fade-scale-enter, .fade-scale-leave-to {
     opacity: 0;
     transform: scale(0.8);
 }

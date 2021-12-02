@@ -5,6 +5,7 @@
             <div class="body-page">
                 <sidebar></sidebar>
                 <movie-player></movie-player>
+                <movie-dialog v-model="$store.state.movieDialog.visible" :movie-id="$store.state.movieDialog.movieId"></movie-dialog>
 
                 <keep-alive>
                     <router-view></router-view>
@@ -18,10 +19,11 @@
 import Toolbar from "@/layouts/Toolbar.vue";
 import Sidebar from "@/layouts/Sidebar.vue";
 import MoviePlayer from "@/layouts/MoviePlayer.vue";
+import MovieDialog from "@/components/MovieDialog.vue";
 
 export default {
     name: 'App',
-    components: {MoviePlayer, Sidebar, Toolbar},
+    components: {MovieDialog, MoviePlayer, Sidebar, Toolbar},
     async created() {
         this.$store.commit('updateLayout');
         window.addEventListener('resize', async () => {
