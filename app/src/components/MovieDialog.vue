@@ -22,7 +22,7 @@
                 </v-btn>
             </div>
         </div>
-        <v-skeleton-loader v-else type="image" width="100%" height="400" class="dark darken-2"></v-skeleton-loader>
+        <v-skeleton-loader v-else type="image" width="100%" height="500" class="dark darken-2"></v-skeleton-loader>
 
         <div class="details">
             <div v-if="movie">
