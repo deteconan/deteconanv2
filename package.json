@@ -11,7 +11,7 @@
     "youtube-test": "node --experimental-modules --experimental-json-modules youtube-test.js",
     "start-dev": "nodemon --experimental-modules --experimental-json-modules app.js",
     "start": "rm -r /tmp/* && set NODE_ENV=production && node --experimental-modules --experimental-json-modules app.js",
-    "build": "cd app && npm cache -f clean && npm i chalk && npm i -g @vue/cli-service @vue/cli-plugin-babel @vue/cli-plugin-eslint && npm i --only=dev && npm run build"
+    "build": "cd app && npm cache -f clean && npm i chalk && npm i -g @vue/cli-service @vue/cli-plugin-babel @vue/cli-plugin-eslint @vue/cli-plugin-babel/preset && npm i --only=dev && npm run build"
   },
   "dependencies": {
     "@yimura/scraper": "^1.2.3",
