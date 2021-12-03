@@ -1,5 +1,4 @@
 import axios from 'axios';
-import ytdl from "ytdl-core";
 import youtube from '@yimura/scraper'
 import cheerio from "cheerio";
 
@@ -77,20 +76,37 @@ export default class TMDB {
 
         const $ = cheerio.load(html);
 
-        return `https://vid.puffyan.us${$('video > source').attr('src')}`;
+        const source = $('video > source').attr('src');
+
+        return source ? `https://vid.puffyan.us${source}` : null;
     }
 
     static async getMovieTrailer(tmdbId, hd = true) {
         const movie = await this.getMovie(tmdbId);
         const yt = new youtube.default('fr-FR');
 
-        const results = await yt.search(`${movie.original_title} bande annonce`, {
+        let results = await yt.search(`${movie.original_title} bande annonce`, {
             language: 'fr-FR',
             searchType: 'video'
         });
-        const trailer = results.videos.shift();
 
-        return trailer ? this.getYoutubeProxyUrl(trailer.id) : null;
+        if (!results.videos.length) {
+            results = await yt.search(`${movie.original_title} trailer`, {
+                language: 'fr-FR',
+                searchType: 'video'
+            });
+        }
+
+        let trailer;
+
+        for (const video of results.videos) {
+            trailer = await this.getYoutubeProxyUrl(video.id);
+
+            if (trailer)
+                return trailer;
+        }
+
+        return null;
     }
 
     // static getMovieTrailer(tmdbId, hd = true) {

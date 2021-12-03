@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="value" @input="onInput" width="900" content-class="movie-dialog">
         <div v-if="movie" class="bg-image" v-bg-img="tmdbPosterHD(movie.image)">
-            <video v-if="movie && trailer" :src="trailer" ref="trailer" @canplay="onLoad" @playing="onPlay" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
+            <video v-if="movie && trailer" :src="trailer" ref="trailer" @canplay="onLoad" @playing="onPlay" @ended="loaded = false" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
             <div class="gradient"></div>
 
             <div v-if="movie">
@@ -16,7 +16,7 @@
                     </v-btn>
                 </transition>
 
-                <v-btn color="primary" class="play-btn">
+                <v-btn @click.stop="playMovie(movie), onInput(false)" color="primary" class="play-btn">
                     <v-icon>play_arrow</v-icon>
                     <span class="ml-1">Lecture</span>
                 </v-btn>
@@ -26,14 +26,31 @@
 
         <div class="details">
             <div v-if="details">
-                <div class="text-spaced mb-3">
-                    <span>{{ date }}</span>
-                    <span class="mx-2">•</span>
-                    <span>{{ runtime }}</span>
-                </div>
+                <div class="details-grid">
+                    <div>
+                        <div class="text-spaced mb-3">
+                            <span>{{ date }}</span>
+                            <template v-if="details.runtime">
+                                <span class="mx-2">•</span>
+                                <span>{{ runtime }}</span>
+                            </template>
+                        </div>
 
-                <div class="title">{{ movie.name }}</div>
-                <v-rating :value="movie.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly></v-rating>
+                        <div class="title">{{ movie.name }}</div>
+                        <v-rating :value="movie.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly></v-rating>
+                        <small class="d-block opacity-80 mt-3">{{ movieGenres }}</small>
+                    </div>
+                    <div>
+                        <div v-if="distribution" class="mb-2">
+                            <small class="opacity-50 mr-1">Distribution :</small>
+                            <small>{{ distribution }}</small>
+                        </div>
+                        <div v-if="cast">
+                            <small class="opacity-50 mr-1">Acteurs :</small>
+                            <small>{{ cast }}</small>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="text-justify mt-4">{{ details.description }}</div>
             </div>
@@ -90,6 +107,24 @@ export default {
                 return this.$moment(this.details.release_date).format('YYYY');
             else
                 return `À venir : ${this.$moment(this.details.release_date).locale('fr').format('LL')}`;
+        },
+        movieGenres() {
+            if (!this.genres.length)
+                return '';
+
+            return this.genres.filter(g => this.movie.genre_ids.includes(g.id)).map(g => g.name).join(' ∙ ');
+        },
+        distribution() {
+            if (!this.details)
+                return '';
+
+            return this.details.directors.concat(this.details.writers).slice(0, 4).map(d => d.name).join(', ');
+        },
+        cast() {
+            if (!this.details)
+                return '';
+
+            return this.details.cast.slice(0, 4).map(d => d.name).join(', ');
         }
     },
     mounted() {
@@ -113,7 +148,7 @@ export default {
             if (!this.videoElement() || this.loaded)
                 return;
 
-            this.videoElement().volume = 0.1;
+            this.videoElement().volume = 0.2;
 
             try {
                 await this.videoElement().play();
@@ -228,11 +263,21 @@ export default {
         padding: 1rem 2rem 2rem;
         background: var(--v-dark-darken1);
 
-        .title {
-            font-size: 1.5rem !important;
-            font-weight: bold;
-            letter-spacing: 1px !important;
-            opacity: 0.8 !important;
+        .details-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+
+            .title {
+                font-size: 1.5rem !important;
+                font-weight: bold;
+                letter-spacing: 1px !important;
+                opacity: 0.8 !important;
+            }
+
+            small {
+                font-size: 0.9rem;
+            }
         }
     }
 
