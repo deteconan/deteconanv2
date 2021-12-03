@@ -5,7 +5,7 @@
             <div class="body-page">
                 <sidebar></sidebar>
                 <movie-player></movie-player>
-                <movie-dialog v-model="$store.state.movieDialog.visible" :movie-id="$store.state.movieDialog.movieId"></movie-dialog>
+                <movie-dialog v-model="$store.state.movieDialog.visible" :movie="$store.state.movieDialog.movie"></movie-dialog>
 
                 <keep-alive>
                     <router-view></router-view>

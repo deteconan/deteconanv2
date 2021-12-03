@@ -1,6 +1,9 @@
 {
   "name": "deteconan",
   "version": "0.0.0",
+  "engines": {
+    "node": "16.x"
+  },
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,6 +14,7 @@
     "build": "cd app && npm cache -f clean && npm i chalk && npm i --only=dev && npm run build"
   },
   "dependencies": {
+    "@yimura/scraper": "^1.2.3",
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.10",
     "compression": "^1.7.4",

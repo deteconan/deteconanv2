@@ -4,7 +4,7 @@
 
         <transition name="fade-scale">
             <div v-if="previewVisible" @click.stop="" class="overlay elevation-5">
-                <div @click.stop="toggleMovieDialog(true, movie.tmdbId)" class="cursor-pointer">
+                <div @click.stop="openMovieDialog" class="cursor-pointer">
                     <aspect-ratio style="pointer-events: none">
                         <transition name="fade">
                             <div v-if="!loaded || trailerError" class="d-flex align-center justify-center" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
@@ -148,6 +148,12 @@
             },
             onTrailerError() {
                 this.trailerError = 'Erreur lors du chargement'
+            },
+            openMovieDialog() {
+                if (this.videoElement())
+                    this.movie.currentTime = this.videoElement().currentTime;
+
+                this.toggleMovieDialog(true, this.movie);
             }
         },
         watch: {

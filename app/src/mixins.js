@@ -56,8 +56,8 @@ Vue.mixin({
         rippleDelay(callback) {
             setTimeout(callback, 250);
         },
-        toggleMovieDialog(visible, movieId) {
-            this.$store.commit('toggleMovieDialog', { visible, movieId });
+        toggleMovieDialog(visible, movie) {
+            this.$store.commit('toggleMovieDialog', { visible, movie });
         }
     }
 });

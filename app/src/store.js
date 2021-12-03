@@ -20,7 +20,7 @@ export default new Vuex.Store({
 
         movieDialog: {
             visible: false,
-            movieId: null
+            movie: null
         }
     },
     mutations: {
@@ -57,9 +57,9 @@ export default new Vuex.Store({
         setGenres(state, genres) {
             state.genres = genres;
         },
-        toggleMovieDialog(state, { visible, movieId }) {
+        toggleMovieDialog(state, { visible, movie }) {
             state.movieDialog.visible = visible;
-            state.movieDialog.movieId = movieId;
+            state.movieDialog.movie = movie;
         }
     },
     actions: {

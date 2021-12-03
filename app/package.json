@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "./node_modules/.bin/vue-cli-service serve --port 8080",
-    "build-dev": "./node_modules/.bin/vue-cli-service build --mode local",
-    "build": "./node_modules/.bin/vue-cli-service build --mode live",
-    "lint": "./node_modules/.bin/vue-cli-service lint"
+    "start": "vue-cli-service serve --port 8080",
+    "build-dev": "vue-cli-service build --mode local",
+    "build": "vue-cli-service build --mode live",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.21.1",

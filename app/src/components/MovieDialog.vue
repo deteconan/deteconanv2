@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="value" @input="onInput" width="900" content-class="movie-dialog">
         <div v-if="movie" class="bg-image" v-bg-img="tmdbPosterHD(movie.image)">
-            <video v-if="movie && trailer" :src="trailer" ref="trailer" @canplay="onLoad" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
+            <video v-if="movie && trailer" :src="trailer" ref="trailer" @canplay="onLoad" @playing="onPlay" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
             <div class="gradient"></div>
 
             <div v-if="movie">
@@ -25,7 +25,7 @@
         <v-skeleton-loader v-else type="image" width="100%" height="500" class="dark darken-2"></v-skeleton-loader>
 
         <div class="details">
-            <div v-if="movie">
+            <div v-if="details">
                 <div class="text-spaced mb-3">
                     <span>{{ date }}</span>
                     <span class="mx-2">•</span>
@@ -35,7 +35,7 @@
                 <div class="title">{{ movie.name }}</div>
                 <v-rating :value="movie.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly></v-rating>
 
-                <div class="text-justify mt-4">{{ movie.description }}</div>
+                <div class="text-justify mt-4">{{ details.description }}</div>
             </div>
 
             <v-skeleton-loader v-else type="article" class="mt-3"></v-skeleton-loader>
@@ -54,22 +54,22 @@ export default {
             type: Boolean,
             required: true
         },
-        movieId: {
-            type: [String, Number]
+        movie: {
+            type: Object
         }
     },
     data() {
         return {
+            details: null,
             loaded: false,
             muted: true,
-            movie: null,
             trailer: null,
             tmdbPosterHD
         }
     },
     computed: {
         runtime() {
-            const date = this.$moment().startOf('day').add({ minute: this.movie.runtime });
+            const date = this.$moment().startOf('day').add({ minute: this.details.runtime });
             const hours = date.hours();
             const minutes = date.minutes();
 
@@ -83,36 +83,36 @@ export default {
                 return `${minutes}min`;
         },
         isReleased() {
-            return this.$moment().isSameOrAfter(this.$moment(this.movie.release_date));
+            return this.$moment().isSameOrAfter(this.$moment(this.details.release_date));
         },
         date() {
             if (this.isReleased)
-                return this.$moment(this.movie.release_date).format('YYYY');
+                return this.$moment(this.details.release_date).format('YYYY');
             else
-                return `À venir : ${this.$moment(this.movie.release_date).locale('fr').format('LL')}`;
+                return `À venir : ${this.$moment(this.details.release_date).locale('fr').format('LL')}`;
         }
     },
     mounted() {
         this.loadMovie();
+        this.loadTrailer();
     },
     methods: {
         reset() {
             this.loaded = false;
-            this.movie = null;
             this.trailer = null;
+            this.details = null;
         },
         videoElement() {
             return this.$refs.trailer;
         },
         onInput(val) {
             this.$emit('input', val);
-            this.$store.commit('toggleMovieDialog', { visible: val, movieId: this.movieId });
+            this.$store.commit('toggleMovieDialog', { visible: val, movie: this.movie });
         },
         async onLoad() {
-            if (!this.videoElement())
+            if (!this.videoElement() || this.loaded)
                 return;
 
-            this.loaded = true;
             this.videoElement().volume = 0.1;
 
             try {
@@ -121,32 +121,48 @@ export default {
                 this.muted = true;
                 await this.videoElement().play();
             }
+
+            this.loaded = true;
         },
-        loadMovie() {
-            if (!this.movieId)
+        onPlay() {
+            if (this.loaded)
                 return;
 
-            this.loading = true;
-            return Network.get(`/movies/details/${this.movieId}`).then(res => {
-                this.movie = res.data;
-                return this.loadTrailer();
-            })
-            .finally(() => this.loading = false);
+            if (this.movie.currentTime) {
+                this.videoElement().currentTime = this.movie.currentTime;
+            }
+        },
+        loadMovie() {
+            if (!this.movie)
+                return;
+
+            return Network.get(`/movies/details/${this.movie.tmdbId}`).then(res => {
+                this.details = res.data;
+            });
         },
         loadTrailer() {
-            return Network.get(`/movie/trailer/${this.movieId}`).then(res => {
+            if (!this.movie)
+                return;
+
+            return Network.get(`/movie/trailer/${this.movie.tmdbId}`).then(res => {
                 this.trailer = res.data;
             });
         }
     },
     watch: {
         value(val) {
-            if (!val)
+            if (!val) {
                 this.reset();
+                this.toggleMovieDialog(false, null);
+            }
             else {
                 this.muted = localStorage.getItem('muted') === 'true';
                 this.loadMovie();
+                this.loadTrailer();
             }
+        },
+        muted(val) {
+            localStorage.setItem('muted', val);
         }
     }
 }
@@ -225,6 +241,10 @@ export default {
 
         .v-skeleton-loader__heading {
             margin: 0 !important;
+        }
+
+        .v-skeleton-loader__article {
+            background: transparent !important;
         }
 
         .v-skeleton-loader__paragraph, .v-skeleton-loader__article {

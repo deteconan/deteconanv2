@@ -1,5 +1,6 @@
 import axios from 'axios';
 import ytdl from "ytdl-core";
+import youtube from '@yimura/scraper'
 import cheerio from "cheerio";
 
 const api = axios.create({
@@ -79,62 +80,43 @@ export default class TMDB {
         return `https://vid.puffyan.us${$('video > source').attr('src')}`;
     }
 
-    static getMovieTrailer(tmdbId, hd = true) {
-        return api.get(`/movie/${tmdbId}/videos`, {
-            params: {
-                language: 'fr-FR'
-            }
-        })
-            .then(async res => {
-                let trailer;
-                for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
-                    try {
-                        trailer = video;
-                        const youtubeId = trailer.key;
+    static async getMovieTrailer(tmdbId, hd = true) {
+        const movie = await this.getMovie(tmdbId);
+        const yt = new youtube.default('fr-FR');
 
-                        if (youtubeId) {
-                            await ytdl.getInfo(youtubeId);
-                        }
+        const results = await yt.search(`${movie.original_title} bande annonce`, {
+            language: 'fr-FR',
+            searchType: 'video'
+        });
+        const trailer = results.videos.shift();
 
-                        break;
-                    } catch {}
-                }
-
-                return trailer ? this.getYoutubeProxyUrl(trailer.key) : null;
-            })
-            .catch(err => console.error(err));
+        return trailer ? this.getYoutubeProxyUrl(trailer.id) : null;
     }
 
-    // static async getMovieTrailer(tmdbId, hd = true) {
-    //     let format;
-    //
-    //     await api.get(`/movie/${tmdbId}/videos`, {
+    // static getMovieTrailer(tmdbId, hd = true) {
+    //     return api.get(`/movie/${tmdbId}/videos`, {
     //         params: {
     //             language: 'fr-FR'
     //         }
     //     })
-    //     .then(async res => {
-    //         let trailer;
-    //         for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
-    //             try {
-    //                 trailer = video;
-    //                 const youtubeId = trailer.key;
+    //         .then(async res => {
+    //             let trailer;
+    //             for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
+    //                 try {
+    //                     trailer = video;
+    //                     const youtubeId = trailer.key;
     //
-    //                 if (youtubeId) {
-    //                     const info = await ytdl.getInfo(youtubeId);
-    //                     info.formats = ytdl.filterFormats(info.formats, format => format.hasVideo && format.hasAudio && ['mp4', 'webm'].includes(format.container));
-    //                     format = ytdl.chooseFormat(info.formats, { quality: hd ? 'highestvideo' : 'lowestvideo' });
-    //                 }
+    //                     if (youtubeId) {
+    //                         await ytdl.getInfo(youtubeId);
+    //                     }
     //
-    //                 break;
-    //             } catch {}
-    //         }
+    //                     break;
+    //                 } catch {}
+    //             }
     //
-    //         return trailer ? trailer.key : null;
-    //     })
-    //     .catch(err => console.error(err));
-    //
-    //     return format ? format.url : null;
+    //             return trailer ? this.getYoutubeProxyUrl(trailer.key) : null;
+    //         })
+    //         .catch(err => console.error(err));
     // }
 
     static getMovieFromImdb(imdbID) {
