@@ -6,7 +6,6 @@
     "start": "vue-cli-service serve --port 8080",
     "build-dev": "vue-cli-service build --mode local",
     "build": "vue-cli-service build --mode live",
-    "build-live": "./node_modules/.bin/vue-cli-service build --mode live",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
