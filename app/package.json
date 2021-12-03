@@ -5,7 +5,7 @@
   "scripts": {
     "start": "vue-cli-service serve --port 8080",
     "build-dev": "vue-cli-service build --mode local",
-    "build": "npx vue-cli-service build --mode live",
+    "build": "vue-cli-service build --mode live",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
