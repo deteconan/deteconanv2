@@ -34,6 +34,7 @@ export default {
                     }).then(() => {
                         sockets.emit('finish', media.link);
                     }).catch(err => {
+                        console.error(err);
                         sockets.emit('error', {err, link: media.link, name: media.name});
                     });
                 }
