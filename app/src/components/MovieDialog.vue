@@ -16,9 +16,14 @@
                     </v-btn>
                 </transition>
 
-                <v-btn @click.stop="playMovie(movie), onInput(false)" color="primary" class="play-btn">
+                <v-btn v-if="downloaded" @click.stop="openPlayer" color="primary" class="action-btn black--text">
                     <v-icon>play_arrow</v-icon>
                     <span class="ml-1">Lecture</span>
+                </v-btn>
+
+                <v-btn v-else-if="details && isAdmin" @click.stop="download" color="success white--text" class="action-btn white--text">
+                    <v-icon>cloud_download</v-icon>
+                    <span class="ml-1 f-600">Télécharger</span>
                 </v-btn>
             </div>
         </div>
@@ -85,6 +90,9 @@ export default {
         }
     },
     computed: {
+        downloaded() {
+            return !!this.movies.find(m => +m.tmdbId === +this.movie.tmdbId);
+        },
         runtime() {
             const date = this.$moment().startOf('day').add({ minute: this.details.runtime });
             const hours = date.hours();
@@ -182,6 +190,15 @@ export default {
             return Network.get(`/movie/trailer/${this.movie.tmdbId}`).then(res => {
                 this.trailer = res.data;
             });
+        },
+        openPlayer() {
+            this.$store.commit('setMovie', this.movie);
+            this.onInput(false);
+            this.togglePlayer();
+        },
+        download() {
+            this.onInput(false);
+            this.reach(`/upload?q=${this.details.original_title}`);
         }
     },
     watch: {
@@ -250,8 +267,7 @@ export default {
             backdrop-filter: blur(3px);
         }
 
-        .play-btn {
-            color: black;
+        .action-btn {
             font-size: 1rem;
             position: absolute;
             bottom: 1rem;

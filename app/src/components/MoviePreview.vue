@@ -1,13 +1,13 @@
 <template>
-    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" class="movie-preview" @click.stop="playMovie(movie)" :class="{'preview-visible': previewVisible}">
+    <div @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" class="movie-preview" @click.stop="onClick" :class="{'preview-visible': previewVisible}">
         <v-img :src="movie.image | tmdbPoster" :alt="movie.name"></v-img>
 
         <transition name="fade-scale">
             <div v-if="previewVisible" @click.stop="" class="overlay elevation-5">
-                <div @click.stop="openMovieDialog" class="cursor-pointer">
+                <div @click.stop="openMovieDialog" class="cursor-pointer border-inherit">
                     <aspect-ratio style="pointer-events: none">
-                        <transition name="fade">
-                            <div v-if="!loaded || trailerError" class="d-flex align-center justify-center" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
+                        <transition name="fade" class="border-inherit">
+                            <div v-if="!loaded || trailerError" class="d-flex align-center justify-center border-inherit" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
                             <video v-else @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
                         </transition>
                         <!--                    <div v-else class="d-flex align-center justify-center" style="background: black">-->
@@ -25,7 +25,7 @@
                         </div>
                         <v-btn @click.stop="playMovie(movie)" icon class="play-btn ml-auto" :class="{'downloaded': downloaded}">
                             <v-icon v-if="downloaded">play_arrow</v-icon>
-                            <v-icon v-else>arrow_downward</v-icon>
+                            <v-icon v-else>arrow_forward</v-icon>
                         </v-btn>
                     </div>
                     <small class="d-block mt-auto">{{ movieGenres }}</small>
@@ -127,6 +127,9 @@
                 })
                 .catch(err => console.error(err.response.data));
             },
+            onClick() {
+                return this.playMovie(this.movie);
+            },
             onMouseEnter() {
                 this.muted = localStorage.getItem('muted') === 'true';
                 this.previewVisible = false;
@@ -135,7 +138,7 @@
 
                 this.timeout = setTimeout(() => {
                     this.showPreview();
-                }, 500);
+                }, 800);
             },
             onMouseLeave() {
                 if (this.videoElement()) {
@@ -254,8 +257,8 @@
         }
 
         &:hover {
-            background-color: var(--v-success-base);
-            border-color: var(--v-success-base);
+            background-color: white;
+            border-color: white;
 
             &.downloaded {
                 background-color: var(--v-primary-base);

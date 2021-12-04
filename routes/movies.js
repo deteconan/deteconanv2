@@ -53,7 +53,6 @@ router.post('/movies/torrents', needAdmin, checkRequiredPOST('name', 'providers'
 
 router.get('/movies/details/:tmdb_id', async (req, res) => {
     try {
-        // const movie = await imdb.getFull(req.params.imdb_id);
         const movie = await TMDB.getMovie(req.params.tmdb_id);
 
         res.json(movie);

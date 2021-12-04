@@ -248,9 +248,8 @@ export default class DriveHelper {
             console.error(err);
         }).finally(() => {
             if (filePath) {
-                fs.rmdirSync(filePath, { // Delete file at the end of upload
-                    recursive: true
-                });
+                // Delete file at the end of upload
+                fs.rmdirSync(filePath, { recursive: true });
             }
         });
 
