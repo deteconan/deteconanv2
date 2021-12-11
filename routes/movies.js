@@ -90,6 +90,15 @@ router.get('/movies/upcoming', async (req, res) => {
     }
 });
 
+router.get('/movie/backdrop/:tmdb_id', async (req, res) => {
+    try {
+        const backdrop = await TMDB.getMovieBackdrop(req.params.tmdb_id);
+        res.json(backdrop);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
 router.get('/movies/genres', async (req, res) => {
     try {
         const genres = await TMDB.getMovieGenres();

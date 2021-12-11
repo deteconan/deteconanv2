@@ -228,6 +228,11 @@
             download() {
                 this.reach(`/upload?q=${this.details.en_title}`);
             }
+        },
+        watch: {
+            movies() {
+                this.movie = this.movies.find(m => +m.tmdbId === +this.$route.params.id);
+            }
         }
     }
 </script>

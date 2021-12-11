@@ -74,6 +74,10 @@ html, body {
         background-repeat: no-repeat;
         background-size: cover;
     }
+
+    .v-main {
+        overflow-x: hidden;
+    }
 }
 
 .mobile {

@@ -9,6 +9,23 @@ const api = axios.create({
     }
 });
 
+export function parseTmdbMovie(tmdbMovie) {
+    const movie =  {
+        tmdbId: tmdbMovie.id,
+        name: tmdbMovie.title,
+        image: tmdbMovie.poster_path,
+        release_date: tmdbMovie.release_date,
+        rating: tmdbMovie.vote_average
+    };
+
+    if (tmdbMovie.genre_ids)
+        movie.genre_ids = tmdbMovie.genre_ids;
+    else if (tmdbMovie.genres)
+        movie.genre_ids = tmdbMovie.genres.map(g => g.id);
+
+    return movie;
+}
+
 export default class TMDB {
 
     static searchMovie(query) {
@@ -21,13 +38,7 @@ export default class TMDB {
             if (!Array.isArray(res.data.results))
                 return [];
             else
-                return res.data.results.map(m => ({
-                    id: m.id,
-                    name: m.title,
-                    image: m.poster_path,
-                    release_date: m.release_date,
-                    genre_ids: m.genre_ids
-                }));
+                return res.data.results.map(movie => parseTmdbMovie(movie));
         }).catch(err => console.error(err.response.data));
     }
 
@@ -42,20 +53,15 @@ export default class TMDB {
             const enTitle = await this.getEnglishMovieTitle(tmdbId);
 
             return {
-                id: movie.id,
+                ...parseTmdbMovie(movie),
                 imdbId: movie.imdb_id,
-                name: movie.title,
                 original_title: movie.original_title,
                 en_title: enTitle,
                 description: movie.overview,
-                image: movie.poster_path,
-                rating: movie.vote_average,
                 runtime: movie.runtime,
                 cast: credits.cast,
                 directors: credits.directors,
-                writers: credits.writers,
-                genre_ids: movie.genres.map(g => g.id),
-                release_date: movie.release_date
+                writers: credits.writers
             };
         }).catch(err => console.error(err.response.data));
     }
@@ -109,32 +115,6 @@ export default class TMDB {
         return null;
     }
 
-    // static getMovieTrailer(tmdbId, hd = true) {
-    //     return api.get(`/movie/${tmdbId}/videos`, {
-    //         params: {
-    //             language: 'fr-FR'
-    //         }
-    //     })
-    //         .then(async res => {
-    //             let trailer;
-    //             for (const video of res.data.results.filter(r => r.site.toLowerCase() === 'youtube')) {
-    //                 try {
-    //                     trailer = video;
-    //                     const youtubeId = trailer.key;
-    //
-    //                     if (youtubeId) {
-    //                         await ytdl.getInfo(youtubeId);
-    //                     }
-    //
-    //                     break;
-    //                 } catch {}
-    //             }
-    //
-    //             return trailer ? this.getYoutubeProxyUrl(trailer.key) : null;
-    //         })
-    //         .catch(err => console.error(err));
-    // }
-
     static getMovieFromImdb(imdbID) {
         return api.get(`/find/${imdbID}`, {
             params: {
@@ -150,12 +130,7 @@ export default class TMDB {
             if (!movie)
                 return null;
 
-            return {
-                id: movie.id,
-                name: movie.title,
-                image: movie.poster_path,
-                release_date: movie.release_date
-            };
+            return parseTmdbMovie(movie);
         }).catch(err => console.error(err));
     }
 
@@ -207,14 +182,7 @@ export default class TMDB {
         }).then(res => {
             const movies = res.data.results;
 
-            return movies.map(m => ({
-                tmdbId: m.id,
-                name: m.title,
-                image: m.poster_path,
-                release_date: m.release_date,
-                genre_ids: m.genre_ids,
-                rating: m.vote_average
-            }));
+            return movies.map(movie => parseTmdbMovie(movie));
         });
 
         const moviesPage2 = await api.get('/movie/upcoming', {
@@ -225,17 +193,19 @@ export default class TMDB {
         }).then(res => {
             const movies = res.data.results;
 
-            return movies.map(m => ({
-                tmdbId: m.id,
-                name: m.title,
-                image: m.poster_path,
-                release_date: m.release_date,
-                genre_ids: m.genre_ids,
-                rating: m.vote_average
-            }));
+            return movies.map(movie => parseTmdbMovie(movie));
         });
 
         return moviesPage1.concat(moviesPage2);
+    }
+
+    static getLatestMovie() {
+        return api.get('/movie/now_playing')
+            .then(res => {
+                const movies = res.data.results;
+
+                return parseTmdbMovie(movies[0]);
+            });
     }
 
     static getEnglishMovieTitle(tmdbId) {
@@ -247,6 +217,18 @@ export default class TMDB {
         .then(res => {
             return res.data.title;
         }).catch(err => console.error(err.response.data));
+    }
+
+    static getMovieBackdrop(tmdbId) {
+        return api.get(`/movie/${tmdbId}/images`)
+            .then(res => {
+                const backdrops = res.data.backdrops;
+
+                if (Array.isArray(backdrops) && backdrops.length)
+                    return backdrops.pop().file_path;
+                else
+                    return null;
+            });
     }
 
     static getMovieGenres() {

@@ -297,7 +297,7 @@
                     progress: 0,
                     image: this.movieDetails.image,
                     release_date: this.movieDetails.release_date,
-                    tmdbId: this.movieDetails.id,
+                    tmdbId: this.movieDetails.tmdbId,
                     genre_ids: this.movieDetails.genre_ids,
                     convert: this.convert
                 });
