@@ -42,7 +42,7 @@ Vue.mixin({
     methods: {
         reach(url) {
             if (this.$route.path !== url)
-                this.$router.push(url);
+                return this.$router.push(url);
         },
         switchTheme() {
             this.$vuetify.theme.dark = !this.$vuetify.theme.dark;

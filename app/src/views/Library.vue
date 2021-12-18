@@ -2,9 +2,9 @@
     <main-page class="d-flex flex-column px-5">
         <movie-carousel :items="movies" @select-movie="selectedMovie = $event" class="mt-10"></movie-carousel>
 
-        <v-row class="flex-1 h-100 overflow-hidden mt-8">
-            <v-col cols="6" class="d-flex flex-column h-100">
-                <v-card color="backdrop" class="d-flex flex-column h-100 flex-1 pa-3">
+        <v-row class="mt-8">
+            <v-col cols="12" lg="6">
+                <v-card color="backdrop" class="d-flex flex-column h-100 pa-3">
                     <v-card-text class="text-spaced pb-2" style="font-size: 1rem">
                         <v-skeleton-loader v-if="loading" type="text" style="width: 100px"></v-skeleton-loader>
                         <div v-else-if="details">
@@ -28,12 +28,22 @@
                         <div v-else-if="details" class="fade-in">
                             <v-rating :value="details.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly class="mb-4"></v-rating>
 
+                            <v-btn v-if="downloaded" @click.stop="playMovie(selectedMovie)" color="primary" class="black--text mb-3">
+                                <v-icon>play_arrow</v-icon>
+                                <span class="f-600 text-spaced-xl ml-1">Lecture</span>
+                            </v-btn>
+
+                            <v-btn v-else-if="details && isAdmin" @click.stop="download" color="success white--text" class="white--text mb-3">
+                                <v-icon>cloud_download</v-icon>
+                                <span class="f-600 text-spaced-xl ml-2">Télécharger</span>
+                            </v-btn>
+
                             <div class="d-block white--text" style="font-size: 1rem">{{ movieGenres }}</div>
 
-                            <div class="description text-justify mt-3" style="font-size: 1rem">{{ details.description }}</div>
+                            <div class="text-justify mt-3" style="font-size: 1rem">{{ details.description }}</div>
                         </div>
 
-                        <div class="mt-auto" style="font-size: 1rem">
+                        <div class="mt-auto pt-5" style="font-size: 1rem">
                             <div v-if="loading">
                                 <v-skeleton-loader type="text" class="mb-2"></v-skeleton-loader>
                                 <v-skeleton-loader type="text"></v-skeleton-loader>
@@ -52,23 +62,23 @@
                     </v-card-text>
                 </v-card>
             </v-col>
-            <v-col cols="6" class="d-flex flex-column h-100">
-                <v-card color="backdrop" class="d-flex flex-column h-100 overflow-hidden pa-3 pb-0">
-                    <v-card-title class="text-spaced" style="font-size: 1.5rem">Similaires</v-card-title>
+            <v-col cols="12" lg="6">
+                <v-card color="backdrop" class="h-100 pa-3">
+                    <v-card-title class="text-spaced mb-2" style="font-size: 1.5rem">Similaires</v-card-title>
 
-                    <v-card-text class="h-100 overflow-hidden pb-0">
-                        <div v-if="loading" class="similar h-100 overflow-y-auto">
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" width="150" height="225" style="border-radius: 4px"></v-skeleton-loader>
+                    <v-card-text>
+                        <div v-if="loading" class="similar">
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
                         </div>
 
-                        <div v-else-if="details" class="similar h-100 overflow-y-auto">
+                        <div v-else-if="details" class="similar">
                             <movie-preview v-for="(movie, index) in details.similar.slice(0, 8)" :key="index" :movie="movie" no-trailer></movie-preview>
                         </div>
                     </v-card-text>
@@ -95,6 +105,9 @@ export default {
         }
     },
     computed: {
+        downloaded() {
+            return !!this.movies.find(m => +m.tmdbId === +this.selectedMovie.tmdbId);
+        },
         movieGenres() {
             if (!this.genres.length)
                 return '';
@@ -153,6 +166,9 @@ export default {
                 })
                 .catch(err => console.error(err.response.data))
                 .finally(() => this.loading = false);
+        },
+        download() {
+            return this.reach(`/upload?q=${this.details.original_title}`);
         }
     },
     watch: {
@@ -174,23 +190,13 @@ export default {
     backdrop-filter: blur(5px);
 }
 
-.description {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 10;
-}
-
 .similar {
-    --preview-width: 150px;
-    --preview-height: 225px;
+    --preview-width: 8vw;
+    --preview-height: calc(var(--preview-width) * 1.5);
 
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--preview-width), 1fr));
     gap: 2rem 1rem;
-    overflow-y: auto;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
 
     &::-webkit-scrollbar {
         width: 4px;
@@ -199,6 +205,21 @@ export default {
     &::-webkit-scrollbar-track {
         background-color: transparent;
         border-radius: 15px;
+    }
+
+    .v-skeleton-loader {
+        width: var(--preview-width);
+        height: var(--preview-height);
+    }
+
+    .movie-preview {
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:hover:active {
+            transform: scale(1.05);
+        }
     }
 }
 </style>

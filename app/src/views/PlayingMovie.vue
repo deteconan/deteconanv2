@@ -32,12 +32,12 @@
 
                         <v-btn v-if="movie" color="primary" class="mr-auto my-5" @click.stop="openPlayer">
                             <v-icon color="black">play_arrow</v-icon>
-                            <span class="black--text ml-1 f-600">Lecture</span>
+                            <span class="black--text text-spaced-xl ml-1 f-600">Lecture</span>
                         </v-btn>
 
                         <v-btn v-else-if="isReleased && isAdmin" @click.stop="download" color="success white--text" class="mr-auto mt-5">
                             <v-icon>cloud_download</v-icon>
-                            <span class="ml-1 f-600">Télécharger</span>
+                            <span class="f-600 text-spaced-xl ml-2">Télécharger</span>
                         </v-btn>
 
                         <div class="text-justify f-500 my-5">{{ details.description }}</div>

@@ -18,12 +18,12 @@
 
                 <v-btn v-if="downloaded" @click.stop="openPlayer" color="primary" class="action-btn black--text">
                     <v-icon>play_arrow</v-icon>
-                    <span class="ml-1">Lecture</span>
+                    <span class="f-600 text-spaced-xl ml-1">Lecture</span>
                 </v-btn>
 
                 <v-btn v-else-if="details && isAdmin" @click.stop="download" color="success white--text" class="action-btn white--text">
                     <v-icon>cloud_download</v-icon>
-                    <span class="ml-1 f-600">Télécharger</span>
+                    <span class="f-600 text-spaced-xl ml-2">Télécharger</span>
                 </v-btn>
             </div>
         </div>
