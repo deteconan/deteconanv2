@@ -44,6 +44,9 @@
 
     .default {
         animation: scrollY 300ms ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     @keyframes scrollY {

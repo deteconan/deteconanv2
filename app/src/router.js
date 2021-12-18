@@ -4,6 +4,7 @@ import Home from "@/views/Home.vue"
 import Movies from "@/views/Movies.vue"
 import Upload from "@/views/Upload.vue"
 import PlayingMovie from "@/views/PlayingMovie.vue"
+import Library from "@/views/Library.vue"
 import store from "@/store.js"
 
 Vue.use(Router)
@@ -35,6 +36,11 @@ export default new Router({
             path: `/movies`,
             name: `films`,
             component: Movies
+        },
+        {
+            path: `/library`,
+            name: `library`,
+            component: Library
         },
         {
             path: `/upload`,

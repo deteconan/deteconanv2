@@ -296,31 +296,5 @@ export default {
             }
         }
     }
-
-    .v-skeleton-loader {
-        border-radius: 0;
-
-        .v-skeleton-loader__heading {
-            margin: 0 !important;
-        }
-
-        .v-skeleton-loader__article {
-            background: transparent !important;
-        }
-
-        .v-skeleton-loader__paragraph, .v-skeleton-loader__article {
-            padding-left: 0;
-            padding-right: 0;
-            background: transparent;
-        }
-
-        .v-skeleton-loader__paragraph {
-            margin-top: 1rem;
-        }
-
-        .v-skeleton-loader__image {
-            height: 100%;
-        }
-    }
 }
 </style>

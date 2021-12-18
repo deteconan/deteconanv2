@@ -72,6 +72,18 @@ router.get('/movie/trailer/:tmdb_id', async (req, res) => {
     }
 });
 
+router.get('/movie/about/:tmdb_id', async (req, res) => {
+    try {
+        const movie = await TMDB.getMovie(req.params.tmdb_id);
+
+        movie.similar = await TMDB.getSimilarMovies(req.params.tmdb_id);
+
+        res.json(movie);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
 router.post('/movies/update', needAdmin, checkRequiredPOST('id'), async (req, res) => {
     try {
         await DriveHelper.updateFile(req.body);

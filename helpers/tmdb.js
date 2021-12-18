@@ -11,7 +11,7 @@ const api = axios.create({
 
 export function parseTmdbMovie(tmdbMovie) {
     const movie =  {
-        tmdbId: tmdbMovie.id,
+        tmdbId: +tmdbMovie.id,
         name: tmdbMovie.title,
         image: tmdbMovie.poster_path,
         release_date: tmdbMovie.release_date,
@@ -231,6 +231,16 @@ export default class TMDB {
             });
     }
 
+    static getSimilarMovies(tmdbId) {
+        return api.get(`/movie/${tmdbId}/recommendations`)
+            .then(res => {
+                if (Array.isArray(res.data.results))
+                    return res.data.results.map(m => parseTmdbMovie(m));
+                else
+                    return [];
+            });
+    }
+
     static getMovieGenres() {
         return api.get('/genre/movie/list', {
             params: {
@@ -240,6 +250,5 @@ export default class TMDB {
             return res.data.genres;
         }).catch(err => console.error(err.response.data));
     }
-
 
 }

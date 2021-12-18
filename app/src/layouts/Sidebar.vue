@@ -14,6 +14,12 @@
                 </v-list-item-icon>
                 <v-list-item-content>Films</v-list-item-content>
             </v-list-item>
+            <v-list-item v-if="!isMobileLayout" to="/library" link>
+                <v-list-item-icon>
+                    <v-icon class="material-icons-outlined">video_library</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>Bibliothèque</v-list-item-content>
+            </v-list-item>
             <v-list-item v-if="isMobileLayout && isAdmin" to="/upload" link>
                 <v-list-item-icon>
                     <v-icon class="material-icons-outlined">backup</v-icon>

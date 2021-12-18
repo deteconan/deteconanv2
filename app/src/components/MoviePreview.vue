@@ -3,7 +3,7 @@
         <v-img :src="movie.image | tmdbPoster" :alt="movie.name"></v-img>
 
         <transition name="fade-scale">
-            <div v-if="previewVisible" @click.stop="" class="overlay elevation-5">
+            <div v-if="previewVisible && !noTrailer" @click.stop="" class="overlay elevation-5">
                 <div @click.stop="openMovieDialog" class="cursor-pointer border-inherit">
                     <aspect-ratio style="pointer-events: none">
                         <transition name="fade" class="border-inherit">
@@ -52,6 +52,10 @@
             movie: {
                 type: Object,
                 required: true
+            },
+            noTrailer: {
+                type: Boolean,
+                default: false
             }
         },
         data() {
@@ -131,6 +135,9 @@
                 return this.playMovie(this.movie);
             },
             onMouseEnter() {
+                if (this.noTrailer)
+                    return;
+
                 this.muted = localStorage.getItem('muted') === 'true';
                 this.previewVisible = false;
                 this.trailer = null;

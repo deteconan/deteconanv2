@@ -78,6 +78,10 @@ html, body {
     .v-main {
         overflow-x: hidden;
     }
+
+    .v-main__wrap {
+        max-height: 100%;
+    }
 }
 
 .mobile {
