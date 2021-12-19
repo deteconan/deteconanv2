@@ -10,10 +10,6 @@
                             <div v-if="!loaded || trailerError" class="d-flex align-center justify-center border-inherit" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
                             <video v-else @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
                         </transition>
-                        <!--                    <div v-else class="d-flex align-center justify-center" style="background: black">-->
-                        <!--                        <span class="mr-1">{{ trailerError }}</span>-->
-                        <!--                        <v-icon>sentiment_very_dissatisfied</v-icon>-->
-                        <!--                    </div>-->
                     </aspect-ratio>
                 </div>
 
@@ -224,6 +220,11 @@
             font-weight: 700;
             font-size: 1.2rem;
             letter-spacing: 1px;
+
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
         }
 
         .mute-btn {
