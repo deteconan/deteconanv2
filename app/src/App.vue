@@ -1,14 +1,16 @@
 <template>
     <div id="app">
         <v-app :class="{'mobile': isMobileLayout}">
-            <toolbar></toolbar>
+            <toolbar v-if="isMobileLayout"></toolbar>
+            <desktop-menu v-else :scrolled="scrollOffset > 0"></desktop-menu>
+
             <div class="body-page">
-                <sidebar></sidebar>
+                <sidebar v-if="isMobileLayout"></sidebar>
                 <movie-player></movie-player>
                 <movie-dialog v-model="$store.state.movieDialog.visible" :movie="$store.state.movieDialog.movie"></movie-dialog>
 
                 <keep-alive>
-                    <router-view></router-view>
+                    <router-view @scroll.native="scrollOffset = $event.target.scrollTop"></router-view>
                 </keep-alive>
             </div>
         </v-app>
@@ -20,10 +22,16 @@ import Toolbar from "@/layouts/Toolbar.vue";
 import Sidebar from "@/layouts/Sidebar.vue";
 import MoviePlayer from "@/layouts/MoviePlayer.vue";
 import MovieDialog from "@/components/MovieDialog.vue";
+import DesktopMenu from "@/layouts/DesktopMenu.vue";
 
 export default {
     name: 'App',
-    components: {MovieDialog, MoviePlayer, Sidebar, Toolbar},
+    components: {DesktopMenu, MovieDialog, MoviePlayer, Sidebar, Toolbar},
+    data() {
+        return {
+            scrollOffset: 0
+        }
+    },
     async created() {
         this.$store.commit('updateLayout');
         window.addEventListener('resize', async () => {

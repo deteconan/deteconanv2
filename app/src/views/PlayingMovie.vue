@@ -182,12 +182,15 @@
             if (this.movie)
                 this.editMovie = JSON.parse(JSON.stringify(this.movie));
 
-            this.loading = true;
-            Network.get(`/movies/details/${this.$route.params.id}`).then(res => {
-                this.details = res.data;
-            }).finally(() => this.loading = false);
+            this.loadMovie();
         },
         methods: {
+            loadMovie() {
+                this.loading = true;
+                return Network.get(`/movies/details/${this.$route.params.id}`).then(res => {
+                    this.details = res.data;
+                }).finally(() => this.loading = false);
+            },
             updateMovie() {
                 if (!this.movie.id)
                     return;
@@ -232,6 +235,9 @@
         watch: {
             movies() {
                 this.movie = this.movies.find(m => +m.tmdbId === +this.$route.params.id);
+            },
+            '$route.params.id'() {
+                this.loadMovie();
             }
         }
     }

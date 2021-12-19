@@ -1,90 +1,92 @@
 <template>
-    <main-page class="d-flex flex-column px-5">
-        <movie-carousel :items="movies" @select-movie="selectedMovie = $event" class="mt-10"></movie-carousel>
+    <main-page class="d-flex flex-column">
+        <v-container class="pb-0">
+            <movie-carousel :items="movies" @select-movie="selectedMovie = $event"></movie-carousel>
 
-        <v-row class="mt-8">
-            <v-col cols="12" lg="6">
-                <v-card color="backdrop" class="d-flex flex-column h-100 pa-3">
-                    <v-card-text class="text-spaced pb-2" style="font-size: 1rem">
-                        <v-skeleton-loader v-if="loading" type="text" style="width: 100px"></v-skeleton-loader>
-                        <div v-else-if="details">
-                            <span>{{ date }}</span>
-                            <template v-if="details.runtime">
-                                <span class="mx-2">•</span>
-                                <span>{{ runtime }}</span>
-                            </template>
-                        </div>
-                    </v-card-text>
-
-                    <v-skeleton-loader v-if="loading" type="title"></v-skeleton-loader>
-                    <v-card-title v-else-if="details" class="headline fade-in pb-1 pt-0">{{ details.name }}</v-card-title>
-
-                    <v-card-text class="d-flex flex-column h-100">
-                        <div v-if="loading">
-                            <v-skeleton-loader type="heading" class="mb-10"></v-skeleton-loader>
-                            <v-skeleton-loader type="text, paragraph, paragraph"></v-skeleton-loader>
-                        </div>
-
-                        <div v-else-if="details" class="fade-in">
-                            <v-rating :value="details.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly class="mb-4"></v-rating>
-
-                            <v-btn v-if="downloaded" @click.stop="playMovie(selectedMovie)" color="primary" class="black--text mb-3">
-                                <v-icon>play_arrow</v-icon>
-                                <span class="f-600 text-spaced-xl ml-1">Lecture</span>
-                            </v-btn>
-
-                            <v-btn v-else-if="details && isAdmin" @click.stop="download" color="success white--text" class="white--text mb-3">
-                                <v-icon>cloud_download</v-icon>
-                                <span class="f-600 text-spaced-xl ml-2">Télécharger</span>
-                            </v-btn>
-
-                            <div class="d-block white--text" style="font-size: 1rem">{{ movieGenres }}</div>
-
-                            <div class="text-justify mt-3" style="font-size: 1rem">{{ details.description }}</div>
-                        </div>
-
-                        <div class="mt-auto pt-5" style="font-size: 1rem">
-                            <div v-if="loading">
-                                <v-skeleton-loader type="text" class="mb-2"></v-skeleton-loader>
-                                <v-skeleton-loader type="text"></v-skeleton-loader>
-                            </div>
+            <v-row class="mt-5">
+                <v-col cols="12" lg="6">
+                    <v-card color="backdrop" elevation="5" class="d-flex flex-column h-100 pa-3">
+                        <v-card-text class="text-spaced pb-2" style="font-size: 1rem">
+                            <v-skeleton-loader v-if="loading" type="text" style="width: 100px"></v-skeleton-loader>
                             <div v-else-if="details">
-                                <div v-if="distribution" class="mb-2">
-                                    <span class="opacity-50 mr-1">Distribution :</span>
-                                    <span>{{ distribution }}</span>
+                                <span>{{ date }}</span>
+                                <template v-if="details.runtime">
+                                    <span class="mx-2">•</span>
+                                    <span>{{ runtime }}</span>
+                                </template>
+                            </div>
+                        </v-card-text>
+
+                        <v-skeleton-loader v-if="loading" type="title"></v-skeleton-loader>
+                        <v-card-title v-else-if="details" class="headline fade-in pb-1 pt-0">{{ details.name }}</v-card-title>
+
+                        <v-card-text class="d-flex flex-column h-100">
+                            <div v-if="loading">
+                                <v-skeleton-loader type="heading" class="mb-10"></v-skeleton-loader>
+                                <v-skeleton-loader type="text, paragraph, paragraph"></v-skeleton-loader>
+                            </div>
+
+                            <div v-else-if="details" class="fade-in">
+                                <v-rating :value="details.rating / 2" background-color="orange lighten-3" color="orange" dense size="15" readonly class="mb-4"></v-rating>
+
+                                <v-btn v-if="downloaded" @click.stop="playMovie(selectedMovie)" color="primary" class="black--text mb-5">
+                                    <v-icon>play_arrow</v-icon>
+                                    <span class="f-600 text-spaced-xl ml-1">Lecture</span>
+                                </v-btn>
+
+                                <v-btn v-else-if="details && isAdmin" @click.stop="download" color="success white--text" class="white--text mb-5">
+                                    <v-icon>cloud_download</v-icon>
+                                    <span class="f-600 text-spaced-xl ml-2">Télécharger</span>
+                                </v-btn>
+
+                                <div class="d-block white--text" style="font-size: 1rem">{{ movieGenres }}</div>
+
+                                <div class="text-justify mt-3" style="font-size: 1rem">{{ details.description }}</div>
+                            </div>
+
+                            <div class="mt-auto pt-5" style="font-size: 1rem">
+                                <div v-if="loading">
+                                    <v-skeleton-loader type="text" class="mb-2"></v-skeleton-loader>
+                                    <v-skeleton-loader type="text"></v-skeleton-loader>
                                 </div>
-                                <div v-if="cast">
-                                    <span class="opacity-50 mr-1">Acteurs :</span>
-                                    <span>{{ cast }}</span>
+                                <div v-else-if="details">
+                                    <div v-if="distribution" class="mb-2">
+                                        <span class="opacity-50 mr-1">Distribution :</span>
+                                        <span>{{ distribution }}</span>
+                                    </div>
+                                    <div v-if="cast">
+                                        <span class="opacity-50 mr-1">Acteurs :</span>
+                                        <span>{{ cast }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-            <v-col cols="12" lg="6">
-                <v-card color="backdrop" class="h-100 pa-3">
-                    <v-card-title class="text-spaced mb-2" style="font-size: 1.5rem">Similaires</v-card-title>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+                <v-col cols="12" lg="6">
+                    <v-card color="backdrop" elevation="5" class="h-100 pa-3">
+                        <v-card-title class="text-spaced mb-2" style="font-size: 1.5rem">Similaires</v-card-title>
 
-                    <v-card-text>
-                        <div v-if="loading" class="similar">
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                            <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
-                        </div>
+                        <v-card-text>
+                            <div v-if="loading" class="similar">
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                                <v-skeleton-loader type="image" style="border-radius: 4px"></v-skeleton-loader>
+                            </div>
 
-                        <div v-else-if="details" class="similar">
-                            <movie-preview v-for="(movie, index) in details.similar.slice(0, 8)" :key="index" :movie="movie" no-trailer></movie-preview>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                            <div v-else-if="details" class="similar">
+                                <movie-preview v-for="(movie, index) in details.similar.slice(0, 8)" :key="index" :movie="movie" no-trailer></movie-preview>
+                            </div>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </v-container>
     </main-page>
 </template>
 
@@ -191,12 +193,12 @@ export default {
 }
 
 .similar {
-    --preview-width: 8vw;
+    --preview-width: 7vw;
     --preview-height: calc(var(--preview-width) * 1.5);
 
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--preview-width), 1fr));
-    gap: 2rem 1rem;
+    gap: 1rem 0.5rem;
 
     &::-webkit-scrollbar {
         width: 4px;
@@ -214,11 +216,11 @@ export default {
 
     .movie-preview {
         &:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         &:hover:active {
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
     }
 }
