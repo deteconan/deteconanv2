@@ -1,13 +1,13 @@
 <template>
     <main-page :loading="loading">
-        <div class="pa-0 pa-lg-15 overflow-x-hidden" :class="{'h-100': isMobileLayout}" v-if="details">
-            <v-row :class="{'h-100': isMobileLayout}">
-                <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pr-0">
+        <v-container class="pa-0 py-lg-5 px-lg-15" :class="{'h-100': isMobileLayout}" v-if="details">
+            <v-row :class="{'h-100': isMobileLayout}" class="elevation-5">
+                <v-col v-if="!isMobileLayout" cols="0" lg="4" class="pa-0">
                     <div style="height: 100%">
                         <v-img :src="details.image | tmdbPosterHD" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; height: 100%;"></v-img>
                     </div>
                 </v-col>
-                <v-col cols="12" lg="8" class="pl-0 pr-0 pr-lg-3 pt-0 pt-lg-3 pb-0 pb-lg-3" :class="{'h-100': isMobileLayout}">
+                <v-col cols="12" lg="8" class="pa-0" :class="{'h-100': isMobileLayout}">
                     <div class="details">
                         <div class="d-flex align-center">
                             <h1>{{ details.name }}</h1>
@@ -58,25 +58,27 @@
                 </v-col>
             </v-row>
 
-            <div v-if="!isMobileLayout" class="d-flex align-center">
-                <h3 class="mt-5 mb-5">Acteurs</h3>
-                <v-btn @click="scrollX('actors', -1)" rounded icon class="ml-auto">
-                    <v-icon>chevron_left</v-icon>
-                </v-btn>
-                <v-btn @click="scrollX('actors', 1)" rounded icon>
-                    <v-icon>chevron_right</v-icon>
-                </v-btn>
-            </div>
-            <div v-if="!isMobileLayout" class="d-flex overflow-auto hide-scrollbar actors" ref="actors">
-                <div v-for="actor in details.cast" :key="actor.id" style="width: 20%" class="text-center mr-10">
-                    <v-avatar size="150" color="indigo">
-                        <v-img :src="actor.image | tmdbPosterHD"></v-img>
-                    </v-avatar>
-                    <div class="font-weight-bold mt-3">{{ actor.name }}</div>
-                    <div class="opacity-80 f-500 f-11">{{ actor.role }}</div>
+            <div class="overflow-x-hidden">
+                <div v-if="!isMobileLayout" class="d-flex align-center">
+                    <h3 class="mt-5 mb-5">Acteurs</h3>
+                    <v-btn @click="scrollX('actors', -1)" rounded icon class="ml-auto">
+                        <v-icon>chevron_left</v-icon>
+                    </v-btn>
+                    <v-btn @click="scrollX('actors', 1)" rounded icon>
+                        <v-icon>chevron_right</v-icon>
+                    </v-btn>
+                </div>
+                <div v-if="!isMobileLayout" class="d-flex overflow-x-auto hide-scrollbar actors" ref="actors">
+                    <div v-for="actor in details.cast" :key="actor.id" style="width: 20%" class="text-center mr-10">
+                        <v-avatar size="150" color="indigo">
+                            <v-img :src="actor.image | tmdbPosterHD"></v-img>
+                        </v-avatar>
+                        <div class="font-weight-bold mt-3">{{ actor.name }}</div>
+                        <div class="opacity-80 f-500 f-11">{{ actor.role }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </v-container>
 
         <v-dialog v-if="movie" v-model="deleteDialog" max-width="320">
             <v-card>
@@ -262,36 +264,6 @@
         &::after {
             content: "";
             padding-right: 40px;
-        }
-    }
-
-    .movie-container {
-
-        .iframe-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 3px;
-
-            .loading {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                z-index: 1;
-            }
-
-            iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                border-radius: 3px;
-                z-index: 2;
-            }
         }
     }
 
