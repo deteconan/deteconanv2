@@ -14,14 +14,14 @@
 
             <v-autocomplete @input="onSelectMovie" :search-input.sync="search" :items="searchItems" item-text="name"
                             return-object solo dense flat clearable hide-details hide-no-data prepend-inner-icon="search"
-                            label="Rechercher dans mes films" class="search"></v-autocomplete>
+                            label="Rechercher dans mes films" class="search mr-3"></v-autocomplete>
 
             <v-btn v-if="isAdmin && $route.fullPath !== '/upload'" color="white" to="/upload" text outlined>
                 <v-icon>backup</v-icon>
                 <span class="text-none ml-2">Upload</span>
             </v-btn>
 
-            <v-btn v-else-if="!user" @click.stop="$store.dispatch('login')" color="white" text outlined class="ml-3">
+            <v-btn v-else-if="!user" @click.stop="$store.dispatch('login')" color="white" text outlined>
                 <v-avatar color="white" size="20">
                     <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
                 </v-avatar>
