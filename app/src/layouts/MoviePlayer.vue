@@ -23,11 +23,16 @@
                     <v-btn class="ml-auto" icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
                         <v-icon class="material-icons-outlined">subtitles</v-icon>
                     </v-btn>
+
+                    <v-btn v-if="!fallback && castInstance.available" @click.stop="cast" icon class="ml-2">
+                        <v-icon size="22">cast</v-icon>
+                    </v-btn>
                 </div>
                 <div class="flex-grow-1 position-relative">
                     <div class="iframe-container">
-                        <video v-if="!fallback" :src="url" @error="fallback = true" controls autoplay></video>
-                        <iframe v-else :src="driveUrl" allowfullscreen frameborder="0"></iframe>
+                        <video v-if="!fallback && isMobileLayout" :src="url" @error="fallback = true" controls autoplay class="video-player"></video>
+                        <video-player v-else-if="!fallback" :src="url" @error="fallback = true" class="video-player"></video-player>
+                        <iframe v-else :src="driveUrl" allowfullscreen style="border: 0"></iframe>
 <!--                        <v-progress-circular class="loading" indeterminate></v-progress-circular>-->
                     </div>
                 </div>
@@ -37,11 +42,15 @@
 </template>
 
 <script>
+    import VideoPlayer from "@/components/VideoPlayer.vue";
     export default {
         name: "MoviePlayer",
+        // eslint-disable-next-line vue/no-unused-components
+        components: {VideoPlayer},
         data() {
             return {
-                fallback: false
+                fallback: false,
+                castInstance: null
             }
         },
         computed: {
@@ -52,11 +61,20 @@
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
             }
         },
+        methods: {
+            cast() {
+                if (!this.fallback && this.castInstance.available) {
+                    this.castInstance.cast(this.url);
+                }
+            }
+        },
         watch: {
             playingMovie: {
                 deep: true,
                 handler() {
                     this.fallback = false;
+                    // eslint-disable-next-line no-undef
+                    this.castInstance = new Castjs();
                 }
             }
         }
@@ -111,7 +129,7 @@
             z-index: 1;
         }
 
-        iframe, video {
+        iframe, .video-player {
             position: absolute;
             top: 0;
             left: 0;
