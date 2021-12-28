@@ -65,12 +65,6 @@
         mounted() {
             window['__onGCastApiAvailable'] = isAvailable => {
                 this.castAvailable = isAvailable;
-
-                if (this.castAvailable) {
-                    window.cast.framework.CastContext.getInstance().setOptions({
-                        receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-                    });
-                }
             };
         },
         methods: {
@@ -78,20 +72,25 @@
                 return window.cast.framework.CastContext.getInstance().getCurrentSession()
             },
             async cast() {
-                if (!this.castSession()) {
-                    try {
-                        await window.cast.framework.CastContext.getInstance().requestSession();
-                    } catch {
-                        return;
-                    }
-                }
+                if (!this.castAvailable)
+                    return Promise.resolve();
 
-                const mediaInfo = new window.chrome.cast.media.MediaInfo(this.url, 'video/mp4');
-                const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
-                const session = this.castSession();
+                window.cast.framework.CastContext.getInstance().setOptions({
+                    receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+                });
 
-                return session.loadMedia(request)
-                    .catch(err => console.error(err));
+                return window.cast.framework.CastContext.getInstance().requestSession()
+                    .then(() => {
+                        const mediaInfo = new window.chrome.cast.media.MediaInfo(this.url, 'video/mp4');
+                        const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+                        const session = this.castSession();
+
+                        return session.loadMedia(request)
+                            .catch(err => console.error(err));
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
             }
         },
         watch: {
