@@ -120,4 +120,41 @@ router.get('/movies/genres', async (req, res) => {
     }
 });
 
+router.get('/movie/stream/:file_id', async (req, res) => {
+    try {
+        const headers = {};
+
+        if (req.header('Range')) {
+            headers['Range'] = req.header('Range');
+            headers['Accept-Ranges'] = 'bytes';
+            headers['Content-Disposition'] = 'inline';
+        }
+
+        const stream = await DriveHelper.getFileStream(req.params.file_id, headers);
+
+        if (req.header('Range')) {
+            res.header('Content-Range', stream.headers['content-range']);
+            res.header('Content-Length', stream.headers['content-length']);
+            res.status(206);
+        } else {
+            res.header(`Content-Length`, stream.headers['content-length']);
+            res.status(200);
+        }
+
+        res.header('Accept-Ranges', 'bytes');
+        res.header('Content-Disposition', 'inline');
+        res.header('Content-Type', 'video/mp4');
+
+        stream.headers['accept-ranges'] = 'bytes';
+        stream.headers['content-disposition'] = 'inline';
+        stream.headers['content-type'] = 'video/mp4';
+
+        res.type('media');
+
+        stream.data.pipe(res);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
 export default router;

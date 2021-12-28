@@ -26,8 +26,9 @@
                 </div>
                 <div class="flex-grow-1 position-relative">
                     <div class="iframe-container">
-                        <iframe :src="url" allowfullscreen frameborder="0"></iframe>
-                        <v-progress-circular class="loading" indeterminate></v-progress-circular>
+                        <video v-if="!fallback" :src="url" @error="fallback = true" controls autoplay></video>
+                        <iframe v-else :src="driveUrl" allowfullscreen frameborder="0"></iframe>
+<!--                        <v-progress-circular class="loading" indeterminate></v-progress-circular>-->
                     </div>
                 </div>
             </v-sheet>
@@ -38,9 +39,25 @@
 <script>
     export default {
         name: "MoviePlayer",
+        data() {
+            return {
+                fallback: false
+            }
+        },
         computed: {
             url() {
+                return `${process.env.VUE_APP_API_URL}/api/movie/stream/${this.playingMovie.id}`;
+            },
+            driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
+            }
+        },
+        watch: {
+            playingMovie: {
+                deep: true,
+                handler() {
+                    this.fallback = false;
+                }
             }
         }
     }
@@ -94,7 +111,7 @@
             z-index: 1;
         }
 
-        iframe {
+        iframe, video {
             position: absolute;
             top: 0;
             left: 0;

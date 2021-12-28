@@ -64,7 +64,5 @@
 </script>
 
 <style lang="scss" scoped>
-.genres {
-    
-}
+
 </style>

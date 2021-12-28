@@ -484,5 +484,15 @@ export default class DriveHelper {
         return folders;
     }
 
+    static getFileStream(fileId, headers) {
+        return drive.files.get({
+            fileId: fileId,
+            alt: 'media'
+        }, {
+            responseType: 'stream',
+            headers
+        });
+    }
+
 };
 

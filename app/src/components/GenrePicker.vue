@@ -1,14 +1,21 @@
 <template>
-    <div class="genre-picker">
+    <div v-if="genresFiltered.length" class="genre-picker">
         <div v-if="isMobileLayout" class="overflow-x-auto scroll-container d-flex align-center">
             <div class="genres d-flex align-center py-2 pr-2">
-                <v-chip @click.stop="selectGenre(genre.id)" v-for="genre in genresFiltered" :key="genre.id" color="primary" :class="{'active': genre.id === selected}" class="ml-2 cursor-pointer">{{ genre.name }}</v-chip>
+                <v-chip @click.stop="selectGenre(genre.id)" v-for="genre in genresFiltered" :key="genre.id"
+                        color="primary" :class="{'active': genre.id === selected}" class="ml-2 cursor-pointer">
+                    {{ genre.name }}
+                </v-chip>
             </div>
         </div>
 
-        <div v-else ref="scrollContainer" class="overflow-hidden px-10 py-2" style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
+        <div v-else ref="scrollContainer" class="overflow-hidden px-10 py-2"
+             style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
             <div ref="scroller" class="scroller" :style="scrollStyle">
-                <v-chip @click.stop="selectGenre(genre.id)" v-for="genre in genresFiltered" :key="genre.id" color="primary" :class="{'active': genre.id === selected}" class="cursor-pointer">{{ genre.name }}</v-chip>
+                <v-chip @click.stop="selectGenre(genre.id)" v-for="genre in genresFiltered" :key="genre.id"
+                        color="primary" :class="{'active': genre.id === selected}" class="cursor-pointer">
+                    {{ genre.name }}
+                </v-chip>
             </div>
         </div>
     </div>
@@ -56,7 +63,7 @@ export default {
             event.stopPropagation();
             event.stopImmediatePropagation();
 
-            if (this.$refs.scroller.getBoundingClientRect().width > this.$refs.scrollContainer.clientWidth  - 50) {
+            if (this.$refs.scroller.getBoundingClientRect().width > this.$refs.scrollContainer.clientWidth - 50) {
                 this.scroll -= event.deltaY;
                 this.scroll = Math.max(this.scroll, -(this.$refs.scroller.getBoundingClientRect().width - (this.$refs.scrollContainer.clientWidth - 50)));
                 this.scroll = Math.min(this.scroll, 0);
