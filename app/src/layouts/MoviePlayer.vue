@@ -24,7 +24,7 @@
                         <v-icon class="material-icons-outlined">subtitles</v-icon>
                     </v-btn>
 
-                    <v-btn v-if="!fallback && castInstance.available" @click.stop="cast" icon class="ml-2">
+                    <v-btn v-if="!fallback && castAvailable" @click.stop="cast" icon class="ml-2">
                         <v-icon size="22">cast</v-icon>
                     </v-btn>
                 </div>
@@ -43,6 +43,7 @@
 
 <script>
     import VideoPlayer from "@/components/VideoPlayer.vue";
+
     export default {
         name: "MoviePlayer",
         // eslint-disable-next-line vue/no-unused-components
@@ -50,7 +51,7 @@
         data() {
             return {
                 fallback: false,
-                castInstance: null
+                castAvailable: false
             }
         },
         computed: {
@@ -61,11 +62,36 @@
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
             }
         },
-        methods: {
-            cast() {
-                if (!this.fallback && this.castInstance.available) {
-                    this.castInstance.cast(this.url);
+        mounted() {
+            window['__onGCastApiAvailable'] = isAvailable => {
+                this.castAvailable = isAvailable;
+
+                if (this.castAvailable) {
+                    window.cast.framework.CastContext.getInstance().setOptions({
+                        receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+                    });
                 }
+            };
+        },
+        methods: {
+            castSession() {
+                return window.cast.framework.CastContext.getInstance().getCurrentSession()
+            },
+            async cast() {
+                if (!this.castSession()) {
+                    try {
+                        await window.cast.framework.CastContext.getInstance().requestSession();
+                    } catch {
+                        return;
+                    }
+                }
+
+                const mediaInfo = new window.chrome.cast.media.MediaInfo(this.url, 'video/mp4');
+                const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+                const session = this.castSession();
+
+                return session.loadMedia(request)
+                    .catch(err => console.error(err));
             }
         },
         watch: {
@@ -73,8 +99,6 @@
                 deep: true,
                 handler() {
                     this.fallback = false;
-                    // eslint-disable-next-line no-undef
-                    this.castInstance = new Castjs();
                 }
             }
         }
