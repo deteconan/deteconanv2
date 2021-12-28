@@ -143,11 +143,11 @@ router.get('/movie/stream/:file_id', async (req, res) => {
 
         res.header('Accept-Ranges', 'bytes');
         res.header('Content-Disposition', 'inline');
-        res.header('Content-Type', 'video/webm');
+        res.header('Content-Type', 'video/mp4');
 
         stream.headers['accept-ranges'] = 'bytes';
         stream.headers['content-disposition'] = 'inline';
-        stream.headers['content-type'] = 'video/webm';
+        stream.headers['content-type'] = 'video/mp4';
 
         res.type('media');
 
