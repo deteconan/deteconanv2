@@ -133,6 +133,31 @@ export default class DriveHelper {
         return total;
     }
 
+    static async streamMP4(stream, output) {
+        return ffmpeg(stream)
+            .inputFormat('mp4')
+            .videoCodec('h264_nvenc')
+            .videoBitrate(8000)
+            .audioCodec('libmp3lame')
+            // .audioBitrate('128k')
+            // .audioChannels(2)
+            // .keepDAR()
+            .outputOptions('-movflags frag_keyframe+empty_moov')
+            // .outputOptions('-movflags empty_moov')
+            // .outputOptions('-movflags faststart')
+            // .outputOptions('-fflags nobuffer')
+            // .outputOptions('-strict experimental')
+            // .outputOptions('-avioflags direct')
+            .toFormat('mp4')
+            .on('progress', progress => {
+                console.log(progress);
+            })
+            .on('error', err => {
+                console.error(err.message);
+            })
+            .pipe(output, { end: true });
+    }
+
     static async convertToMP4(stream, filePath) {
         const convertedFileName = `${filePath}.mp4`;
         console.log('CONVERTED FILE PATH:', convertedFileName);

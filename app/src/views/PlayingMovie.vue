@@ -238,8 +238,9 @@
             movies() {
                 this.movie = this.movies.find(m => +m.tmdbId === +this.$route.params.id);
             },
-            '$route.params.id'() {
-                this.loadMovie();
+            '$route.params.id'(val) {
+                if (val)
+                    this.loadMovie();
             }
         }
     }

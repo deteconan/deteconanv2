@@ -122,7 +122,9 @@ router.get('/movies/genres', async (req, res) => {
 
 router.get('/movie/stream/:file_id', async (req, res) => {
     try {
-        const headers = {};
+        const headers = {
+            'Content-Type': 'video/mp4'
+        };
 
         if (req.header('Range')) {
             headers['Range'] = req.header('Range');
