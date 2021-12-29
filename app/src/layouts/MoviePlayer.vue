@@ -43,6 +43,7 @@
 
 <script>
     import VideoPlayer from "@/components/VideoPlayer.vue";
+    import {tmdbPosterHD} from "@/filters.js";
 
     export default {
         name: "MoviePlayer",
@@ -82,6 +83,12 @@
                 return window.cast.framework.CastContext.getInstance().requestSession()
                     .then(() => {
                         const mediaInfo = new window.chrome.cast.media.MediaInfo(this.url, 'video/mp4');
+                        const mediaMetaData = new window.chrome.cast.media.MovieMediaMetadata();
+                        mediaMetaData.images = [new window.chrome.cast.Image(tmdbPosterHD(this.playingMovie.image))];
+                        mediaMetaData.title = this.playingMovie.name;
+                        mediaMetaData.releaseDate = this.$moment(this.playingMovie.release_date).format('YYYY-DD-MM');
+
+                        mediaInfo.metadata = mediaMetaData;
                         const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
                         const session = this.castSession();
 
