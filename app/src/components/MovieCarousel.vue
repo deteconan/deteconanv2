@@ -58,7 +58,7 @@ export default {
 
         this.selectedIndex = 3;
 
-        this.$el.addEventListener('mousewheel', event => {
+        this.$el.addEventListener('wheel', event => {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
