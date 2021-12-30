@@ -1,51 +1,105 @@
 <template>
     <div @mousemove="onMouseMove" class="video-container" :style="cursorStyle">
         <video ref="video" @click.stop="togglePlaying" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
-               @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" :src="src" autoplay :muted="muted"></video>
+               crossorigin="anonymous"
+               @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" autoplay :muted="muted">
+            <source :src="src" type="video/mp4">
+            <track v-if="subtitleSrc && subtitleVisible" :src="subtitleSrc" @load="onSubtitleLoad" label="Français"
+                   srclang="fr" kind="subtitles" default>
+        </video>
 
-        <div v-if="cursorVisible" class="controls">
-            <div class="slider-container">
-                <v-slider :value="currentTime" @change="seek" @start="seeking = true" @end="seeking = false" :min="0"
-                          :max="duration" dense hide-details></v-slider>
-                <div class="ml-2" style="width: 60px">{{ remainingTime }}</div>
+        <transition name="slide-fade" duration="150">
+            <div v-if="cursorVisible" @mouseenter="hasFocus = true" @mouseleave="hasFocus = false" class="controls">
+                <div class="slider-container">
+                    <v-slider :value="currentTime" @change="seek" @start="seeking = true" @end="seeking = false"
+                              :min="0"
+                              :max="duration" dense hide-details></v-slider>
+                    <div class="ml-2" style="width: 60px">{{ remainingTime }}</div>
+                </div>
+
+                <div class="buttons">
+                    <v-btn @click.stop="togglePlaying" icon :ripple="false" class="mr-3">
+                        <v-icon v-if="!playing" size="60" class="material-icons-round">play_arrow</v-icon>
+                        <v-icon v-else size="50" class="material-icons-round">pause</v-icon>
+                    </v-btn>
+
+                    <v-btn @click.stop="jump(-10)" icon :ripple="false">
+                        <v-icon size="50" class="material-icons-round">replay_10</v-icon>
+                    </v-btn>
+
+                    <v-btn @click.stop="jump(10)" icon :ripple="false">
+                        <v-icon size="50" class="material-icons-round">forward_10</v-icon>
+                    </v-btn>
+
+                    <v-hover v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-3">
+                        <div>
+                            <v-btn @click.stop="toggleMute" icon :ripple="false">
+                                <v-icon v-if="muted" size="50" class="material-icons-round">volume_off</v-icon>
+                                <v-icon v-else size="50" class="material-icons-round">volume_down</v-icon>
+                            </v-btn>
+
+                            <v-hover v-slot="{ hover: hoverSlider }" close-delay="300" class="volume-slider">
+                                <v-slider v-show="hoverBtn || hoverSlider" :value="currentVolume" hide-details dense
+                                          @input="setVolume" vertical color="white" class="px-5"></v-slider>
+                            </v-hover>
+                        </div>
+                    </v-hover>
+
+                    <v-spacer></v-spacer>
+
+                    <v-btn v-if="subtitleVisible" @click.stop="delayDialog.visible = true" icon :ripple="false">
+                        <v-icon size="40" class="material-icons-round">history</v-icon>
+                    </v-btn>
+
+                    <v-btn @click.stop="toggleSubtitle" icon :ripple="false">
+                        <v-icon v-if="!subtitleVisible" size="40" class="material-icons-round">subtitles_off</v-icon>
+                        <v-icon v-else size="40" class="material-icons-round">subtitles</v-icon>
+                    </v-btn>
+
+                    <v-btn @click.stop="toggleFullscreen" icon :ripple="false">
+                        <v-icon v-if="!fullscreen" size="60" class="material-icons-round">fullscreen</v-icon>
+                        <v-icon v-else size="60" class="material-icons-round">fullscreen_exit</v-icon>
+                    </v-btn>
+                </div>
             </div>
+        </transition>
 
-            <div class="buttons">
-                <v-btn @click.stop="togglePlaying" icon :ripple="false" class="mr-3">
-                    <v-icon v-if="!playing" size="60" class="material-icons-round">play_arrow</v-icon>
-                    <v-icon v-else size="50" class="material-icons-round">pause</v-icon>
+        <v-dialog v-model="delayDialog.visible" width="300" persistent content-class="delay-dialog">
+            <v-card color="dark darken-1" class="position-relative">
+                <v-btn @click.stop="delayDialog.visible = false" icon class="position-absolute"
+                       style="top: 5px; right: 5px;">
+                    <v-icon>close</v-icon>
                 </v-btn>
 
-                <v-btn @click.stop="jump(-10)" icon :ripple="false">
-                    <v-icon size="50" class="material-icons-round">replay_10</v-icon>
-                </v-btn>
+                <v-card-title class="justify-center mb-3">Délai des sous-titres</v-card-title>
 
-                <v-btn @click.stop="jump(10)" icon :ripple="false">
-                    <v-icon size="50" class="material-icons-round">forward_10</v-icon>
-                </v-btn>
-
-                <v-hover v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-3">
-                    <div>
-                        <v-btn @click.stop="toggleMute" icon :ripple="false">
-                            <v-icon v-if="muted" size="50" class="material-icons-round">volume_off</v-icon>
-                            <v-icon v-else size="50" class="material-icons-round">volume_down</v-icon>
+                <v-card-text class="pb-5">
+                    <div class="title text-primary font-weight-bold text-center my-3">{{ delayDialog.value }} ms</div>
+                    <div class="grid-2">
+                        <v-btn @click.stop="delaySubtitle(-100)" :loading="delayDialog.loading"
+                               class="text-none">- 100 ms
+                        </v-btn>
+                        <v-btn @click.stop="delaySubtitle(100)" :loading="delayDialog.loading"
+                               class="text-none">+ 100 ms
                         </v-btn>
 
-                        <v-hover v-slot="{ hover: hoverSlider }" close-delay="300" class="volume-slider">
-                            <v-slider v-show="hoverBtn || hoverSlider" :value="currentVolume" hide-details dense
-                                      @input="setVolume" vertical color="white" class="px-5"></v-slider>
-                        </v-hover>
+                        <v-btn @click.stop="delaySubtitle(-500)" :loading="delayDialog.loading"
+                               class="text-none">- 500 ms
+                        </v-btn>
+                        <v-btn @click.stop="delaySubtitle(500)" :loading="delayDialog.loading"
+                               class="text-none">+ 500 ms
+                        </v-btn>
+
+                        <v-btn @click.stop="delaySubtitle(-1000)" :loading="delayDialog.loading"
+                               class="text-none">- 1 s
+                        </v-btn>
+                        <v-btn @click.stop="delaySubtitle(1000)" :loading="delayDialog.loading"
+                               class="text-none">+ 1 s
+                        </v-btn>
                     </div>
-                </v-hover>
-
-                <v-spacer></v-spacer>
-
-                <v-btn @click.stop="toggleFullscreen" icon :ripple="false">
-                    <v-icon v-if="!fullscreen" size="60" class="material-icons-round">fullscreen</v-icon>
-                    <v-icon v-else size="60" class="material-icons-round">fullscreen_exit</v-icon>
-                </v-btn>
-            </div>
-        </div>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -54,6 +108,9 @@ export default {
     name: "VideoPlayer",
     props: {
         src: {
+            type: String
+        },
+        subtitleSrc: {
             type: String
         }
     },
@@ -67,7 +124,14 @@ export default {
             seeking: false,
             fullscreen: false,
             cursorVisible: true,
-            mouseTimeout: null
+            mouseTimeout: null,
+            subtitleVisible: false,
+            delayDialog: {
+                visible: false,
+                value: 0,
+                loading: false
+            },
+            hasFocus: false
         }
     },
     computed: {
@@ -87,8 +151,9 @@ export default {
         onLoad() {
             this.setVolume(10);
 
-            if (this.$refs.video)
+            if (this.$refs.video) {
                 this.duration = this.$refs.video.duration;
+            }
         },
         onTimeUpdate() {
             if (!this.seeking && this.$refs.video)
@@ -99,8 +164,16 @@ export default {
             clearTimeout(this.mouseTimeout);
 
             this.mouseTimeout = setTimeout(() => {
-                this.cursorVisible = false;
+                if (!this.hasFocus)
+                    this.cursorVisible = false;
             }, 3000);
+        },
+        onSubtitleLoad() {
+            this.delaySubtitle(this.delayDialog.value, false);
+            const track = this.$refs.video.textTracks[0];
+
+            if (track)
+                track.mode = 'showing';
         },
         togglePlaying() {
             if (this.$refs.video) {
@@ -151,12 +224,54 @@ export default {
             }
 
             this.fullscreen = !this.fullscreen;
+        },
+        toggleSubtitle() {
+            this.subtitleVisible = !this.subtitleVisible;
+        },
+        async delaySubtitle(delayInMs, compute = true) {
+            if (!this.$refs.video)
+                return;
+
+            const track = this.$refs.video.textTracks[0];
+
+            if (!track)
+                return;
+
+            this.delayDialog.loading = true;
+            Array.from(track.cues).forEach(cue => {
+                cue.startTime += delayInMs / 1000;
+                cue.endTime += delayInMs / 1000;
+            });
+            this.delayDialog.loading = false;
+
+            if (compute)
+                this.delayDialog.value += delayInMs;
+        }
+    },
+    watch: {
+        src() {
+            if (!this.$refs.video)
+                return;
+
+            this.delayDialog.value = 0;
+            const track = this.$refs.video.textTracks[0];
+            if (track)
+                track.mode = 'hidden';
+            this.$refs.video.load();
         }
     }
 }
 </script>
 
 <style lang="scss">
+.delay-dialog {
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+}
+
 .video-container {
     position: relative;
     background: black;
@@ -164,6 +279,27 @@ export default {
     video {
         width: 100%;
         height: 100%;
+
+        &::cue {
+            //background: purple;
+        }
+
+        &::-webkit-media-text-track-container {
+            transform: translateY(-50px);
+        }
+    }
+
+    .slide-fade-enter-active {
+        transition: all 150ms ease;
+    }
+
+    .slide-fade-leave-active {
+        transition: all 150ms cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+
+    .slide-fade-enter, .slide-fade-leave-to {
+        transform: translateY(100%);
+        opacity: 0;
     }
 
     .controls {
@@ -171,6 +307,7 @@ export default {
         bottom: 0;
         left: 0;
         width: 100%;
+        animation: translateY 150ms ease;
 
         .slider-container {
             display: flex;
@@ -227,6 +364,13 @@ export default {
                         }
                     }
                 }
+            }
+
+            .subtitle-delay {
+                position: absolute;
+                top: -70px;
+                left: -30px;
+                min-width: 100px;
             }
         }
     }

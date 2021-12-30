@@ -13,14 +13,14 @@
         </v-card>
         <v-bottom-sheet :value="playerVisible" fullscreen>
             <v-sheet class="d-flex flex-column" height="100%" v-if="playingMovie">
-                <div class="dark d-flex align-center px-5" style="height: 58px">
+                <div class="black d-flex align-center px-5" style="height: 58px">
                     <v-btn @click.stop="togglePlayer" icon>
                         <v-icon>expand_more</v-icon>
                     </v-btn>
 
-                    <h3 class="ml-5 opacity-80 text-spaced f-500">{{ playingMovie.name }}</h3>
+                    <h3 class="opacity-80 text-spaced f-500 mx-auto">{{ playingMovie.name }}</h3>
 
-                    <v-btn class="ml-auto" icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
+                    <v-btn icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
                         <v-icon class="material-icons-outlined">subtitles</v-icon>
                     </v-btn>
 
@@ -31,7 +31,7 @@
                 <div class="flex-grow-1 position-relative">
                     <div class="iframe-container">
                         <video v-if="!fallback && isMobileLayout" :src="url" @error="fallback = true" controls autoplay class="video-player"></video>
-                        <video-player v-else-if="!fallback" :src="url" @error="fallback = true" class="video-player"></video-player>
+                        <video-player v-else-if="!fallback" :src="url" :subtitle-src="subtitleUrl" @error="fallback = true" class="video-player"></video-player>
                         <iframe v-else :src="driveUrl" allowfullscreen style="border: 0"></iframe>
 <!--                        <v-progress-circular class="loading" indeterminate></v-progress-circular>-->
                     </div>
@@ -59,6 +59,9 @@
             url() {
                 return `${process.env.VUE_APP_API_URL}/api/movie/stream/${this.playingMovie.id}`;
             },
+            subtitleUrl() {
+                return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.tmdbId}`;
+            },
             driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
             }
@@ -73,6 +76,7 @@
                 return window.cast.framework.CastContext.getInstance().getCurrentSession()
             },
             async cast() {
+                console.log(this.playingMovie);
                 if (!this.castAvailable)
                     return Promise.resolve();
 

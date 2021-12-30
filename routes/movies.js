@@ -5,6 +5,7 @@ import TMDB from "../helpers/tmdb.js";
 import {sendError} from "../helpers/utils.js";
 import TorrentSearchApi from "torrent-search-api";
 import DriveHelper from "../helpers/drive.js";
+import OpenSubtitles from "../helpers/open-subtitles.js";
 
 const router = express.Router();
 
@@ -154,6 +155,16 @@ router.get('/movie/stream/:file_id', async (req, res) => {
         res.type('media');
 
         stream.data.pipe(res);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
+router.get('/movie/subtitle/:tmdb_id', async (req, res) => {
+    try {
+        const stream = await OpenSubtitles.getVTTSubtitles(+req.params.tmdb_id);
+
+        stream.pipe(res);
     } catch (err) {
         sendError(err, req, res);
     }
