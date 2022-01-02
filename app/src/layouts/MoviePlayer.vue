@@ -60,7 +60,7 @@
                 return `${process.env.VUE_APP_API_URL}/api/movie/stream/${this.playingMovie.id}`;
             },
             subtitleUrl() {
-                return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.tmdbId}`;
+                return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.imdbId}`;
             },
             driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;

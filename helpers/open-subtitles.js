@@ -1,6 +1,5 @@
 import OS from 'opensubtitles-api';
-import TMDB from "./tmdb.js";
-import srt2vtt from 'srt-to-vtt';
+import { parse, resync, stringify } from 'subtitle';
 import axios from "axios";
 
 const OpenSubtitlesInstance = new OS({
@@ -17,20 +16,13 @@ export default class OpenSubtitles {
             .catch(err => console.error(err));
     }
 
-    static async getVTTSubtitles(tmdbId) {
+    static async getVTTSubtitles(imdbId, offset = 0) {
         if (!this.token)
             this.token = await this.login();
 
-        const movie = await TMDB.getMovie(tmdbId);
-
-        if (!movie) {
-            console.error('Looking for subtitles: Movie not found');
-            return Promise.resolve(null);
-        }
-
         const url = await OpenSubtitlesInstance.search({
             sublanguageid: 'fre',
-            imdbid: movie.imdbId
+            imdbid: imdbId
         })
         .then(subtitles => {
             if (!subtitles.fr)
@@ -52,6 +44,8 @@ export default class OpenSubtitles {
             responseType: 'stream'
         });
 
-        return stream.data.pipe(srt2vtt());
+        return stream.data.pipe(parse())
+            .pipe(resync(offset))
+            .pipe(stringify({ format: 'WebVTT' }));
     }
 }

@@ -4,7 +4,7 @@
                crossorigin="anonymous"
                @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" autoplay :muted="muted">
             <source :src="src" type="video/mp4">
-            <track v-if="subtitleSrc && subtitleVisible" :src="subtitleSrc" @load="onSubtitleLoad" label="Français"
+            <track v-if="subtitle && subtitleVisible" :src="subtitle" @load="onSubtitleLoad" label="Français"
                    srclang="fr" kind="subtitles" default>
         </video>
 
@@ -145,6 +145,12 @@ export default {
             return {
                 'cursor': this.cursorVisible ? 'default' : 'none'
             };
+        },
+        subtitle() {
+            if (this.subtitleSrc)
+                return `${this.subtitleSrc}?offset=${this.delayDialog.value}`;
+            else
+                return null;
         }
     },
     methods: {
@@ -169,7 +175,6 @@ export default {
             }, 3000);
         },
         onSubtitleLoad() {
-            this.delaySubtitle(this.delayDialog.value, false);
             const track = this.$refs.video.textTracks[0];
 
             if (track)
@@ -228,24 +233,8 @@ export default {
         toggleSubtitle() {
             this.subtitleVisible = !this.subtitleVisible;
         },
-        async delaySubtitle(delayInMs, compute = true) {
-            if (!this.$refs.video)
-                return;
-
-            const track = this.$refs.video.textTracks[0];
-
-            if (!track)
-                return;
-
-            this.delayDialog.loading = true;
-            Array.from(track.cues).forEach(cue => {
-                cue.startTime += delayInMs / 1000;
-                cue.endTime += delayInMs / 1000;
-            });
-            this.delayDialog.loading = false;
-
-            if (compute)
-                this.delayDialog.value += delayInMs;
+        delaySubtitle(delayInMs) {
+            this.delayDialog.value += delayInMs;
         }
     },
     watch: {

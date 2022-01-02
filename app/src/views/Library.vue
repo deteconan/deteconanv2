@@ -1,7 +1,7 @@
 <template>
     <main-page class="d-flex flex-column">
         <v-container class="pb-0">
-            <movie-carousel :items="movies" @select-movie="selectedMovie = $event"></movie-carousel>
+            <movie-carousel :items="moviesFiltered" @select-movie="selectedMovie = $event"></movie-carousel>
 
             <v-row class="mt-5">
                 <v-col cols="12" lg="6">
@@ -150,6 +150,11 @@ export default {
                 return '';
 
             return this.details.cast.slice(0, 4).map(d => d.name).join(', ');
+        },
+        moviesFiltered() {
+            return this.movies.filter(() => true).sort((a, b) => {
+                return new Date(b.createdTime) - new Date(a.createdTime);
+            });
         }
     },
     methods: {

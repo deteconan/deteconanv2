@@ -160,11 +160,15 @@ router.get('/movie/stream/:file_id', async (req, res) => {
     }
 });
 
-router.get('/movie/subtitle/:tmdb_id', async (req, res) => {
+router.get('/movie/subtitle/:imdb_id', async (req, res) => {
     try {
-        const stream = await OpenSubtitles.getVTTSubtitles(+req.params.tmdb_id);
+        const offset = req.query.offset || 0;
+        const stream = await OpenSubtitles.getVTTSubtitles(req.params.imdb_id, +offset);
 
-        stream.pipe(res);
+        if (stream)
+            stream.pipe(res);
+        else
+            res.status(HTTP_NOT_FOUND).send('No subtitles found');
     } catch (err) {
         sendError(err, req, res);
     }
