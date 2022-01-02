@@ -248,6 +248,7 @@ export default class DriveHelper {
             appProperties: {
                 parentId: options.parentId,
                 image: movie.image,
+                backdrop: movie.backdrop,
                 release_date: movie.release_date,
                 tmdbId: options.tmdbId,
                 imdbId: movie.imdbId,
