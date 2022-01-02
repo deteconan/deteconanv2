@@ -30,10 +30,9 @@
                 </div>
                 <div class="flex-grow-1 position-relative">
                     <div class="iframe-container">
-                        <video v-if="!fallback && isMobileLayout" :src="url" @error="fallback = true" controls autoplay class="video-player"></video>
-                        <video-player v-else-if="!fallback" :src="url" :subtitle-src="subtitleUrl" @error="fallback = true" class="video-player"></video-player>
+<!--                        <video v-if="!fallback && isMobileLayout" :src="url" @error="fallback = true" controls autoplay class="video-player"></video>-->
+                        <video-player v-if="!fallback" :src="url" :subtitle-src="subtitleUrl" @error="fallback = true" @delay-subtitle="subtitleDelay = $event" class="video-player"></video-player>
                         <iframe v-else :src="driveUrl" allowfullscreen style="border: 0"></iframe>
-<!--                        <v-progress-circular class="loading" indeterminate></v-progress-circular>-->
                     </div>
                 </div>
             </v-sheet>
@@ -47,12 +46,12 @@
 
     export default {
         name: "MoviePlayer",
-        // eslint-disable-next-line vue/no-unused-components
         components: {VideoPlayer},
         data() {
             return {
                 fallback: false,
-                castAvailable: false
+                castAvailable: false,
+                subtitleDelay: 0
             }
         },
         computed: {
@@ -60,7 +59,7 @@
                 return `${process.env.VUE_APP_API_URL}/api/movie/stream/${this.playingMovie.id}`;
             },
             subtitleUrl() {
-                return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.imdbId}`;
+                return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.imdbId}?offset=${this.subtitleDelay}`;
             },
             driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
@@ -72,11 +71,7 @@
             };
         },
         methods: {
-            castSession() {
-                return window.cast.framework.CastContext.getInstance().getCurrentSession()
-            },
             async cast() {
-                console.log(this.playingMovie);
                 if (!this.castAvailable)
                     return Promise.resolve();
 
@@ -94,7 +89,7 @@
 
                         mediaInfo.metadata = mediaMetaData;
                         const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
-                        const session = this.castSession();
+                        const session = window.cast.framework.CastContext.getInstance().getCurrentSession();
 
                         return session.loadMedia(request)
                             .catch(err => console.error(err));

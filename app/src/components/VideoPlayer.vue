@@ -1,10 +1,10 @@
 <template>
     <div @mousemove="onMouseMove" class="video-container" :style="cursorStyle">
-        <video ref="video" @click.stop="togglePlaying" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
+        <video ref="video" @click.stop="!isMobileLayout && togglePlaying()" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
                crossorigin="anonymous"
                @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" autoplay :muted="muted">
             <source :src="src" type="video/mp4">
-            <track v-if="subtitle && subtitleVisible" :src="subtitle" @load="onSubtitleLoad" label="Français"
+            <track v-if="subtitleSrc && subtitleVisible" :src="subtitleSrc" @load="onSubtitleLoad" label="Français"
                    srclang="fr" kind="subtitles" default>
         </video>
 
@@ -18,20 +18,20 @@
                 </div>
 
                 <div class="buttons">
-                    <v-btn @click.stop="togglePlaying" icon :ripple="false" class="mr-3">
+                    <v-btn @click.stop="togglePlaying" icon :ripple="false" class="mr-lg-3">
                         <v-icon v-if="!playing" size="60" class="material-icons-round">play_arrow</v-icon>
                         <v-icon v-else size="50" class="material-icons-round">pause</v-icon>
                     </v-btn>
 
-                    <v-btn @click.stop="jump(-10)" icon :ripple="false">
+                    <v-btn v-if="!isMobileLayout" @click.stop="jump(-10)" icon :ripple="false">
                         <v-icon size="50" class="material-icons-round">replay_10</v-icon>
                     </v-btn>
 
-                    <v-btn @click.stop="jump(10)" icon :ripple="false">
+                    <v-btn v-if="!isMobileLayout" @click.stop="jump(10)" icon :ripple="false">
                         <v-icon size="50" class="material-icons-round">forward_10</v-icon>
                     </v-btn>
 
-                    <v-hover v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-3">
+                    <v-hover v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-lg-3">
                         <div>
                             <v-btn @click.stop="toggleMute" icon :ripple="false">
                                 <v-icon v-if="muted" size="50" class="material-icons-round">volume_off</v-icon>
@@ -145,12 +145,6 @@ export default {
             return {
                 'cursor': this.cursorVisible ? 'default' : 'none'
             };
-        },
-        subtitle() {
-            if (this.subtitleSrc)
-                return `${this.subtitleSrc}?offset=${this.delayDialog.value}`;
-            else
-                return null;
         }
     },
     methods: {
@@ -247,6 +241,9 @@ export default {
             if (track)
                 track.mode = 'hidden';
             this.$refs.video.load();
+        },
+        'delayDialog.value'(val) {
+            this.$emit('delay-subtitle', val);
         }
     }
 }
@@ -268,10 +265,6 @@ export default {
     video {
         width: 100%;
         height: 100%;
-
-        &::cue {
-            //background: purple;
-        }
 
         &::-webkit-media-text-track-container {
             transform: translateY(-50px);
@@ -362,6 +355,12 @@ export default {
                 min-width: 100px;
             }
         }
+    }
+}
+
+.mobile {
+    .controls .buttons {
+        gap: 2rem;
     }
 }
 </style>
