@@ -14,6 +14,7 @@ export function parseTmdbMovie(tmdbMovie) {
         tmdbId: +tmdbMovie.id,
         name: tmdbMovie.title,
         image: tmdbMovie.poster_path,
+        backdrop: tmdbMovie.backdrop_path,
         release_date: tmdbMovie.release_date,
         rating: tmdbMovie.vote_average
     };
@@ -220,15 +221,24 @@ export default class TMDB {
     }
 
     static getMovieBackdrop(tmdbId) {
-        return api.get(`/movie/${tmdbId}/images`)
-            .then(res => {
-                const backdrops = res.data.backdrops;
+        // return api.get(`/movie/${tmdbId}/images`)
+        //     .then(res => {
+        //         const backdrops = res.data.backdrops;
+        //
+        //         if (Array.isArray(backdrops) && backdrops.length)
+        //             return backdrops.pop().file_path;
+        //         else
+        //             return null;
+        //     });
 
-                if (Array.isArray(backdrops) && backdrops.length)
-                    return backdrops.pop().file_path;
-                else
-                    return null;
-            });
+        return api.get(`/movie/${tmdbId}`, {
+            params: {
+                language: 'fr-FR'
+            }
+        })
+        .then(res => {
+            return res.data;
+        });
     }
 
     static getSimilarMovies(tmdbId) {

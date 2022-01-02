@@ -71,10 +71,10 @@
                     <v-icon>close</v-icon>
                 </v-btn>
 
-                <v-card-title class="justify-center mb-3">Délai des sous-titres</v-card-title>
+                <v-card-title class="justify-center">Délai des sous-titres</v-card-title>
 
                 <v-card-text class="pb-5">
-                    <div class="title text-primary font-weight-bold text-center my-3">{{ delayDialog.value }} ms</div>
+                    <div class="title text-primary font-weight-bold text-center mb-3">{{ delayDialog.value }} ms</div>
                     <div class="grid-2">
                         <v-btn @click.stop="delaySubtitle(-100)" :loading="delayDialog.loading"
                                class="text-none">- 100 ms

@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="value" @input="onInput" width="900" content-class="movie-dialog">
-        <div v-if="movie" class="bg-image" v-bg-img="tmdbPosterHD(movie.image)">
-            <video v-if="movie && trailer" :src="trailer" ref="trailer" @canplay="onLoad" @playing="onPlay" @ended="loaded = false" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
+        <div v-if="movie" class="bg-image" v-bg-img="tmdbPosterHD(movie.backdrop)">
+            <video :src="trailer" ref="trailer" @canplay="onLoad" @playing="onPlay" @ended="loaded = false" :class="{'loaded': loaded}" autoplay :muted="muted"></video>
             <div class="gradient"></div>
 
             <div v-if="movie">

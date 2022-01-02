@@ -6,20 +6,17 @@ export default {
         let sockets = io.of('/upload');
         sockets.on('connection', (socket) => {
 
-            socket.on('upload_url', async (media) => {
+            socket.on('upload_url', async media => {
                 const parent = await Folders.find({ _id: media.parent_id });
                 if (!parent)
                     sockets.emit('error', 'parent does not exist');
 
                 if (media.link.startsWith('magnet')) {
                     DriveHelper.uploadFromTorrent({
-                        outputName: media.name,
                         url: media.link,
+                        outputName: media.name,
                         parentId: media.parent_id,
-                        image: media.image,
-                        releaseDate: media.release_date,
                         tmdbId: media.tmdbId,
-                        genreIds: media.genre_ids,
                         convert: media.convert
                     }, ({ progress, speed }) => {
                         sockets.emit('progress', {progress, speed, link: media.link, name: media.name});

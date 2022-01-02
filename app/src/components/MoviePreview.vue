@@ -7,7 +7,7 @@
                 <div @click.stop="openMovieDialog" class="cursor-pointer border-inherit">
                     <aspect-ratio style="pointer-events: none">
                         <transition name="fade" class="border-inherit">
-                            <div v-if="!loaded || trailerError" class="d-flex align-center justify-center border-inherit" v-bg-img="tmdbPoster(movie.image)" style="background-size: cover"></div>
+                            <div v-if="!loaded || trailerError" class="d-flex align-center justify-center border-inherit" v-bg-img="tmdbPoster(movie.backdrop)" style="background-size: cover"></div>
                             <video v-else @error="onTrailerError" :src="trailer" autoplay width="100%" :muted="muted"></video>
                         </transition>
                     </aspect-ratio>

@@ -16,6 +16,7 @@ import fs from 'fs';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
+import TMDB from "./tmdb.js";
 
 ffmpeg.setFfmpegPath(ffmpegStatic);
 ffmpeg.setFfprobePath(ffprobeStatic.path);
@@ -35,6 +36,22 @@ const drive = google.drive({
     version: 'v3',
     auth: jwToken
 });
+
+/**
+ @typedef DriveFile
+ @type {Object}
+ @property {string} id
+ @property {string} name
+ @property {string} description
+ @property {string} image
+ @property {string} backdrop
+ @property {string} release_date
+ @property {string} parentId
+ @property {string|number} tmdbId
+ @property {string|number} imdbId
+ @property {string|Array} genre_ids
+ @property {string|number} rating
+ */
 
 export default class DriveHelper {
 
@@ -184,7 +201,18 @@ export default class DriveHelper {
         });
     }
 
+    /**
+     * @param options {Object}
+     * @param options.url {String}
+     * @param options.outputName {String}
+     * @param options.parentId {String}
+     * @param options.tmdbId {String}
+     * @param options.convert {Boolean}
+     * @param onProgress {Function}
+     * @returns {Promise<*>}
+     */
     static async uploadFromTorrent(options, onProgress) {
+        const movie = await TMDB.getMovie(options.tmdbId);
         let client = new WebTorrent();
         let fileSize = 0, filename = '', filePath = null, torrentPath = null;
 
@@ -219,10 +247,11 @@ export default class DriveHelper {
             parents: [config.fileId],
             appProperties: {
                 parentId: options.parentId,
-                image: options.image,
-                release_date: options.releaseDate,
+                image: movie.image,
+                release_date: movie.release_date,
                 tmdbId: options.tmdbId,
-                genre_ids: options.genreIds.join(','),
+                imdbId: movie.imdbId,
+                genre_ids: movie.genre_ids.join(','),
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
@@ -420,6 +449,10 @@ export default class DriveHelper {
         return files;
     }
 
+    /**
+     * @param file {DriveFile}
+     * @returns {Promise<void>}
+     */
     static async updateFile(file) {
         const fileAccount = await FileAccount.findOne({ file_id: file.id });
         const cred = await Credentials.findOne({ client_email: fileAccount.account_email });
@@ -442,9 +475,11 @@ export default class DriveHelper {
                 description: file.description,
                 appProperties: {
                     image: file.image,
+                    backdrop: file.backdrop,
                     release_date: file.release_date,
                     parentId: file.parentId,
                     tmdbId: file.tmdbId,
+                    imdbId: file.imdbId,
                     genre_ids: genreIds,
                     rating: file.rating
                 }

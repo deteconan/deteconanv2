@@ -37,11 +37,13 @@ router.get('/movies', async (req, res) => {
       let movies = await DriveHelper.listFiles(config.fileId, '5f8a78a89a206e33c0450a58'); // Movies folder
       movies.forEach(m => {
           m.image = m.appProperties.image;
+          m.backdrop = m.appProperties.backdrop;
           m.release_date = m.appProperties.release_date;
           m.parentId = m.appProperties.parentId;
           m.tmdbId = m.appProperties.tmdbId;
+          m.imdbId = m.appProperties.imdbId;
           m.genre_ids = (m.appProperties.genre_ids || '').split(',').map(id => +id);
-          m.rating = m.appProperties.rating;
+          m.rating = +m.appProperties.rating;
           delete m.appProperties;
       });
       res.json(movies);
