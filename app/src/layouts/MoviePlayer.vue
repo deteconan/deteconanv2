@@ -87,10 +87,11 @@
                         mediaMetaData.title = this.playingMovie.name;
                         mediaMetaData.releaseDate = this.$moment(this.playingMovie.release_date).format('YYYY-DD-MM');
 
+                        // Add subtitles
                         const subtitle = new window.chrome.cast.media.Track(0, window.chrome.cast.media.TrackType.TEXT);
                         subtitle.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
                         subtitle.trackContentId = this.subtitleUrl;
-                        mediaMetaData.tracks = [subtitle];
+                        mediaInfo.tracks = [subtitle];
 
                         mediaInfo.metadata = mediaMetaData;
                         const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
