@@ -20,18 +20,14 @@
 
                     <h3 class="opacity-80 text-spaced f-500 mx-auto">{{ playingMovie.name }}</h3>
 
-                    <v-btn icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">
-                        <v-icon class="material-icons-outlined">subtitles</v-icon>
-                    </v-btn>
-
-                    <v-btn v-if="!fallback && castAvailable" @click.stop="cast" icon class="ml-2">
-                        <v-icon size="22">cast</v-icon>
-                    </v-btn>
+<!--                    <v-btn icon @click.stop="window.open('https://chrome.google.com/webstore/detail/substital-add-subtitles-t/kkkbiiikppgjdiebcabomlbidfodipjg')">-->
+<!--                        <v-icon class="material-icons-outlined">subtitles</v-icon>-->
+<!--                    </v-btn>-->
                 </div>
                 <div class="flex-grow-1 position-relative">
                     <div class="iframe-container">
 <!--                        <video v-if="!fallback && isMobileLayout" :src="url" @error="fallback = true" controls autoplay class="video-player"></video>-->
-                        <video-player v-if="!fallback" :src="url" :subtitle-src="subtitleUrl" @error="fallback = true" @delay-subtitle="subtitleDelay = $event" class="video-player"></video-player>
+                        <video-player v-if="!fallback" :src="url" :subtitle-src="subtitleUrl" :cast-options="castOptions" @error="fallback = true" @delay-subtitle="subtitleDelay = $event" class="video-player"></video-player>
                         <iframe v-else :src="driveUrl" allowfullscreen style="border: 0"></iframe>
                     </div>
                 </div>
@@ -50,7 +46,6 @@
         data() {
             return {
                 fallback: false,
-                castAvailable: false,
                 subtitleDelay: 0
             }
         },
@@ -63,53 +58,13 @@
             },
             driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;
-            }
-        },
-        mounted() {
-            window['__onGCastApiAvailable'] = isAvailable => {
-                this.castAvailable = isAvailable;
-            };
-        },
-        methods: {
-            async cast() {
-                if (!this.castAvailable)
-                    return Promise.resolve();
-
-                window.cast.framework.CastContext.getInstance().setOptions({
-                    receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-                });
-
-                return window.cast.framework.CastContext.getInstance().requestSession()
-                    .then(() => {
-                        const mediaInfo = new window.chrome.cast.media.MediaInfo(this.url, 'video/mp4');
-                        const mediaMetaData = new window.chrome.cast.media.MovieMediaMetadata();
-                        mediaMetaData.images = [new window.chrome.cast.Image(tmdbPosterHD(this.playingMovie.image))];
-                        mediaMetaData.title = this.playingMovie.name;
-                        mediaMetaData.releaseDate = this.$moment(this.playingMovie.release_date).format('YYYY-DD-MM');
-
-                        // Add subtitles
-                        const subtitle = new window.chrome.cast.media.Track(1, window.chrome.cast.media.TrackType.TEXT);
-                        subtitle.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
-                        subtitle.trackContentId = this.subtitleUrl;
-                        subtitle.trackContentType = 'text/vtt';
-                        mediaInfo.textTrackStyle = new window.chrome.cast.media.TextTrackStyle();
-                        mediaInfo.tracks = [subtitle];
-
-                        mediaInfo.metadata = mediaMetaData;
-                        const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
-                        const session = window.cast.framework.CastContext.getInstance().getCurrentSession();
-
-                        return session.loadMedia(request)
-                            .then(() => {
-                                // Load subtitles
-                                const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest([1]);
-                                session.getMediaSession().editTracksInfo(tracksInfoRequest);
-                            })
-                            .catch(err => console.error(err));
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
+            },
+            castOptions() {
+                return {
+                    title: this.playingMovie.name,
+                    image: tmdbPosterHD(this.playingMovie.image),
+                    releaseDate: this.playingMovie.release_date
+                };
             }
         },
         watch: {

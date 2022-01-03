@@ -1,6 +1,6 @@
 <template>
     <div @mousemove="onMouseMove" class="video-container" :style="cursorStyle">
-        <video ref="video" @click.stop="!isMobileLayout && togglePlaying()" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
+        <video ref="video" @click.stop="onClickVideo" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
                crossorigin="anonymous"
                @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" autoplay :muted="muted">
             <source :src="src" type="video/mp4">
@@ -31,7 +31,7 @@
                         <v-icon size="50" class="material-icons-round">forward_10</v-icon>
                     </v-btn>
 
-                    <v-hover v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-lg-3">
+                    <v-hover v-if="!isMobileLayout" v-slot="{ hover: hoverBtn }" close-delay="300" class="ml-lg-3">
                         <div>
                             <v-btn @click.stop="toggleMute" icon :ripple="false">
                                 <v-icon v-if="muted" size="50" class="material-icons-round">volume_off</v-icon>
@@ -56,9 +56,13 @@
                         <v-icon v-else size="40" class="material-icons-round">subtitles</v-icon>
                     </v-btn>
 
+                    <v-btn v-if="castAvailable" @click.stop="cast" icon :ripple="false">
+                        <v-icon size="40" :color="castSession() ? 'primary' : 'white'">cast</v-icon>
+                    </v-btn>
+
                     <v-btn @click.stop="toggleFullscreen" icon :ripple="false">
-                        <v-icon v-if="!fullscreen" size="60" class="material-icons-round">fullscreen</v-icon>
-                        <v-icon v-else size="60" class="material-icons-round">fullscreen_exit</v-icon>
+                        <v-icon v-if="!fullscreen" size="55" class="material-icons-round">fullscreen</v-icon>
+                        <v-icon v-else size="55" class="material-icons-round">fullscreen_exit</v-icon>
                     </v-btn>
                 </div>
             </div>
@@ -112,6 +116,14 @@ export default {
         },
         subtitleSrc: {
             type: String
+        },
+        castOptions: {
+            type: Object,
+            default: () => ({
+                title: null,
+                image: null,
+                releaseDate: null
+            })
         }
     },
     data() {
@@ -131,7 +143,10 @@ export default {
                 value: 0,
                 loading: false
             },
-            hasFocus: false
+            hasFocus: false,
+            castAvailable: false,
+            castPlayer: null,
+            castRemoteController: null
         }
     },
     computed: {
@@ -147,9 +162,27 @@ export default {
             };
         }
     },
+    created() {
+        try {
+            this.castAvailable = !!window.cast.framework.CastContext.getInstance();
+            this.castPlayer = new window.cast.framework.RemotePlayer()
+            this.castRemoteController = new window.cast.framework.RemotePlayerController(this.castPlayer);
+
+            this.castRemoteController.addEventListener(window.cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED, () => {
+                this.playing = !this.castPlayer.isPaused;
+            });
+
+            this.castRemoteController.addEventListener(window.cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
+                this.currentTime = this.castPlayer.currentTime;
+            });
+        } catch {
+            this.castAvailable = false;
+        }
+    },
     methods: {
         onLoad() {
-            this.setVolume(10);
+            if (!this.isMobileLayout)
+                this.setVolume(10);
 
             if (this.$refs.video) {
                 this.duration = this.$refs.video.duration;
@@ -160,6 +193,9 @@ export default {
                 this.currentTime = this.$refs.video.currentTime;
         },
         onMouseMove() {
+            if (this.isMobileLayout)
+                return;
+
             this.cursorVisible = true;
             clearTimeout(this.mouseTimeout);
 
@@ -174,17 +210,33 @@ export default {
             if (track)
                 track.mode = 'showing';
         },
+        onClickVideo() {
+            if (!this.isMobileLayout) {
+                this.togglePlaying();
+            } else {
+                this.cursorVisible = !this.cursorVisible;
+            }
+        },
         togglePlaying() {
-            if (this.$refs.video) {
-                if (this.playing)
-                    this.$refs.video.pause();
-                else
-                    this.$refs.video.play();
+            if (this.castSession()) {
+                this.castRemoteController.playOrPause();
+            } else {
+                if (this.$refs.video) {
+                    if (this.playing)
+                        this.$refs.video.pause();
+                    else
+                        this.$refs.video.play();
+                }
             }
         },
         seek(time) {
-            if (this.$refs.video)
-                this.$refs.video.currentTime = time;
+            if (this.castSession()) {
+                this.castPlayer.currentTime = time;
+                this.castRemoteController.seek();
+            } else {
+                if (this.$refs.video)
+                    this.$refs.video.currentTime = time;
+            }
         },
         toggleMute() {
             if (this.$refs.video) {
@@ -200,8 +252,13 @@ export default {
             }
         },
         jump(step) {
-            if (this.$refs.video)
-                this.$refs.video.currentTime += step;
+            if (this.castSession()) {
+                this.castPlayer.currentTime += step;
+                this.castRemoteController.seek();
+            } else {
+                if (this.$refs.video)
+                    this.$refs.video.currentTime += step;
+            }
         },
         async toggleFullscreen() {
             if (!this.fullscreen) {
@@ -226,9 +283,62 @@ export default {
         },
         toggleSubtitle() {
             this.subtitleVisible = !this.subtitleVisible;
+
+            if (this.castSession()) {
+                const activeTrackIds = [];
+
+                if (this.subtitleVisible)
+                    activeTrackIds.push(1);
+
+                const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest(activeTrackIds);
+                this.castSession().getMediaSession().editTracksInfo(tracksInfoRequest);
+            }
         },
         delaySubtitle(delayInMs) {
             this.delayDialog.value += delayInMs;
+        },
+        castSession() {
+            return window.cast.framework.CastContext.getInstance().getCurrentSession();
+        },
+        cast() {
+            if (!this.castAvailable)
+                return Promise.resolve();
+
+            window.cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+            });
+
+            return window.cast.framework.CastContext.getInstance().requestSession()
+                .then(() => {
+                    const mediaInfo = new window.chrome.cast.media.MediaInfo(this.src, 'video/mp4');
+                    const mediaMetaData = new window.chrome.cast.media.MovieMediaMetadata();
+                    mediaMetaData.images = this.castOptions.image ? [new window.chrome.cast.Image(this.castOptions.image)] : null;
+                    mediaMetaData.title = this.castOptions.title;
+                    mediaMetaData.releaseDate = this.castOptions.releaseDate ? this.$moment(this.castOptions.releaseDate).format('YYYY-DD-MM') : null;
+
+                    // Add subtitles
+                    const subtitle = new window.chrome.cast.media.Track(1, window.chrome.cast.media.TrackType.TEXT);
+                    subtitle.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
+                    subtitle.trackContentId = this.subtitleSrc;
+                    subtitle.trackContentType = 'text/vtt';
+                    mediaInfo.textTrackStyle = new window.chrome.cast.media.TextTrackStyle();
+                    mediaInfo.tracks = [subtitle];
+
+                    mediaInfo.metadata = mediaMetaData;
+                    const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+                    const session = this.castSession();
+
+                    return session.loadMedia(request)
+                        .then(() => {
+                            // Load subtitles
+                            const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest([1]);
+                            session.getMediaSession().editTracksInfo(tracksInfoRequest);
+                        })
+                        .catch(err => console.error(err));
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
     },
     watch: {
@@ -359,8 +469,26 @@ export default {
 }
 
 .mobile {
-    .controls .buttons {
-        gap: 2rem;
+    .controls {
+        .slider-container {
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .buttons {
+            gap: 2rem;
+            padding: 0.5rem 1rem 1rem 1rem;
+
+            i {
+                &:hover {
+                    transform: none;
+
+                    &:active {
+                        transform: none;
+                    }
+                }
+            }
+        }
     }
 }
 </style>
