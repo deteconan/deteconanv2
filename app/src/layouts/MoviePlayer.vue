@@ -100,10 +100,10 @@
                         const session = window.cast.framework.CastContext.getInstance().getCurrentSession();
 
                         return session.loadMedia(request)
-                            .then(media => {
+                            .then(() => {
                                 // Load subtitles
                                 const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest([1]);
-                                media.editTracksInfo(tracksInfoRequest);
+                                session.getMediaSession().editTracksInfo(tracksInfoRequest);
                             })
                             .catch(err => console.error(err));
                     })
