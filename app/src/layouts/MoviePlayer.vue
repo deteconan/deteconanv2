@@ -88,9 +88,11 @@
                         mediaMetaData.releaseDate = this.$moment(this.playingMovie.release_date).format('YYYY-DD-MM');
 
                         // Add subtitles
-                        const subtitle = new window.chrome.cast.media.Track(0, window.chrome.cast.media.TrackType.TEXT);
+                        const subtitle = new window.chrome.cast.media.Track(1, window.chrome.cast.media.TrackType.TEXT);
                         subtitle.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
                         subtitle.trackContentId = this.subtitleUrl;
+                        subtitle.trackContentType = 'text/vtt';
+                        mediaInfo.textTrackStyle = new window.chrome.cast.media.TextTrackStyle();
                         mediaInfo.tracks = [subtitle];
 
                         mediaInfo.metadata = mediaMetaData;
@@ -98,6 +100,11 @@
                         const session = window.cast.framework.CastContext.getInstance().getCurrentSession();
 
                         return session.loadMedia(request)
+                            .then(media => {
+                                // Load subtitles
+                                const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest([1]);
+                                media.editTracksInfo(tracksInfoRequest);
+                            })
                             .catch(err => console.error(err));
                     })
                     .catch(err => {
