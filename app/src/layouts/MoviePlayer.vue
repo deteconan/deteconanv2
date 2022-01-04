@@ -52,9 +52,11 @@
         computed: {
             url() {
                 return `${process.env.VUE_APP_API_URL}/api/movie/stream/${this.playingMovie.id}`;
+                // return `https://deteconanv2.herokuapp.com/api/movie/stream/${this.playingMovie.id}`;
             },
             subtitleUrl() {
                 return `${process.env.VUE_APP_API_URL}/api/movie/subtitle/${this.playingMovie.imdbId}?offset=${this.subtitleDelay}`;
+                // return `https://deteconanv2.herokuapp.com/api/movie/subtitle/${this.playingMovie.imdbId}?offset=${this.subtitleDelay}`;
             },
             driveUrl() {
                 return `https://drive.google.com/file/d/${this.playingMovie.id}/preview`;

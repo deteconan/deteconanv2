@@ -1,8 +1,7 @@
 <template>
     <div @mousemove="onMouseMove" class="video-container" :style="cursorStyle">
-        <video ref="video" @click.stop="onClickVideo" @loadeddata="onLoad" @timeupdate="onTimeUpdate"
-               crossorigin="anonymous"
-               @play="playing = true" @pause="playing = false" @error="$emit('error', $event)" autoplay :muted="muted">
+        <video ref="video" @click.stop="onClickVideo" @loadeddata="onLoad" @timeupdate="onTimeUpdate" crossorigin="anonymous"
+               @error="$emit('error', $event)" autoplay :muted="muted">
             <source :src="src" type="video/mp4">
             <track v-if="subtitleSrc && subtitleVisible" :src="subtitleSrc" @load="onSubtitleLoad" label="Français"
                    srclang="fr" kind="subtitles" default>
@@ -57,7 +56,7 @@
                     </v-btn>
 
                     <v-btn v-if="castAvailable" @click.stop="cast" icon :ripple="false">
-                        <v-icon size="40" :color="castSession() ? 'primary' : 'white'">cast</v-icon>
+                        <v-icon size="40" :color="castActive ? 'primary' : 'white'">cast</v-icon>
                     </v-btn>
 
                     <v-btn @click.stop="toggleFullscreen" icon :ripple="false">
@@ -144,7 +143,10 @@ export default {
                 loading: false
             },
             hasFocus: false,
+
+            // Cast properties
             castAvailable: false,
+            castActive: false,
             castPlayer: null,
             castRemoteController: null
         }
@@ -174,6 +176,13 @@ export default {
 
             this.castRemoteController.addEventListener(window.cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
                 this.currentTime = this.castPlayer.currentTime;
+            });
+
+            const castInstance = window.cast.framework.CastContext.getInstance();
+            this.castActive = castInstance.getCastState() === window.cast.framework.CastState.CONNECTED;
+
+            castInstance.addEventListener(window.cast.framework.CastContextEventType.CAST_STATE_CHANGED, event => {
+                this.castActive = event.castState === window.cast.framework.CastState.CONNECTED;
             });
         } catch {
             this.castAvailable = false;
@@ -218,19 +227,23 @@ export default {
             }
         },
         togglePlaying() {
-            if (this.castSession()) {
+            if (this.castActive) {
                 this.castRemoteController.playOrPause();
             } else {
                 if (this.$refs.video) {
-                    if (this.playing)
+                    if (this.playing) {
                         this.$refs.video.pause();
-                    else
+                        this.playing = false;
+                    }
+                    else {
                         this.$refs.video.play();
+                        this.playing = true;
+                    }
                 }
             }
         },
         seek(time) {
-            if (this.castSession()) {
+            if (this.castActive) {
                 this.castPlayer.currentTime = time;
                 this.castRemoteController.seek();
             } else {
@@ -252,7 +265,7 @@ export default {
             }
         },
         jump(step) {
-            if (this.castSession()) {
+            if (this.castActive) {
                 this.castPlayer.currentTime += step;
                 this.castRemoteController.seek();
             } else {
@@ -284,7 +297,7 @@ export default {
         toggleSubtitle() {
             this.subtitleVisible = !this.subtitleVisible;
 
-            if (this.castSession()) {
+            if (this.castActive) {
                 const activeTrackIds = [];
 
                 if (this.subtitleVisible)
@@ -331,7 +344,12 @@ export default {
                     return session.loadMedia(request)
                         .then(() => {
                             // Load subtitles
-                            const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest([1]);
+                            const activeTrackIds = [];
+
+                            if (this.subtitleVisible)
+                                activeTrackIds.push(1);
+
+                            const tracksInfoRequest = new window.chrome.cast.media.EditTracksInfoRequest(activeTrackIds);
                             session.getMediaSession().editTracksInfo(tracksInfoRequest);
                         })
                         .catch(err => console.error(err));
@@ -354,6 +372,15 @@ export default {
         },
         'delayDialog.value'(val) {
             this.$emit('delay-subtitle', val);
+        },
+        castActive(val) {
+            if (val) {
+                if (this.$refs.video)
+                    this.$refs.video.pause();
+            } else {
+                if (this.$refs.video && this.playing)
+                    this.$refs.video.play();
+            }
         }
     }
 }
