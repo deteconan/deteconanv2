@@ -68,24 +68,34 @@ export default class TMDB {
     }
 
     static async getYoutubeProxyUrl(youtubeId) {
-        const html = await axios.get(`https://vid.puffyan.us/watch?v=${youtubeId}`, {
-            headers: {
-                "Origin": "vid.puffyan.us",
-                "User-Agent": "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
-                "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"",
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": "\"Windows\"",
-                "Referer": "https://vid.puffyan.us",
-                "Referrer-Policy": "same-origin"
-            }
-        })
-        .then((res => res.data));
+        try {
+            const html = await axios.get(`https://vid.puffyan.us/watch?v=${youtubeId}`, {
+                headers: {
+                    "Origin": "vid.puffyan.us",
+                    "User-Agent": "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+                    "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"",
+                    "sec-ch-ua-mobile": "?0",
+                    "sec-ch-ua-platform": "\"Windows\"",
+                    "Referer": "https://vid.puffyan.us",
+                    "Referrer-Policy": "same-origin"
+                }
+            })
+                .then((res => res.data));
 
-        const $ = cheerio.load(html);
+            const $ = cheerio.load(html);
 
-        const source = $('video > source').attr('src');
+            // const source = $('source[src~="video/mp4"]').attr('src');
+            let source = null;
+            $('video source').each((_, el) => {
+                if ($(el).attr('type').startsWith('video/mp4'))
+                    source = $(el).attr('src');
+            });
 
-        return source ? `https://vid.puffyan.us${source}` : null;
+            return source ? `https://vid.puffyan.us${source}` : null;
+        } catch (err) {
+            console.error(err.response.data);
+            return null;
+        }
     }
 
     static async getMovieTrailer(tmdbId, hd = true) {
