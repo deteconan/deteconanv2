@@ -10,16 +10,16 @@
             </v-card-title>
 
             <div class="dialog-content">
-                <div class="d-flex align-center justify-center">
-                    <div class="upload-type" @click.stop="uploadType = 'movie'" :class="{checked: uploadType === 'movie'}" v-ripple>
-                        <v-icon class="material-icons-outlined">theaters</v-icon>
-                        <div>Film</div>
+                <div class="d-flex align-center justify-center" style="gap: 1rem">
+                    <div class="upload-type" @click.stop="uploadType = 'torrent'" :class="{checked: uploadType === 'torrent'}" v-ripple>
+                        <v-icon class="material-icons-outlined">mdi-magnet</v-icon>
+                        <div class="f-500 text-spaced">Torrent</div>
                     </div>
-                    <div class="upload-type" @click.stop="uploadType = 'serie'" :class="{checked: uploadType === 'serie'}" v-ripple>
-                        <v-icon class="material-icons-outlined">live_tv</v-icon>
-                        <div>Série</div>
+                    <div class="upload-type" @click.stop="uploadType = 'url'" :class="{checked: uploadType === 'url'}" v-ripple>
+                        <v-icon class="material-icons-outlined">link</v-icon>
+                        <div class="f-500 text-spaced">Url</div>
                     </div>
-                    <div class="upload-type" @click.stop="uploadType = 'video'" :class="{checked: uploadType === 'video'}" v-ripple>
+                    <div v-if="false" class="upload-type" @click.stop="uploadType = 'video'" :class="{checked: uploadType === 'video'}" v-ripple>
                         <v-icon class="material-icons-outlined">videocam</v-icon>
                         <div>Vidéo</div>
                     </div>
@@ -31,7 +31,7 @@
 
                 <div v-if="uploadType">
                     <v-divider class="my-7"></v-divider>
-                    <div v-if="uploadType === 'movie'">
+                    <div v-if="uploadType === 'torrent' || uploadType === 'url'">
                         <v-text-field v-model="file.name" autocomplete="off" outlined label="Nom du film" append-icon="search" @keypress.13="searchMovieInfo" @click:append="searchMovieInfo">
                             <template #prepend-inner>
                                 <v-icon class="material-icons-outlined">theaters</v-icon>
@@ -63,7 +63,8 @@
                         <template v-if="autocomplete.length > 0 || torrents.length > 0">
                             <v-tabs v-model="moviesTab" grow>
                                 <v-tab href="#info">Informations</v-tab>
-                                <v-tab href="#torrents">Torrents</v-tab>
+                                <v-tab v-if="uploadType === 'torrent'" href="#torrents">Torrents</v-tab>
+                                <v-tab v-else-if="uploadType === 'url'" href="#url">Url</v-tab>
                             </v-tabs>
 
                             <v-tabs-items v-model="moviesTab">
@@ -89,7 +90,8 @@
                                         </div>
                                     </div>
                                 </v-tab-item>
-                                <v-tab-item value="torrents">
+
+                                <v-tab-item v-if="uploadType === 'torrent'" value="torrents">
                                     <v-progress-linear v-if="loadingMoviesTorrents" indeterminate></v-progress-linear>
                                     <v-list v-if="!movieTorrent" class="pa-0">
                                         <v-list-item>
@@ -149,6 +151,24 @@
                                         </v-btn>
                                     </v-list>
                                 </v-tab-item>
+
+                                <v-tab-item v-else-if="uploadType === 'url'" value="url">
+                                    <v-list class="pa-0">
+                                        <v-list-item>
+                                            <v-list-item-content>
+                                                <v-text-field v-if="!file.link" v-model="customUrl" label="Lien direct" prepend-inner-icon="link" outlined hide-details dense autocomplete="off"></v-text-field>
+                                                <span v-else>{{ file.link }}</span>
+                                            </v-list-item-content>
+                                            <v-list-item-action>
+                                                <v-btn v-if="!file.link" @click.stop="setCustomUrl" color="primary" :disabled="!customUrl">Valider</v-btn>
+                                                <v-btn v-else @click.stop="file.link = null">
+                                                    <v-icon>close</v-icon>
+                                                    <span class="ml-1">Changer</span>
+                                                </v-btn>
+                                            </v-list-item-action>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-tab-item>
                             </v-tabs-items>
                         </template>
                     </div>
@@ -196,7 +216,7 @@
         },
         data() {
             return {
-                uploadType: 'movie',
+                uploadType: 'torrent',
                 autocomplete: [],
                 torrents: [],
                 movieDetails: null,
@@ -213,12 +233,18 @@
                 providers: providers,
                 selectedProviders: ['ThePirateBay'],
                 customMagnet: null,
+                customUrl: null,
                 convert: false
             }
         },
         computed: {
             canUpload() {
-                return this.uploadType && this.file.name && this.movieDetails && this.movieTorrent && this.folderSelected;
+                if (this.uploadType === 'torrent')
+                    return this.file.name && this.movieDetails && this.movieTorrent && this.folderSelected;
+                else if (this.uploadType === 'url')
+                    return this.file.name && this.movieDetails && this.file.link && this.folderSelected;
+                else
+                    return false;
             }
         },
         watch: {
@@ -226,7 +252,7 @@
                 if (!val)
                     this.reset();
                 else {
-                    this.uploadType = 'movie';
+                    this.uploadType = 'torrent';
                     this.file.name = this.movieTitle;
                     this.searchMovieInfo();
                     this.$emit('update:movie-title', null);
@@ -244,6 +270,13 @@
                 };
 
                 this.customMagnet = null;
+            },
+            setCustomUrl() {
+                if (!this.customUrl)
+                    return;
+
+                this.file.link = this.customUrl;
+                this.customUrl = null;
             },
             searchMovieInfo() {
                 if (!this.file.name)
@@ -290,14 +323,20 @@
 
                 this.$emit('input', false);
 
-                this.$emit('upload', {
-                    link: this.movieTorrent.magnet,
+                const options = {
                     name: this.file.name,
                     parentId: this.folderSelected,
                     tmdbId: this.movieDetails.tmdbId,
                     convert: this.convert,
                     progress: 0
-                });
+                };
+
+                if (this.uploadType === 'torrent')
+                    options.link = this.movieTorrent.magnet;
+                else if (this.uploadType === 'url')
+                    options.link = this.file.link;
+
+                this.$emit('upload', options);
             }
         }
     }
@@ -316,22 +355,21 @@
             justify-content: center;
             text-align: center;
             padding: 0.5em 1em;
-            width: 90px;
+            width: 100px;
             border-radius: 5px;
             cursor: pointer;
 
             &.checked {
-                i {
-                    color: var(--v-primary-base);
-                }
+                background: var(--v-primary-base);
             }
 
-            &:hover {
+            &:not(.checked):hover {
                 background: rgba(255, 255, 255, 0.1);
             }
 
             i {
                 font-size: 50px;
+                margin-bottom: 0.25rem;
             }
         }
 

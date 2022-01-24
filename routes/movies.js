@@ -6,6 +6,7 @@ import {sendError} from "../helpers/utils.js";
 import TorrentSearchApi from "torrent-search-api";
 import DriveHelper from "../helpers/drive.js";
 import OpenSubtitles from "../helpers/open-subtitles.js";
+import WebTorrent from "webtorrent";
 
 const router = express.Router();
 
@@ -155,6 +156,70 @@ router.get('/movie/stream/:file_id', async (req, res) => {
         res.type('media');
 
         stream.data.pipe(res);
+    } catch (err) {
+        sendError(err, req, res);
+    }
+});
+
+const client = new WebTorrent();
+let streamingFile = null;
+
+router.get('/movie/test', async (req, res) => {
+    try {
+        res.header('Accept-Ranges', 'bytes');
+        res.header('Content-Disposition', 'attachment');
+        res.header('Content-Type', 'video/mp4');
+
+        const magnet = 'magnet:?xt=urn:btih:B550A0A32B0749ABFADB8EB0736F03D271E876E0&dn=Iron%20man%202%20(2010)%201080p%20BrRip%20x264%20-%201.60GB%20-%20YIFY&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce&tr=udp%3A%2F%2F9.rarbg.me%3A2780%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2730%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=http%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce';
+
+        let fileSize = 0, filename = '', filePath = null, torrentPath = null;
+
+        if (!streamingFile) {
+            streamingFile = await new Promise(resolve => {
+                client.add(magnet, torrent => {
+                    torrentPath = torrent.path;
+                    let selected = torrent.files[0];
+                    torrent.files.forEach(file => {
+                        if (file.length > selected.length)
+                            selected = file;
+                    });
+
+                    fileSize = selected.length;
+                    filename = selected.name;
+                    filePath = selected.path;
+
+                    resolve(selected);
+                });
+            });
+        }
+
+        let start, range, end, parts, partialStart, partialEnd, chunkSize, total = streamingFile.length;
+
+        if (req.headers.range) {
+            range = req.headers.range;
+            parts = range.replace(/bytes=/, "").split("-");
+            partialStart = parts[0];
+            partialEnd = parts[1];
+            start = parseInt(partialStart, 10);
+            end = partialEnd ? parseInt(partialEnd, 10) : total - 1;
+            chunkSize = (end - start) + 1;
+            res.status(206);
+        } else {
+            start = 0;
+            end = total;
+            res.status(200);
+        }
+
+        console.log(start, end, total);
+
+        res.header('Content-Range', 'bytes ' + start + '-' + end + '/' + total);
+        res.header('Content-Length', chunkSize);
+        res.header('Transfer-Encoding', 'chunked');
+
+        const stream = streamingFile.createReadStream({ start, end });
+
+        await DriveHelper.streamMP4(stream, res);
+        // stream.pipe(res);
     } catch (err) {
         sendError(err, req, res);
     }

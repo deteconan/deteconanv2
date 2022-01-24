@@ -27,7 +27,13 @@ export default {
                         sockets.emit('error', {err, link: media.link, name: media.name});
                     });
                 } else {
-                    DriveHelper.uploadFromUrl(media.name, media.link, media.parent_id, media.image, media.release_date, progress => {
+                    DriveHelper.uploadFromUrl({
+                        url: media.link,
+                        outputName: media.name,
+                        parentId: media.parent_id,
+                        tmdbId: media.tmdbId,
+                        convert: media.convert
+                    }, progress => {
                         sockets.emit('progress', {progress, link: media.link, name: media.name});
                     }).then(() => {
                         sockets.emit('finish', media.link);

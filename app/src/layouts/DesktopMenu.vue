@@ -23,7 +23,7 @@
 
             <v-btn v-else-if="!user" @click.stop="$store.dispatch('login')" color="white" text outlined>
                 <v-avatar color="white" size="20">
-                    <v-img src="https://img-authors.flaticon.com/google.jpg"></v-img>
+                    <v-img :src="require('../assets/img/google.png')" max-width="80%" max-height="80%"></v-img>
                 </v-avatar>
                 <span class="text-none ml-2">Se connecter</span>
             </v-btn>

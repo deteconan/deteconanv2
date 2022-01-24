@@ -208,39 +208,14 @@ export default class DriveHelper {
      * @param options.parentId {String}
      * @param options.tmdbId {String}
      * @param options.convert {Boolean}
+     * @param options.file_size {Number}
+     * @param options.filename {String}
+     * @param stream {ReadableStream}
      * @param onProgress {Function}
-     * @returns {Promise<*>}
+     * @returns {Promise<drive_v3.Schema$File>}
      */
-    static async uploadFromTorrent(options, onProgress) {
+    static async uploadFromStream(options, stream, onProgress = () => {}) {
         const movie = await TMDB.getMovie(options.tmdbId);
-        let client = new WebTorrent();
-        let fileSize = 0, filename = '', filePath = null, torrentPath = null;
-
-        let stream = await new Promise(resolve => {
-            client.add(options.url, torrent => {
-                torrentPath = torrent.path;
-                let selected = torrent.files[0];
-                torrent.files.forEach(file => {
-                    if (file.length > selected.length)
-                        selected = file;
-                });
-
-                fileSize = selected.length;
-                filename = selected.name;
-                filePath = selected.path;
-
-                resolve(selected.createReadStream());
-            });
-        });
-
-        if (options.convert) {
-            const fullPath = `${torrentPath}/${filePath}`;
-
-            // Convert to MP4 before uploading to Google Drive
-            const convertedFilePath = (await this.convertToMP4(stream, fullPath)).toString();
-            stream = fs.createReadStream(convertedFilePath);
-            fileSize = fs.statSync(convertedFilePath).size;
-        }
 
         const metadata = {
             name: options.outputName,
@@ -257,12 +232,12 @@ export default class DriveHelper {
             }
         };
 
-        let media = {
-            mimeType: mime.getType(filename),
+        const media = {
+            mimeType: mime.getType(options.filename),
             body: stream
         };
 
-        const cred = await IamHelper.getAccountWithEnoughQuota(fileSize);
+        const cred = await IamHelper.getAccountWithEnoughQuota(options.file_size);
         const token = new google.auth.JWT(
             cred.client_email,
             null,
@@ -271,8 +246,8 @@ export default class DriveHelper {
             null
         );
 
-        console.log('FILE SIZE:', fileSize);
-        await this.addQuota(cred.client_email, fileSize); // Reserve quota for simultaneous uploads
+        console.log('FILE SIZE:', options.file_size);
+        await this.addQuota(cred.client_email, options.file_size); // Reserve quota for simultaneous uploads
 
         let time = new Date().getTime();
         const res = await drive.files.create({
@@ -282,34 +257,17 @@ export default class DriveHelper {
             fields: 'id'
         }, {
             onUploadProgress: e => {
-                // process.stdout.clearLine();
-                // process.stdout.cursorTo(0);
-                let progress = Math.round(Number(e.bytesRead.toString()) * 10000 / Number(fileSize)) / 100;
-                // process.stdout.write(JSON.stringify(progress) + '%');
+                const progress = Math.round(Number(e.bytesRead.toString()) * 10000 / Number(options.file_size)) / 100;
 
-                if (onProgress) {
-                    let now = new Date().getTime();
+                let now = new Date().getTime();
 
-                    if (now - time >= 2000) {
-                        onProgress({
-                            progress,
-                            speed: client.downloadSpeed
-                        });
-                        time = now;
-                    }
+                if (now - time >= 2000) {
+                    onProgress(progress);
+                    time = now;
                 }
             }
         }).catch(err => {
             console.error(err);
-        }).finally(() => {
-            if (filePath) {
-                // Delete file at the end of upload
-                try {
-                    fs.rmSync(filePath, { recursive: true });
-                } catch (err) {
-                    console.error(err);
-                }
-            }
         });
 
         const fileAccount = new FileAccount({
@@ -323,94 +281,80 @@ export default class DriveHelper {
         return res.data;
     }
 
-    static async uploadFromUrl(outputName, url, parentId, image = null, releaseDate = null, onProgress) {
-        const response = await axios({
-            url,
-            method: 'GET',
-            responseType: 'stream'
+    /**
+     * @param options {Object}
+     * @param options.url {String}
+     * @param options.outputName {String}
+     * @param options.parentId {String}
+     * @param options.tmdbId {String}
+     * @param options.convert {Boolean}
+     * @param onProgress {Function}
+     * @returns {Promise<*>}
+     */
+    static async uploadFromTorrent(options, onProgress = () => {}) {
+        const client = new WebTorrent();
+        let filePath = null, torrentPath = null;
+        const opts = {...options};
+
+        let stream = await new Promise(resolve => {
+            client.add(options.url, torrent => {
+                torrentPath = torrent.path;
+                let selected = torrent.files[0];
+                torrent.files.forEach(file => {
+                    if (file.length > selected.length)
+                        selected = file;
+                });
+
+                opts.filename = selected.name;
+                filePath = selected.path;
+
+                opts.file_size = selected.length;
+
+                resolve(selected.createReadStream());
+            });
         });
 
-        const quota = await this.getQuota();
-        const fileSize = response.data.headers['content-length'];
-        console.log('file size: ' + fileSize);
-        console.log('quota remaining: ' + ( Number(quota.limit) - (Number(quota.usage) + Number(fileSize)) ));
+        if (options.convert) {
+            const fullPath = `${torrentPath}/${filePath}`;
 
-        let thumbnail = null;
-        if (image) {
-            if (image) {
-                console.log('Uploading thumbnail...');
-                const thumbnailLink = image.split('_V1_').join('_V1_UX182_CR0,0,182,268_AL_'); // To get Imdb thumbnail
-                console.log('Small:', thumbnailLink);
-                thumbnail = await uploadImage(thumbnailLink);
-                console.log('Thumbnail uploaded: ' + thumbnail);
-            }
-
-            console.log('Uploading poster...');
-            console.log('Big:', image);
-            image = await uploadImage(image);
-            console.log('Poster uploaded: ' + image);
+            // Convert to MP4 before uploading to Google Drive
+            const convertedFilePath = (await this.convertToMP4(stream, fullPath)).toString();
+            stream = fs.createReadStream(convertedFilePath);
+            opts.file_size = fs.statSync(convertedFilePath).size;
         }
 
-        let metadata = {
-            name: outputName,
-            parents: [config.fileId],
-            appProperties: {
-                parentId,
-                upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
-            }
-        };
-
-        let media = {
-            mimeType: response.data.headers['content-type'],
-            body: response.data
-        };
-
-        const cred = await IamHelper.getAccountWithEnoughQuota(fileSize);
-        const token = new google.auth.JWT(
-            cred.client_email,
-            null,
-            cred.private_key,
-            ['https://www.googleapis.com/auth/drive'],
-            null
-        );
-
-        let time = new Date().getTime();
-        const res = await drive.files.create({
-            auth: token,
-            resource: metadata,
-            media: media,
-            fields: 'id'
-        }, {
-            onUploadProgress: e => {
-                // process.stdout.clearLine();
-                // process.stdout.cursorTo(0);
-                let progress = Math.round(Number(e.bytesRead.toString()) * 10000 / Number(response.data.headers['content-length'])) / 100;
-                // process.stdout.write(JSON.stringify(progress) + '%');
-
-                if (onProgress) {
-                    let now = new Date().getTime();
-
-                    if (now - time >= 2000) {
-                        onProgress(progress);
-                        time = now;
+        return this.uploadFromStream(opts, stream, progress => onProgress({ progress, speed: client.downloadSpeed }))
+            .finally(() => {
+                if (filePath) {
+                    // Delete file at the end of upload
+                    try {
+                        fs.rmSync(filePath, { recursive: true });
+                    } catch (err) {
+                        console.error(err);
                     }
                 }
-            }
-        }).catch(err => {
-            console.error(err);
+            });
+    }
+
+    /**
+     * @param options {Object}
+     * @param options.url {String}
+     * @param options.outputName {String}
+     * @param options.parentId {String}
+     * @param options.tmdbId {String}
+     * @param onProgress {Function}
+     * @returns {Promise<*>}
+     */
+    static async uploadFromUrl(options, onProgress = () => {}) {
+        const opts = {...options};
+        const response = await axios.get(options.url, {
+            responseType: 'stream'
         });
+        const stream = response.data;
 
-        // process.stdout.clearLine();
+        opts.file_size = response.data.headers['content-length'];
 
-        const fileAccount = new FileAccount({
-            file_id: res.data.id,
-            account_email: cred.client_email
-        });
-
-        await fileAccount.save();
-        await this.updateQuota(cred.client_email);
-
-        return res.data;
+        return this.uploadFromStream(opts, stream, onProgress);
     }
 
     static async listFiles(folderId, parentId = null) {
