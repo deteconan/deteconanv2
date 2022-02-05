@@ -228,6 +228,7 @@ export default class DriveHelper {
                 tmdbId: options.tmdbId,
                 imdbId: movie.imdbId,
                 genre_ids: movie.genre_ids.join(','),
+                rating: movie.rating,
                 upload_date: moment().format('YYYY-MM-DD HH:mm:ss.SSSZ')
             }
         };
