@@ -2,14 +2,14 @@
     <main-page>
         <div class="pb-5 pb-lg-10 pt-lg-0">
             <div class="genres mb-lg-5">
-                <genre-picker v-if="genres.length > 0" v-model="selectedGenre"></genre-picker>
+                <genre-picker v-if="genres.length" v-model="selectedGenre"></genre-picker>
             </div>
 
-            <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-5 mb-lg-10"></movie-section>
-            <movie-section v-if="recentlyAddedMovies.length > 0" title="Ajouts récents" :local-movies="recentlyAddedMovies" class="mb-5 mb-lg-10"></movie-section>
+<!--            <movie-section v-if="processingMovies.length > 0" title="En cours de traitement" :local-movies="processingMovies" class="mb-5 mb-lg-10"></movie-section>-->
+<!--            <movie-section v-if="recentlyAddedMovies.length > 0" title="Ajouts récents" :local-movies="recentlyAddedMovies" class="mb-5 mb-lg-10"></movie-section>-->
 
-            <movie-section v-if="filteredUpcomingMovies.length > 0" title="Nouveautés" :local-movies="filteredUpcomingMovies" class="mb-5 mb-lg-10"></movie-section>
-            <movie-section v-if="otherMovies.length > 0" title="Tous les films" :local-movies="otherMovies"></movie-section>
+            <movie-section v-if="filteredUpcomingMovies.length" title="À l'affiche" :local-movies="filteredUpcomingMovies" class="mb-5 mb-lg-10"></movie-section>
+            <movie-section v-if="downloadedMovies.length" title="Téléchargés" :local-movies="downloadedMovies"></movie-section>
         </div>
     </main-page>
 </template>
@@ -43,8 +43,8 @@
                 return this.filteredMovies.filter(m => m.thumbnailLink && this.$moment(m.createdTime).isAfter(this.$moment().subtract({ day: 2 })))
                     .sort((a, b) => b.createdTime > a.createdTime ? 1 : -1);
             },
-            otherMovies() {
-                return this.filteredMovies.filter(m => m.thumbnailLink).sort((a, b) => a.name > b.name ? 1 : -1);
+            downloadedMovies() {
+                return this.filteredMovies.filter(m => m.thumbnailLink).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
             }
         },
         methods: {
@@ -53,12 +53,15 @@
                     return false;
 
                 return !(this.selectedGenre && !movie.genre_ids.includes(this.selectedGenre));
+            },
+            getUpcomingMovies() {
+                return Network.get('/movies/upcoming').then(res => {
+                    this.upcomingMovies = res.data;
+                }).catch(err => console.error(err.response.data));
             }
         },
         mounted() {
-            Network.get('/movies/upcoming').then(res => {
-                this.upcomingMovies = res.data;
-            }).catch(err => console.error(err.response.data));
+            this.getUpcomingMovies();
         }
     }
 </script>

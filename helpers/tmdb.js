@@ -185,7 +185,7 @@ export default class TMDB {
     }
 
     static async getUpcomingMovies() {
-        const moviesPage1 = await api.get('/movie/upcoming', {
+        const moviesPage1 = await api.get('/movie/now_playing', {
             params: {
                 language: 'fr-FR',
                 page: 1

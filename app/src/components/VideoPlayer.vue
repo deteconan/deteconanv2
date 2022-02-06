@@ -190,8 +190,13 @@ export default {
     },
     methods: {
         onLoad() {
-            if (!this.isMobileLayout)
-                this.setVolume(10);
+            if (!this.isMobileLayout) {
+                const volume = localStorage.getItem('volume');
+                if (Number(volume))
+                    this.setVolume(volume);
+                else
+                    this.setVolume(10);
+            }
 
             if (this.$refs.video) {
                 this.duration = this.$refs.video.duration;
@@ -260,6 +265,7 @@ export default {
         setVolume(volume) {
             if (this.$refs.video) {
                 this.volume = volume;
+                localStorage.setItem('volume', volume);
                 this.$refs.video.volume = this.volume / 100;
                 this.muted = this.volume === 0;
             }
