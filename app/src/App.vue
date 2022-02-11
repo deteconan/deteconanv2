@@ -38,11 +38,24 @@ export default {
             this.$store.commit('updateLayout');
         });
 
+        this.$nextTick(() => {
+            document.querySelector('main').addEventListener('scroll', event => {
+                this.scrollOffset = event.target.scrollTop;
+            });
+        });
+
         this.$store.dispatch('loadGoogleAuthApi').then(() => this.$store.dispatch('getCurrentUser'));
         await this.$store.dispatch('loadFolders');
         await this.$store.dispatch('loadMovies');
         await this.$store.dispatch('loadGenres');
         await this.$store.dispatch('getTotalUsage');
+    },
+    watch: {
+        '$route.name'() {
+            this.$nextTick(() => {
+                this.scrollOffset = document.querySelector('main').scrollTop;
+            });
+        }
     }
 }
 </script>

@@ -34,7 +34,8 @@
                 return this.movies.filter(m => this.filterMovie(m));
             },
             filteredUpcomingMovies() {
-                return this.upcomingMovies.filter(m => this.filterMovie(m));
+                const excludeIds = this.downloadedMovies.map(m => +m.tmdbId);
+                return this.upcomingMovies.filter(m => this.filterMovie(m)).filter(m => !excludeIds.includes(m.tmdbId));
             },
             processingMovies() {
                 return this.filteredMovies.filter(m => !m.thumbnailLink).sort((a, b) => b.createdTime > a.createdTime ? 1 : -1);
