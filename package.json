@@ -2,7 +2,7 @@
   "name": "deteconan",
   "version": "0.0.0",
   "engines": {
-    "node": "16.x"
+    "node": "14.x"
   },
   "private": true,
   "type": "module",
